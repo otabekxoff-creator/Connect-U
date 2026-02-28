@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ConnectU — Kirish</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#040810;--s1:#080F1E;--s2:#0D1628;
+  --border:rgba(255,255,255,0.07);
+  --gold:#F0A500;--teal:#00BFA6;--red:#FF4D6A;--green:#22C55E;
+  --text:#EEF2FF;--text2:#6B7FA0;--text3:#2D3F5A;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:none;outline:none}
+
+body{
+  display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;
+  background:
+    radial-gradient(ellipse 60% 50% at 10% 60%, rgba(0,191,166,.06) 0%, transparent 100%),
+    radial-gradient(ellipse 50% 40% at 90% 20%, rgba(240,165,0,.05) 0%, transparent 100%),
+    var(--bg);
+}
+
+/* ── Loading ── */
+#loadingScreen{
+  position:fixed;inset:0;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:99;
+}
+#loadingScreen.gone{display:none}
+.spin{width:36px;height:36px;border-radius:50%;border:3px solid rgba(240,165,0,.15);border-top-color:var(--gold);animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin-sm{width:18px;height:18px;border-width:2px;animation:spin .7s linear infinite;border-radius:50%;border:2px solid rgba(255,255,255,.2);border-top-color:white;display:inline-block;vertical-align:middle}
+
+/* ── Wrap ── */
+.wrap{width:100%;max-width:400px}
+
+/* ── Logo ── */
+.logo{text-align:center;margin-bottom:28px}
+.logo-name{font-size:28px;font-weight:800;letter-spacing:-1px;color:var(--text)}
+.logo-name em{color:var(--gold);font-style:normal}
+.logo-tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--text3);text-transform:uppercase;margin-top:5px}
+
+/* ── Card ── */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:18px;padding:26px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,191,166,.03) 0%,transparent 60%);pointer-events:none}
+
+/* ── Session warn ── */
+.s-warn{
+  background:rgba(255,77,106,.07);border:1px solid rgba(255,77,106,.18);
+  border-radius:10px;padding:12px 14px;margin-bottom:16px;
+  font-size:12px;color:#FF8095;display:none;line-height:1.5;
+}
+.s-warn.show{display:block}
+.s-warn strong{color:var(--red)}
+
+/* ── Telegram auto state (inside WebApp) ── */
+#tgState{display:none;text-align:center;padding:8px 0 16px}
+.tg-av{
+  width:62px;height:62px;border-radius:50%;
+  background:linear-gradient(135deg,#0088cc,#00BFA6);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;font-weight:800;margin:0 auto 12px;
+}
+.tg-name{font-size:17px;font-weight:700;margin-bottom:3px}
+.tg-sub{font-size:12px;color:var(--text2);margin-bottom:18px}
+
+/* ── Tabs ── */
+.tabs{display:flex;gap:3px;background:var(--s2);border-radius:10px;padding:3px;margin-bottom:20px}
+.tab{flex:1;padding:9px 6px;border-radius:8px;font-size:12px;font-weight:600;color:var(--text2);background:none;transition:all .2s;text-align:center}
+.tab.on{background:var(--s1);color:var(--text);box-shadow:0 1px 6px rgba(0,0,0,.4)}
+
+/* ── Deep Link ── */
+.dl-body{text-align:center;padding:4px 0}
+.dl-ico{font-size:36px;margin-bottom:10px}
+.dl-title{font-size:15px;font-weight:700;margin-bottom:6px}
+.dl-hint{font-size:12px;color:var(--text2);margin-bottom:20px;line-height:1.6}
+.btn-tg{
+  width:100%;padding:13px;border-radius:10px;
+  background:linear-gradient(135deg,#0088cc,#2AABEE);
+  color:white;font-size:14px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  transition:all .2s;
+}
+.btn-tg:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,136,204,.3)}
+.btn-tg:active{transform:scale(.98)}
+.btn-tg:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+.waiting{
+  margin-top:14px;background:var(--s2);border:1px solid var(--border);
+  border-radius:10px;padding:14px;text-align:center;display:none;
+}
+.waiting.show{display:block}
+.waiting p{font-size:12px;color:var(--text2);margin-top:8px;line-height:1.5}
+.waiting strong{color:var(--teal)}
+.cancel-lnk{color:var(--text2);font-size:11px;text-decoration:underline;background:none;margin-top:8px;display:inline-block}
+
+/* ── QR ── */
+.qr-body{text-align:center;padding:4px 0}
+.qr-frame{
+  background:white;border-radius:12px;padding:14px;display:inline-block;
+  margin-bottom:12px;position:relative;
+}
+.qr-frame img,.qr-frame canvas{display:block;border-radius:4px}
+.qr-overlay{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:white;border-radius:8px;padding:3px;
+  font-size:14px;font-weight:800;color:var(--bg);line-height:1;
+}
+.qr-hint{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px}
+.qr-hint strong{color:var(--teal)}
+.qr-pulse{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:12px;font-weight:600;color:var(--teal);
+  background:rgba(0,191,166,.08);border:1px solid rgba(0,191,166,.2);
+  border-radius:8px;padding:8px 12px;
+}
+.pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:p 1.4s ease-in-out infinite}
+@keyframes p{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.7)}}
+
+/* ── Success ── */
+#successState{display:none;text-align:center;padding:12px 0}
+#successState.show{display:block}
+.s-icon{font-size:44px;margin-bottom:10px}
+.s-name{font-size:18px;font-weight:700;margin-bottom:4px}
+.s-role{font-size:12px;font-weight:600;color:var(--teal);letter-spacing:1px;text-transform:uppercase}
+
+/* ── Admin link ── */
+.admin-link{text-align:center;margin-top:18px;font-size:12px;color:var(--text2)}
+.admin-link a{color:var(--gold);font-weight:600;text-decoration:none}
+.admin-link a:hover{text-decoration:underline}
+
+/* ── Toast ── */
+#toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:#1a2a4a;color:var(--red);
+  padding:11px 18px;border-radius:12px;font-size:13px;font-weight:600;
+  z-index:999;border:1px solid rgba(255,77,106,.25);
+  white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none;
+}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div id="loadingScreen">
+  <div class="spin"></div>
+  <div style="font-size:13px;color:var(--text2)">Tekshirilmoqda...</div>
+</div>
+
+<div id="toast"></div>
+
+<div class="wrap" id="mainWrap">
+  <div class="logo">
+    <div class="logo-name">Connect<em>-U</em></div>
+    <div class="logo-tag">Platform</div>
+  </div>
+
+  <div class="card">
+
+    <div class="s-warn" id="sWarn">
+      ⚠ <strong>Diqqat:</strong> Bu akkaunt boshqa qurilmada ochiq edi. Eski sessiya tugatildi.
+    </div>
+
+    <div id="tgState">
+      <div class="tg-av" id="tgAv">T</div>
+      <div class="tg-name" id="tgName">Yuklanmoqda...</div>
+      <div class="tg-sub">Telegram orqali kirish</div>
+      <div class="spin" style="margin:0 auto"></div>
+    </div>
+
+    <div id="browserState" style="display:none">
+      <div class="tabs">
+        <button class="tab on" id="tabDL" onclick="setTab('dl')">📱 Telegram</button>
+        <button class="tab" id="tabQR" onclick="setTab('qr')">📷 QR Kod</button>
+      </div>
+
+      <div id="panelDL">
+        <div class="dl-body">
+          <div class="dl-ico">🔐</div>
+          <div class="dl-title">Telegram orqali kiring</div>
+          <div class="dl-hint">Telegramdagi botimizni bir marta bosib tasdiqlang.<br>Parol yoki SMS kerak emas.</div>
+          <button class="btn-tg" id="btnDL" onclick="startDeepLink()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-2.04 9.61c-.15.666-.543.832-1.1.517l-3.033-2.234-1.464 1.41c-.162.162-.298.298-.61.298l.217-3.09 5.622-5.08c.244-.217-.054-.338-.378-.12L7.25 14.18l-3.005-.938c-.652-.204-.666-.652.136-.967l11.734-4.526c.544-.197 1.02.133.447.499z"/></svg>
+            Telegram orqali kirish
+          </button>
+          <div class="waiting" id="waiting">
+            <div class="spin-sm"></div>
+            <p>Bot javobini kutilmoqda...<br><strong id="waitHint">Telegramni oching va tasdiqlang</strong></p>
+            <button class="cancel-lnk" onclick="cancelPoll()">Bekor qilish</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="panelQR" style="display:none">
+        <div class="qr-body">
+          <div class="qr-frame">
+            <div id="qrContainer" style="position:relative; width:176px; height:176px; margin:0 auto;">
+              <div id="qrLoading" style="position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#f5f5f5; border-radius:4px; z-index:2;">
+                <div class="spin-sm"></div>
+              </div>
+              <img id="qrImg" width="176" height="176" alt="QR" src="" style="display:none; position:relative; z-index:1; border-radius:4px;">
+              <div class="qr-overlay" style="position:absolute; bottom:5px; right:5px; background:white; color:#040810; padding:2px 6px; border-radius:4px; font-weight:bold; font-size:12px; z-index:3;">C-U</div>
+            </div>
+          </div>
+          <div class="qr-hint">Telefon kamerasidan oddiy <strong>📷 skaner qiling</strong></div>
+          <div class="qr-pulse">
+            <div class="pulse-dot"></div>
+            <span id="qrStatus">QR kod tayyorlanmoqda...</span>
+          </div>
+          <button class="cancel-lnk" onclick="cancelQR()" style="margin-top:15px;">❌ Bekor qilish</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="successState">
+      <div class="s-icon">✅</div>
+      <div class="s-name" id="sName">Xush kelibsiz!</div>
+      <div class="s-role" id="sRole"></div>
+    </div>
+
+  </div>
+
+  <div class="admin-link">
+    Admin kirishi: <a href="admin_login.html">Admin panel →</a>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let pollTimer = null;
+let currentToken = null;
+let activeTab = 'dl';
+
+// ══════════════════════════════════════════
+// INIT & NATIVE APP SCANNER MODE
+// ══════════════════════════════════════════
+window.addEventListener('load', async function() {
+  const tg = window.Telegram?.WebApp;
+  const urlParams = new URLSearchParams(window.location.search);
+
+  // MAXSUS QISM: Agar botdagi Skanerlash tugmasi orqali kirilsa
+  if (urlParams.get('mode') === 'scan' && tg) {
+    tg.ready();
+    tg.expand();
+    
+    // Ekranni tozalab kamerani ochish
+    document.getElementById('mainWrap').style.display = 'none';
+    document.getElementById('loadingScreen').innerHTML = '<div class="spin"></div><div style="font-size:14px;color:var(--text2);margin-top:15px;">Kamera ochilmoqda...</div>';
+    show('loadingScreen');
+
+    tg.showScanQrPopup({text: "Saytdagi QR kodni skanerlang"}, function(qrText) {
+      if(qrText && qrText.includes('start=qr_')) {
+        // Kod to'g'ri bo'lsa darhol Telegram havolaga yo'naltiramiz, bu avtomatik ravishda botni ochadi va tasdiqlaydi.
+        tg.openTelegramLink(qrText);
+        tg.close();
+      } else {
+        alert("Noto'g'ri QR kod skanerlandi!");
+        tg.close();
+      }
+      return true; // pop-up ni yopish uchun
+    });
+    return; // Pastdagi kodlar ishlamasligi uchun to'xtatamiz
+  }
+
+  // 1. Telegram WebApp ichida — initData bilan avtomatik login
+  if (tg && tg.initData && tg.initDataUnsafe?.user) {
+    tg.ready();
+    tg.expand();
+    showTgState(tg.initDataUnsafe.user);
+    await doTgLogin(tg.initData);
+    return;
+  }
+
+  // 2. Backend session tekshiruvi
+  try {
+    const r = await fetch('/api/me', { credentials: 'include' });
+    const d = await r.json();
+    if (d.success) {
+      if (['admin', 'superadmin'].includes(d.user?.role)) {
+        window.location.href = 'admin_login.html';
+        return;
+      }
+      showSuccess(d.user);
+      setTimeout(function() { redirect(d.user); }, 800);
+      return;
+    }
+  } catch(e) {
+    console.log('Session tekshiruv xatosi:', e);
+  }
+
+  // 3. Ko'rsatish
+  hide('loadingScreen');
+  show('browserState');
+});
+
+// ══════════════════════════════════════════
+// TELEGRAM WEBAPP LOGIN
+// ══════════════════════════════════════════
+function showTgState(u) {
+  hide('loadingScreen');
+  show('tgState');
+  const name = [u.first_name, u.last_name].filter(Boolean).join(' ');
+  el('tgName').textContent = name || 'Foydalanuvchi';
+  el('tgAv').textContent = (name || 'T')[0].toUpperCase();
+}
+
+async function doTgLogin(initData) {
+  try {
+    const r = await fetch('/api/telegram-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ initData }),
+      credentials: 'include'
+    });
+    const d = await r.json();
+    if (d.success) {
+      if (d.session_replaced) showWarn();
+      showSuccess(d.user);
+      setTimeout(function() { redirect(d.user); }, 1000);
+    } else {
+      hide('tgState');
+      show('browserState');
+      toast(d.error || 'Telegram login xatosi');
+    }
+  } catch(e) {
+    hide('tgState');
+    show('browserState');
+    toast('Server bilan bog\'lanib bo\'lmadi');
+  }
+}
+
+// ══════════════════════════════════════════
+// DEEP LINK (Variant A) - BaxaSaveBot
+// ══════════════════════════════════════════
+async function startDeepLink() {
+  const btn = el('btnDL');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spin-sm"></div> Yuklanmoqda...';
+
+  try {
+    const r = await fetch('/api/auth/token', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      credentials: 'include'
+    });
+    const d = await r.json();
+    if (!d.success) throw new Error(d.error || 'Token xatosi');
+
+    currentToken = d.token;
+    const link = `https://t.me/BaxaSaveBot?start=dl_${currentToken}`;
+    window.open(link, '_blank');
+
+    showWaiting();
+    startPoll(currentToken);
+  } catch(e) {
+    toast(e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248-2.04 9.61c-.15.666-.543.832-1.1.517l-3.033-2.234-1.464 1.41c-.162.162-.298.298-.61.298l.217-3.09 5.622-5.08c.244-.217-.054-.338-.378-.12L7.25 14.18l-3.005-.938c-.652-.204-.666-.652.136-.967l11.734-4.526c.544-.197 1.02.133.447.499z"/></svg> Telegram orqali kirish`;
+  }
+}
+
+// ══════════════════════════════════════════
+// QR LOGIN (Variant B) - BaxaSaveBot
+// ══════════════════════════════════════════
+async function initQR() {
+  const qrImg = document.getElementById('qrImg');
+  const qrLoading = document.getElementById('qrLoading');
+  const qrStatus = document.getElementById('qrStatus');
+  
+  qrStatus.textContent = 'QR yaratilmoqda...';
+  qrImg.style.display = 'none';
+  qrLoading.style.display = 'flex';
+  
+  try {
+    const response = await fetch('/api/auth/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source: 'qr' }),
+      credentials: 'include'
+    });
+    
+    const data = await response.json();
+    if (!data.success) throw new Error(data.error || 'Token olinmadi');
+    
+    currentToken = data.token;
+    
+    const deepLink = `https://t.me/BaxaSaveBot?start=qr_${currentToken}`;
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=176x176&data=${encodeURIComponent(deepLink)}&bgcolor=ffffff&color=040810&margin=2`;
+    
+    qrImg.src = qrCodeUrl;
+    qrImg.onload = function() {
+      qrImg.style.display = 'block';
+      qrLoading.style.display = 'none';
+      qrStatus.textContent = '📷 Skanlanishini kutmoqda...';
+    };
+    qrImg.onerror = function() {
+      qrStatus.innerHTML = 'QR yuklanmadi. <button onclick="initQR()">Qayta urinish</button>';
+      qrLoading.style.display = 'none';
+    };
+
+    startPoll(currentToken, 'qr');
+    
+  } catch (error) {
+    qrStatus.textContent = 'Xatolik: ' + error.message;
+    qrLoading.style.display = 'none';
+  }
+}
+
+function cancelQR() {
+  clearInterval(pollTimer);
+  currentToken = null;
+  
+  const qrImg = document.getElementById('qrImg');
+  const qrLoading = document.getElementById('qrLoading');
+  const qrStatus = document.getElementById('qrStatus');
+  
+  qrImg.style.display = 'none';
+  qrLoading.style.display = 'flex';
+  qrStatus.textContent = 'QR kod tayyorlanmoqda...';
+}
+
+// ══════════════════════════════════════════
+// POLLING VA AVTOMATIK KIRITISH (Visibility API)
+// ══════════════════════════════════════════
+function startPoll(token) {
+  clearInterval(pollTimer);
+  pollTimer = setInterval(async function() {
+    await checkTokenInstant(token);
+  }, 2000);
+}
+
+function cancelPoll() {
+  clearInterval(pollTimer);
+  hideWaiting();
+  currentToken = null;
+}
+
+// Tokenni backenddan tekshirish logikasi
+async function checkTokenInstant(token) {
+  if (!token) return;
+  try {
+    const r = await fetch(`/api/auth/check?token=${token}`, { credentials: 'include' });
+    const d = await r.json();
+    if (d.success && d.user) {
+      clearInterval(pollTimer);
+      if (d.session_replaced) showWarn();
+      hideWaiting();
+      showSuccess(d.user);
+      setTimeout(function() { redirect(d.user); }, 500); // Darhol yo'naltirish
+    } else if (d.expired) {
+      clearInterval(pollTimer);
+      el('qrStatus') && (el('qrStatus').textContent = 'Muddati o\'tdi. Yangilang.');
+      hideWaiting();
+      toast('Token muddati o\'tdi');
+    }
+  } catch(e) { console.log('Polling xatosi:', e); }
+}
+
+// Foydalanuvchi Telegramdan brauzerga qaytganini taniyotgan sensor
+document.addEventListener("visibilitychange", function() {
+  if (!document.hidden && currentToken) {
+    checkTokenInstant(currentToken); // Qaytganda soniyaning ulushida tekshiradi
+  }
+});
+window.addEventListener("focus", function() {
+  if (currentToken) {
+    checkTokenInstant(currentToken);
+  }
+});
+
+// ══════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════
+function setTab(t) {
+  activeTab = t;
+  el('tabDL').classList.toggle('on', t === 'dl');
+  el('tabQR').classList.toggle('on', t === 'qr');
+  el('panelDL').style.display = t === 'dl' ? 'block' : 'none';
+  el('panelQR').style.display = t === 'qr' ? 'block' : 'none';
+  if (t === 'qr' && !currentToken) initQR();
+}
+
+// ══════════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════════
+function showSuccess(user) {
+  hide('tgState'); hide('browserState'); hide('loadingScreen');
+  const s = el('successState');
+  s.classList.add('show');
+  const name = (user.full_name || 'Foydalanuvchi').split(' ')[0];
+  el('sName').textContent = '👋 Salom, ' + name + '!';
+  const roles = {student:'Abituriyent', mentor:'Mentor', admin:'Admin', superadmin:'Superadmin'};
+  el('sRole').textContent = roles[user.role] || user.role;
+}
+
+function showWarn() {
+  el('sWarn').classList.add('show');
+}
+
+function showWaiting() { el('waiting').classList.add('show'); }
+function hideWaiting() { el('waiting').classList.remove('show'); }
+
+function redirect(user) {
+  const pages = {student:'abuturyent.html', mentor:'mentor.html', admin:'admin.html', superadmin:'admin.html'};
+  window.location.href = pages[user.role] || 'abuturyent.html';
+}
+
+function toast(msg) {
+  const t = el('toast');
+  t.textContent = '⚠ ' + msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 3500);
+}
+
+function hide(id) { 
+  const e = el(id); 
+  if(e) e.style.display = 'none'; 
+}
+
+function show(id) { 
+  const e = el(id); 
+  if(e) e.style.display = 'block'; 
+}
+
+function el(id) { 
+  return document.getElementById(id); 
+}
+</script>
+</body>
+</html>

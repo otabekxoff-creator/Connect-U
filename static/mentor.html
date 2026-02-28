@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ConnectU — Mentor Panel</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#070D1A;--s1:#0D1625;--s2:#132038;--s3:#1A2A4A;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --gold:#F0A500;--gold-d:rgba(240,165,0,0.12);
+  --teal:#00BFA6;--teal-d:rgba(0,191,166,0.1);
+  --purple:#7C5CFC;--red:#FF4D6A;--green:#22C55E;
+  --text:#EEF2FF;--text2:#7A8BA8;--text3:#3D4F6A;
+  --r:14px;--r-sm:10px;--nav-h:64px;--safe:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;-webkit-font-smoothing:antialiased}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+button{font-family:inherit;cursor:pointer}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:0;height:0}
+img{display:block;object-fit:cover}
+
+/* SHELL */
+.shell{display:flex;flex-direction:column;min-height:100vh}
+
+/* HEADER */
+.hdr{
+  position:sticky;top:0;z-index:100;
+  background:rgba(7,13,26,0.92);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  height:var(--nav-h);padding:0 18px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.hdr-logo{font-size:17px;font-weight:800;letter-spacing:0.5px;white-space:nowrap}
+.hdr-logo span{color:var(--gold)}
+.hdr-badge{
+  display:flex;align-items:center;gap:6px;
+  background:var(--gold-d);border:1px solid rgba(240,165,0,0.25);
+  padding:5px 12px;border-radius:20px;
+  font-size:12px;font-weight:600;color:var(--gold);
+  font-family:'JetBrains Mono',monospace;
+}
+.hdr-badge .dot{width:6px;height:6px;background:var(--teal);border-radius:50%;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* CONTENT */
+.content{flex:1;padding-bottom:calc(var(--nav-h)+16px+var(--safe));overflow-y:auto}
+
+/* BOTTOM NAV */
+.nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:rgba(7,13,26,0.96);backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  display:flex;height:calc(var(--nav-h)+var(--safe));
+  padding-bottom:var(--safe);
+}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;background:none;color:var(--text3);transition:color .2s;padding:8px 4px;position:relative}
+.ni.active{color:var(--gold)}
+.ni-label{font-size:10px;font-weight:600;letter-spacing:.3px}
+.ni-badge{position:absolute;top:6px;right:calc(50% - 18px);background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:10px;min-width:16px;text-align:center;display:none}
+
+/* PAGES */
+.page{display:none;animation:fadeUp .2s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* TYPOGRAPHY */
+.ph{padding:20px 18px 14px}
+.pt{font-size:22px;font-weight:800;margin-bottom:3px}
+.ps{font-size:13px;color:var(--text2)}
+.mono{font-family:'JetBrains Mono',monospace}
+.label{font-size:10px;font-weight:600;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:8px;display:block}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border-radius:var(--r-sm);font-family:inherit;font-size:14px;font-weight:600;border:none;transition:all .18s;width:100%}
+.btn-gold{background:var(--gold);color:#070D1A}
+.btn-gold:active{background:#FFB830;transform:scale(0.98)}
+.btn-teal{background:var(--teal);color:#070D1A}
+.btn-surface{background:var(--s2);color:var(--text);border:1px solid var(--border2)}
+.btn-ghost{background:transparent;border:1.5px solid var(--border2);color:var(--text2)}
+.btn-ghost:active{border-color:var(--gold);color:var(--gold)}
+.btn-red{background:rgba(255,77,106,.12);color:var(--red);border:1px solid rgba(255,77,106,.25)}
+.btn-sm{padding:8px 14px;font-size:13px;border-radius:8px;width:auto;display:inline-flex}
+.btn-purple{background:rgba(124,92,252,.15);color:var(--purple);border:1px solid rgba(124,92,252,.3)}
+
+/* DIVIDER */
+.div{height:1px;background:var(--border);margin:0 18px}
+.gap{height:20px}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.b-gold{background:var(--gold-d);color:var(--gold);border:1px solid rgba(240,165,0,.2)}
+.b-teal{background:var(--teal-d);color:var(--teal)}
+.b-red{background:rgba(255,77,106,.1);color:var(--red)}
+.b-gray{background:rgba(255,255,255,.06);color:var(--text2)}
+.b-green{background:rgba(34,197,94,.1);color:var(--green)}
+.b-purple{background:rgba(124,92,252,.1);color:var(--purple)}
+
+/* ── HOME ── */
+.balance-card{
+  margin:16px 18px;border-radius:20px;
+  background:linear-gradient(135deg,#0D2040,#162A50);
+  border:1px solid rgba(240,165,0,0.2);
+  padding:24px 20px;position:relative;overflow:hidden;
+}
+.balance-card::before{content:'';position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(240,165,0,0.12),transparent 70%)}
+.balance-card::after{content:'';position:absolute;bottom:-40px;left:-20px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(0,191,166,0.08),transparent 70%)}
+.bc-label{font-size:11px;color:rgba(255,255,255,.5);margin-bottom:6px;font-weight:500;letter-spacing:1px}
+.bc-amount{font-size:38px;font-weight:800;color:var(--gold);line-height:1;margin-bottom:4px;position:relative;z-index:1}
+.bc-sub{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:20px}
+.sparkline{display:flex;align-items:flex-end;gap:4px;height:40px;margin-bottom:20px;position:relative;z-index:1}
+.sp-bar{flex:1;border-radius:3px 3px 0 0;background:rgba(240,165,0,0.2)}
+.sp-bar.active{background:var(--gold)}
+.bc-actions{display:flex;gap:10px;position:relative;z-index:1}
+.bc-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;border-radius:10px;font-size:13px;font-weight:600;border:none;transition:all .2s;cursor:pointer}
+.bc-btn-withdraw{background:var(--gold);color:#070D1A}
+.bc-btn-history{background:rgba(255,255,255,.08);border:1px solid var(--border2);color:var(--text2)}
+
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 18px 16px}
+.stat-box{background:var(--s1);border:1px solid var(--border);border-radius:var(--r-sm);padding:13px 10px;text-align:center}
+.sb-val{font-size:20px;font-weight:800;color:var(--gold);line-height:1;margin-bottom:3px}
+.sb-lbl{font-size:10px;color:var(--text2);line-height:1.3}
+
+/* Section row */
+.sr{display:flex;justify-content:space-between;align-items:center;padding:0 18px;margin-bottom:12px}
+.sr-t{font-size:16px;font-weight:700}
+.sr-a{font-size:13px;color:var(--gold);cursor:pointer;background:none;border:none;font-family:inherit;padding:4px 0}
+
+/* Session items */
+.session-item{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start}
+.session-item:last-child{border-bottom:none}
+.si-avatar{width:44px;height:44px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff}
+.si-info{flex:1;min-width:0}
+.si-name{font-size:14px;font-weight:600;margin-bottom:2px}
+.si-meta{font-size:12px;color:var(--text2);margin-bottom:6px}
+.si-tags{display:flex;gap:6px;flex-wrap:wrap}
+.si-right{text-align:right;flex-shrink:0}
+.si-time{font-size:12px;color:var(--text2);margin-bottom:4px}
+.si-points{font-size:13px;font-weight:700;color:var(--teal)}
+
+/* ── PROFILE ── */
+.profile-cover{width:100%;height:140px;position:relative;background:linear-gradient(135deg,#0D1F3C,#1A3060);cursor:pointer}
+.profile-cover-edit{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);padding:7px 13px;border-radius:20px;font-size:12px;font-weight:600;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:5px;cursor:pointer}
+.profile-avatar-wrap{padding:0 18px;margin-top:-40px;position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
+.p-avatar{width:80px;height:80px;border-radius:50%;border:3px solid var(--bg);overflow:hidden;background:linear-gradient(135deg,var(--gold),var(--teal));display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:#070D1A;position:relative;cursor:pointer;flex-shrink:0}
+.p-avatar img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.p-avatar-overlay{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
+.p-avatar:active .p-avatar-overlay{opacity:1}
+.p-name{font-size:20px;font-weight:800;margin-bottom:3px}
+.p-sub{font-size:13px;color:var(--gold);font-family:'JetBrains Mono',monospace;margin-bottom:8px}
+
+/* Verification banners */
+.verify-banner{margin:0 18px 16px;border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px}
+.vb-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.vb-text h4{font-size:14px;font-weight:600;margin-bottom:2px}
+.vb-text p{font-size:12px;color:var(--text2)}
+.vb-action{margin-left:auto;font-size:12px;font-weight:600;color:var(--purple);white-space:nowrap;cursor:pointer;background:none;border:none;font-family:inherit}
+
+/* Info list */
+.info-list{margin:0 18px 16px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.il-row{display:flex;justify-content:space-between;align-items:center;padding:13px 15px;border-bottom:1px solid var(--border)}
+.il-row:last-child{border-bottom:none}
+.il-label{font-size:13px;color:var(--text2)}
+.il-val{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.il-edit{color:var(--gold);font-size:12px;cursor:pointer;background:none;border:none;padding:2px 6px;border-radius:6px}
+
+/* Edit form */
+.edit-form{margin:0 18px 16px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.ef-field{margin-bottom:14px}
+.ef-label{font-size:12px;color:var(--text2);margin-bottom:6px;display:block;font-weight:500}
+.ef-input{width:100%;padding:12px 14px;background:var(--s2);border:1.5px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:inherit;font-size:14px;outline:none;transition:border-color .2s}
+.ef-input:focus{border-color:var(--gold)}
+.ef-textarea{min-height:90px;resize:vertical}
+.ef-btns{display:flex;gap:10px}
+
+/* Card display */
+.card-display{background:linear-gradient(135deg,#1A2A4A,#0D1A30);border:1px solid var(--border2);border-radius:16px;padding:20px;position:relative;overflow:hidden;margin:0 18px 16px}
+.cd-chip{width:36px;height:26px;border-radius:5px;background:linear-gradient(135deg,#F0A500,#FFD166);margin-bottom:16px}
+.cd-number{font-family:'JetBrains Mono',monospace;font-size:17px;letter-spacing:3px;margin-bottom:10px}
+.cd-bottom{display:flex;justify-content:space-between;align-items:flex-end}
+.cd-holder{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px}
+.cd-logo{font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace}
+
+/* ── CERTIFICATES ── */
+.cert-card{margin:0 18px 10px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:15px;display:flex;gap:12px;align-items:flex-start}
+.cert-icon{width:48px;height:48px;border-radius:10px;flex-shrink:0;background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.2);display:flex;align-items:center;justify-content:center}
+.cert-info{flex:1;min-width:0}
+.cert-title{font-size:14px;font-weight:600;margin-bottom:2px}
+.cert-issuer{font-size:12px;color:var(--text2);margin-bottom:6px}
+.cert-actions{display:flex;gap:8px}
+
+/* Upload zone */
+.upload-zone{margin:0 18px 16px;border:2px dashed var(--border2);border-radius:var(--r);padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--s1)}
+.upload-zone:active{border-color:var(--gold);background:var(--gold-d)}
+.uz-icon{margin:0 auto 10px;width:44px;height:44px;background:var(--s2);border-radius:12px;display:flex;align-items:center;justify-content:center}
+.uz-title{font-size:14px;font-weight:600;margin-bottom:4px}
+.uz-sub{font-size:12px;color:var(--text2)}
+
+/* ── EARNINGS ── */
+.earnings-summary{margin:16px 18px;background:linear-gradient(135deg,#0A1F15,#0D2A1E);border:1px solid rgba(0,191,166,.2);border-radius:20px;padding:20px}
+.es-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.es-box{text-align:center}
+.es-val{font-size:24px;font-weight:800;margin-bottom:3px}
+.es-lbl{font-size:11px;color:var(--text2)}
+.point-item{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.point-item:last-child{border-bottom:none}
+.pi-left h4{font-size:14px;font-weight:600;margin-bottom:2px}
+.pi-left p{font-size:12px;color:var(--text2)}
+.pi-amount{font-size:15px;font-weight:700}
+.pi-plus{color:var(--teal)}
+.pi-minus{color:var(--red)}
+
+/* ── SESSIONS FILTERS ── */
+.sess-filters{display:flex;gap:8px;overflow-x:auto;padding:0 18px 12px;scrollbar-width:none}
+.sess-filters::-webkit-scrollbar{display:none}
+.sf-chip{flex-shrink:0;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:500;background:var(--s1);border:1.5px solid var(--border);color:var(--text2);transition:all .18s;cursor:pointer}
+.sf-chip.active{background:var(--gold-d);border-color:var(--gold);color:var(--gold)}
+
+/* ── MODAL ── */
+.modal{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:flex-end}
+.modal.open{display:flex}
+.modal-sheet{width:100%;background:var(--s1);border-radius:20px 20px 0 0;border-top:1px solid var(--border);padding:0 18px calc(28px + var(--safe));animation:sheetUp .3s cubic-bezier(.23,1,.32,1);max-height:92vh;overflow-y:auto}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:14px auto 18px}
+.modal-title{font-size:18px;font-weight:800;margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--text2);margin-bottom:20px}
+.modal-btns{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+
+/* ── SPINNER ── */
+.spinner{width:30px;height:30px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── LOADING SCREEN ── */
+#loadingScreen{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+#loadingScreen .logo{font-size:28px;font-weight:800;color:var(--text)}
+#loadingScreen .logo span{color:var(--gold)}
+
+/* ── EMPTY STATE ── */
+.empty-state{padding:32px 20px;text-align:center;color:var(--text2);font-size:14px}
+.empty-state svg{margin:0 auto 12px;opacity:.4}
+
+/* ── NOTIFICATION DOT ── */
+.notify-dot{width:8px;height:8px;background:var(--red);border-radius:50%;display:inline-block;margin-left:4px;vertical-align:middle}
+
+/* ── DESKTOP ── */
+@media(min-width:768px){
+  body{background:#04080F}
+  .shell{max-width:1100px;margin:0 auto;flex-direction:row}
+  .hdr{display:none}
+  .nav{position:fixed;left:0;top:0;bottom:0;width:220px;height:100vh;flex-direction:column;justify-content:flex-start;border-right:1px solid var(--border);border-top:none;background:var(--bg);padding:0}
+  .nav::before{content:'ConnectU';display:flex;align-items:center;height:64px;padding:0 22px;font-size:16px;font-weight:800;border-bottom:1px solid var(--border)}
+  .ni{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;padding:12px 22px;border-radius:0;width:100%;font-size:14px}
+  .ni-label{font-size:14px;font-weight:600}
+  .ni.active{background:var(--gold-d);color:var(--gold)}
+  .content{margin-left:220px;flex:1}
+  .ni-badge{right:auto;left:32px;top:8px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loadingScreen">
+  <div class="spinner" style="width:40px;height:40px"></div>
+  <div style="font-size:13px;color:var(--text2)">Yuklanmoqda...</div>
+</div>
+
+<div class="shell" id="appShell" style="display:none">
+
+<!-- HEADER (mobile) -->
+<div class="hdr">
+  <div class="hdr-logo">Connect<span>-U</span></div>
+  <div class="hdr-badge">
+    <div class="dot"></div>
+    MENTOR
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- HOME -->
+  <div class="page active" id="pg-home">
+
+    <!-- Home verification warning (3 kunlik ogohlantirish) -->
+    <div id="homeVerifyBanner" style="display:none;margin:12px 18px 0;border-radius:var(--r);padding:12px 16px;display:none;align-items:center;gap:12px;cursor:pointer" onclick="showPage('certs')">
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700" id="hvbTitle">⚠️ Verifikatsiya talab qilinadi</div>
+        <div style="font-size:12px;margin-top:2px" id="hvbMsg">Guvohnomangizni yuklang</div>
+      </div>
+      <div style="font-size:12px;font-weight:600;white-space:nowrap">Yuklash →</div>
+    </div>
+
+    <div class="balance-card">
+      <div class="bc-label">JORIY BALANS</div>
+      <div class="bc-amount" id="balanceAmount">0 so'm</div>
+      <div class="bc-sub" id="balancePending">Kutilmoqda: 0 so'm</div>
+      <div class="sparkline" id="sparkline"></div>
+      <div class="bc-actions">
+        <button class="bc-btn bc-btn-withdraw" onclick="openWithdrawModal()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 7l-5-5-5 5M7 17l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          Pul yechish
+        </button>
+        <button class="bc-btn bc-btn-history" onclick="showPage('earnings')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Tarix
+        </button>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="sb-val" id="kpiSessions">0</div>
+        <div class="sb-lbl">Sessiyalar</div>
+      </div>
+      <div class="stat-box">
+        <div class="sb-val" id="kpiRating">5.0★</div>
+        <div class="sb-lbl">Reyting</div>
+      </div>
+      <div class="stat-box">
+        <div class="sb-val" id="kpiStudents">0</div>
+        <div class="sb-lbl">Talabalar</div>
+      </div>
+    </div>
+
+    <div class="sr">
+      <div class="sr-t">Yaqinlashgan sessiyalar</div>
+      <button class="sr-a" onclick="showPage('sessions')">Hammasi →</button>
+    </div>
+    <div class="card" style="margin:0 18px 16px"><div id="upcomingSessions"></div></div>
+
+    <div class="sr">
+      <div class="sr-t">Yangi so'rovlar</div>
+      <span id="reqBadge" style="font-size:13px;color:var(--red);font-weight:600"></span>
+    </div>
+    <div class="card" style="margin:0 18px 16px"><div id="pendingRequests"></div></div>
+    <div class="gap"></div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="page" id="pg-profile">
+
+    <!-- Verification banners -->
+    <div id="bannerPending" class="verify-banner" style="background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.3);display:none">
+      <div class="vb-icon" style="background:rgba(240,165,0,.15)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <div class="vb-text">
+        <h4 id="bannerTitle">Verifikatsiya talab qilinadi</h4>
+        <p id="bannerMsg">3 kun ichida guvohnomangizni yuklang</p>
+      </div>
+      <button class="vb-action" onclick="showPage('certs')">Yuklash →</button>
+    </div>
+
+    <div id="bannerVerified" class="verify-banner" style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);display:none">
+      <div class="vb-icon" style="background:rgba(34,197,94,.15)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="12" r="10" stroke="var(--green)" stroke-width="1.8"/></svg>
+      </div>
+      <div class="vb-text">
+        <h4 style="color:var(--green)">✓ Profil tasdiqlangan</h4>
+        <p>Mentorlar ro'yxatida ko'rinasiz</p>
+      </div>
+    </div>
+
+    <!-- Cover -->
+    <div class="profile-cover" id="profileCover" onclick="document.getElementById('coverInput').click()">
+      <div class="profile-cover-edit">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Cover
+      </div>
+    </div>
+    <input type="file" id="coverInput" accept="image/*" onchange="handleCover(this)" style="display:none">
+
+    <!-- Avatar + name -->
+    <div class="profile-avatar-wrap">
+      <div class="p-avatar" id="pAvatar" onclick="document.getElementById('avatarInput').click()">
+        <span id="pAvatarText">M</span>
+        <div class="p-avatar-overlay">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="white" stroke-width="1.8"/><circle cx="12" cy="13" r="4" stroke="white" stroke-width="1.8"/></svg>
+        </div>
+      </div>
+      <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatar(this)" style="display:none">
+      <div style="text-align:right">
+        <div class="p-name" id="pName">Mentor</div>
+        <div class="p-sub" id="pSub">@username</div>
+        <div id="pVerifyBadge"></div>
+      </div>
+    </div>
+
+    <!-- Info list -->
+    <div style="padding:0 18px;margin-bottom:8px"><span class="label">ASOSIY MA'LUMOTLAR</span></div>
+    <div class="info-list">
+      <div class="il-row">
+        <span class="il-label">To'liq ism</span>
+        <span class="il-val"><span id="ilName">—</span><button class="il-edit" onclick="openEditModal('name','To\'liq ism','text')">✏️</button></span>
+      </div>
+      <div class="il-row">
+        <span class="il-label">Universitet</span>
+        <span class="il-val"><span id="ilUni">—</span><button class="il-edit" onclick="openEditModal('university','Universitet','text')">✏️</button></span>
+      </div>
+      <div class="il-row">
+        <span class="il-label">Yo'nalish</span>
+        <span class="il-val"><span id="ilFaculty">—</span><button class="il-edit" onclick="openEditModal('faculty','Yo\'nalish','text')">✏️</button></span>
+      </div>
+      <div class="il-row">
+        <span class="il-label">Kurs</span>
+        <span class="il-val"><span id="ilYear">—</span><button class="il-edit" onclick="openEditModal('year','Kurs (1-6)','number')">✏️</button></span>
+      </div>
+      <div class="il-row">
+        <span class="il-label">GPA</span>
+        <span class="il-val"><span id="ilGpa">—</span><button class="il-edit" onclick="openEditModal('gpa','GPA (masalan: 3.85)','number')">✏️</button></span>
+      </div>
+    </div>
+
+    <!-- Bio -->
+    <div style="padding:0 18px;margin-bottom:8px"><span class="label">BIO</span></div>
+    <div class="edit-form">
+      <div class="ef-field">
+        <textarea class="ef-input ef-textarea" id="bioText" placeholder="O'zingiz haqingizda yozing..."></textarea>
+      </div>
+      <button class="btn btn-gold btn-sm" onclick="saveBio()">💾 Saqlash</button>
+    </div>
+
+    <!-- Card -->
+    <div style="padding:0 18px;margin-bottom:8px"><span class="label">TO'LOV KARTASI</span></div>
+    <div class="card-display">
+      <div class="cd-chip"></div>
+      <div class="cd-number" id="cdNumber">•••• •••• •••• ••••</div>
+      <div class="cd-bottom">
+        <div class="cd-holder" id="cdHolder">KARTA EGASI</div>
+        <div class="cd-logo">VISA / MC</div>
+      </div>
+    </div>
+    <div style="padding:0 18px;margin-bottom:16px">
+      <button class="btn btn-ghost" onclick="openModal('cardModal')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="1" y="4" width="22" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M1 10h22" stroke="currentColor" stroke-width="1.8"/></svg>
+        Karta ma'lumotlarini o'zgartirish
+      </button>
+    </div>
+
+    <div style="padding:0 18px;margin-bottom:24px">
+      <button class="btn btn-red" onclick="logout()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Chiqish
+      </button>
+    </div>
+    <div class="gap"></div>
+  </div>
+
+  <!-- CERTIFICATES -->
+  <div class="page" id="pg-certs">
+    <div class="ph">
+      <span class="label">HUJJATLAR</span>
+      <div class="pt">Sertifikatlar & CV</div>
+      <div class="ps">Abituriyentlar bu fayllarni ko'ra oladi</div>
+    </div>
+
+    <!-- Student ID -->
+    <div style="padding:0 18px;margin-bottom:8px"><span class="label">TALABA GUVOHNOMASI (MAJBURIY)</span></div>
+    <div id="studentIdZone" class="upload-zone" onclick="document.getElementById('studentIdInput').click()">
+      <div class="uz-icon" id="studentIdIcon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="var(--gold)" stroke-width="1.8"/><path d="M7 9h5M7 13h8M7 17h4" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </div>
+      <div class="uz-title" id="studentIdTitle">Talaba guvohnomasi</div>
+      <div class="uz-sub" id="studentIdSub">JPG, PNG yoki PDF · 5 MB gacha</div>
+      <div id="studentIdStatus" style="margin-top:8px;font-size:12px;font-weight:600"></div>
+    </div>
+    <input type="file" id="studentIdInput" accept="image/*,.pdf" onchange="uploadStudentId(this)" style="display:none">
+
+    <!-- CV -->
+    <div style="padding:0 18px;margin-bottom:8px"><span class="label">CV / REZYUME</span></div>
+    <div class="upload-zone" onclick="document.getElementById('cvInput').click()">
+      <div class="uz-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="var(--teal)" stroke-width="1.8"/><polyline points="14,2 14,8 20,8" stroke="var(--teal)" stroke-width="1.8"/></svg>
+      </div>
+      <div class="uz-title">CV yuklash</div>
+      <div class="uz-sub">PDF · 10 MB gacha</div>
+    </div>
+    <input type="file" id="cvInput" accept=".pdf,.doc,.docx" onchange="uploadCV(this)" style="display:none">
+
+    <!-- Certs list -->
+    <div class="sr" style="margin-top:4px">
+      <div class="sr-t">Sertifikatlar</div>
+      <button class="sr-a" onclick="openModal('certModal')">+ Qo'shish</button>
+    </div>
+    <div id="certsList"></div>
+    <div class="gap"></div>
+  </div>
+
+  <!-- EARNINGS -->
+  <div class="page" id="pg-earnings">
+    <div class="ph">
+      <span class="label">DAROMAD</span>
+      <div class="pt">Ballar & To'lovlar</div>
+    </div>
+    <div class="earnings-summary">
+      <div class="es-grid">
+        <div class="es-box">
+          <div class="es-val" style="color:var(--teal)" id="totalEarned">0</div>
+          <div class="es-lbl">Jami topilgan</div>
+        </div>
+        <div class="es-box">
+          <div class="es-val" style="color:var(--gold)" id="pendingPayout">0</div>
+          <div class="es-lbl">Mavjud balans</div>
+        </div>
+        <div class="es-box">
+          <div class="es-val" style="color:var(--green)" id="paidOut">0</div>
+          <div class="es-lbl">Olingan</div>
+        </div>
+        <div class="es-box">
+          <div class="es-val" id="sessCount">0</div>
+          <div class="es-lbl">Sessiya soni</div>
+        </div>
+      </div>
+      <button class="btn btn-teal btn-sm" onclick="openWithdrawModal()" style="width:100%">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 7l-5-5-5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        Pul yechish so'rovi
+      </button>
+    </div>
+    <div class="sr"><div class="sr-t">Tranzaksiyalar tarixi</div></div>
+    <div class="card" style="margin:0 18px 16px"><div id="pointsHistory"></div></div>
+    <div class="gap"></div>
+  </div>
+
+  <!-- SESSIONS -->
+  <div class="page" id="pg-sessions">
+    <div class="ph">
+      <span class="label">SESSIYALAR</span>
+      <div class="pt">Mening sessiyalarim</div>
+    </div>
+    <div class="sess-filters">
+      <button class="sf-chip active" onclick="filterSessions('all',this)">Hammasi</button>
+      <button class="sf-chip" onclick="filterSessions('pending',this)">Kutilmoqda</button>
+      <button class="sf-chip" onclick="filterSessions('confirmed',this)">Tasdiqlangan</button>
+      <button class="sf-chip" onclick="filterSessions('completed',this)">Tugallangan</button>
+      <button class="sf-chip" onclick="filterSessions('cancelled',this)">Bekor</button>
+    </div>
+    <div class="card" style="margin:0 18px"><div id="sessionsListMentor"></div></div>
+    <div class="gap"></div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- BOTTOM NAV -->
+<nav class="nav">
+  <button class="ni active" id="ni-home" onclick="showPage('home')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><polyline points="9,22 9,12 15,12 15,22" stroke="currentColor" stroke-width="2"/></svg>
+    <span class="ni-label">Bosh sahifa</span>
+  </button>
+  <button class="ni" id="ni-sessions" onclick="showPage('sessions')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span class="ni-label">Sessiyalar</span>
+    <span class="ni-badge" id="sessionBadge">0</span>
+  </button>
+  <button class="ni" id="ni-certs" onclick="showPage('certs')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="2"/><polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2"/></svg>
+    <span class="ni-label">Hujjatlar</span>
+  </button>
+  <button class="ni" id="ni-earnings" onclick="showPage('earnings')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span class="ni-label">Daromad</span>
+  </button>
+  <button class="ni" id="ni-profile" onclick="showPage('profile')">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+    <span class="ni-label">Profil</span>
+  </button>
+</nav>
+
+</div><!-- /shell -->
+
+<!-- ════ MODALS ════ -->
+
+<!-- WITHDRAW MODAL -->
+<div class="modal" id="withdrawModal" onclick="if(event.target===this)closeModal('withdrawModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Pul yechish</div>
+    <div class="modal-sub" id="withdrawSub">Mavjud balans: 0 so'm</div>
+    <div class="card-display" style="margin:0 0 16px">
+      <div class="cd-chip"></div>
+      <div class="cd-number" id="wdCardNum">•••• •••• •••• ••••</div>
+      <div class="cd-bottom">
+        <div class="cd-holder" id="wdCardHolder">KARTA EGASI</div>
+        <div class="cd-logo">VISA / MC</div>
+      </div>
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Summa (so'm)</label>
+      <input class="ef-input" id="withdrawAmount" type="number" placeholder="50000" min="50000">
+      <div style="font-size:11px;color:var(--text2);margin-top:4px">Minimal: 50,000 so'm</div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" onclick="submitWithdraw()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 7l-5-5-5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        So'rov yuborish
+      </button>
+      <button class="btn btn-ghost" onclick="closeModal('withdrawModal')">Bekor qilish</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD CERT MODAL -->
+<div class="modal" id="certModal" onclick="if(event.target===this)closeModal('certModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Sertifikat qo'shish</div>
+    <div class="ef-field" style="margin-top:4px">
+      <label class="ef-label">Sertifikat nomi *</label>
+      <input class="ef-input" id="certTitle" placeholder="IELTS 7.0, AWS Certified...">
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Berilgan tashkilot</label>
+      <input class="ef-input" id="certIssuer" placeholder="British Council, Amazon...">
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Sana</label>
+      <input class="ef-input" id="certDate" type="date">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" onclick="addCert()">✓ Qo'shish</button>
+      <button class="btn btn-ghost" onclick="closeModal('certModal')">Bekor qilish</button>
+    </div>
+  </div>
+</div>
+
+<!-- CARD MODAL -->
+<div class="modal" id="cardModal" onclick="if(event.target===this)closeModal('cardModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Karta ma'lumotlari</div>
+    <div class="modal-sub">Pul yechish uchun karta raqamingizni kiriting</div>
+    <div class="ef-field">
+      <label class="ef-label">Karta raqami</label>
+      <input class="ef-input mono" id="cardNumber" type="text" placeholder="8600 0000 0000 0000" maxlength="19" oninput="formatCard(this)">
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Karta egasi (lotincha)</label>
+      <input class="ef-input" id="cardHolder" type="text" placeholder="AZIZ KARIMOV" style="text-transform:uppercase">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" onclick="saveCard()">Saqlash</button>
+      <button class="btn btn-ghost" onclick="closeModal('cardModal')">Bekor qilish</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT FIELD MODAL -->
+<div class="modal" id="editModal" onclick="if(event.target===this)closeModal('editModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="editModalTitle">Tahrirlash</div>
+    <div class="ef-field" style="margin-top:8px">
+      <label class="ef-label" id="editModalLabel">Qiymat</label>
+      <input class="ef-input" id="editModalInput" type="text" placeholder="">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" onclick="saveEditField()">Saqlash</button>
+      <button class="btn btn-ghost" onclick="closeModal('editModal')">Bekor qilish</button>
+    </div>
+  </div>
+</div>
+
+<!-- SESSION DETAIL MODAL -->
+<div class="modal" id="sessionDetailModal" onclick="if(event.target===this)closeModal('sessionDetailModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div id="sessionDetailContent"></div>
+  </div>
+</div>
+
+<script>
+const tg = window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand();}
+
+/* ─── STATE ─── */
+let currentUser = null;
+let mentorData = null;
+let sessions = [];
+let pointsHistory = [];
+let certificates = [];
+let currentEditField = null;
+
+/* ─── INIT ─── */
+async function init() {
+  try {
+    // Auth tekshirish
+    const meRes = await fetch('/api/me', {credentials:'include'});
+    if(!meRes.ok) { window.location.href='login.html'; return; }
+    
+    const meData = await meRes.json();
+    if(!meData.success) { window.location.href='login.html'; return; }
+    
+    currentUser = meData.user;
+    if(currentUser.role !== 'mentor') {
+      window.location.href = 'abuturyent.html';
+      return;
+    }
+
+    // Mentor profili
+    if(currentUser.mentor_profile) {
+      mentorData = currentUser.mentor_profile;
+    }
+
+    // Parallel so'rovlar
+    await Promise.allSettled([
+      loadSessions(),
+      loadPoints(),
+      loadCertificates(),
+      loadVerificationStatus()
+    ]);
+
+    // UI render
+    renderAll();
+
+    // Loading yashirish
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('appShell').style.display = 'flex';
+
+  } catch(e) {
+    console.error('Init xatosi:', e);
+    window.location.href = 'login.html';
+  }
+}
+
+async function loadSessions() {
+  try {
+    const res = await fetch('/api/sessions', {credentials:'include'});
+    const data = await res.json();
+    if(data.success) sessions = data.sessions || [];
+  } catch(e) { console.error('Sessions xatosi:', e); }
+}
+
+async function loadPoints() {
+  try {
+    const res = await fetch('/api/mentor/points', {credentials:'include'});
+    const data = await res.json();
+    if(data.success) pointsHistory = data.points || [];
+  } catch(e) { console.error('Points xatosi:', e); }
+}
+
+async function loadCertificates() {
+  try {
+    const res = await fetch('/api/mentor/certificates', {credentials:'include'});
+    const data = await res.json();
+    if(data.success) certificates = data.certificates || [];
+  } catch(e) { console.error('Certs xatosi:', e); }
+}
+
+async function loadVerificationStatus() {
+  try {
+    const res = await fetch('/api/mentor/student-id-status', {credentials:'include'});
+    if(!res.ok) return;
+    const data = await res.json();
+    if(data.success) updateVerificationUI(data);
+  } catch(e) { console.error('Verify xatosi:', e); }
+}
+
+function renderAll() {
+  renderHome();
+  renderProfile();
+  renderCerts();
+  renderEarnings();
+  renderSessions('all');
+}
+
+/* ─── HOME ─── */
+function renderHome() {
+  const balance = mentorData?.balance || 0;
+  document.getElementById('balanceAmount').textContent = fmt(balance) + ' so\'m';
+  
+  const pendingPts = sessions
+    .filter(s => s.status === 'pending' || s.status === 'confirmed')
+    .reduce((sum, s) => sum + (s.session_type === 'individual' ? 8000 : s.session_type === 'group' ? 2000 : 0), 0);
+  document.getElementById('balancePending').textContent = 'Kutilmoqda: ' + fmt(pendingPts) + ' so\'m';
+
+  document.getElementById('kpiSessions').textContent = mentorData?.total_sessions || 0;
+  document.getElementById('kpiRating').textContent = (mentorData?.rating || 5.0) + '★';
+  document.getElementById('kpiStudents').textContent = mentorData?.total_reviews || 0;
+  document.getElementById('withdrawSub').textContent = 'Mavjud balans: ' + fmt(balance) + ' so\'m';
+
+  // Sparkline
+  const vals = [20,35,28,55,40,70,50,80,65,100];
+  const max = Math.max(...vals);
+  document.getElementById('sparkline').innerHTML = vals.map((v,i) =>
+    `<div class="sp-bar${i===vals.length-1?' active':''}" style="height:${Math.round(v/max*100)}%"></div>`
+  ).join('');
+
+  // Upcoming
+  const upcoming = sessions.filter(s => s.status === 'confirmed' && s.scheduled_at).slice(0,3);
+  document.getElementById('upcomingSessions').innerHTML = upcoming.length
+    ? upcoming.map(s => sessionItemHTML(s)).join('')
+    : emptyState('Tasdiqlangan sessiya yo\'q');
+
+  // Pending requests
+  const pending = sessions.filter(s => s.status === 'pending');
+  document.getElementById('reqBadge').textContent = pending.length ? pending.length + ' yangi' : '';
+  
+  const sessB = document.getElementById('sessionBadge');
+  if(pending.length) { sessB.textContent = pending.length; sessB.style.display = 'block'; }
+  else { sessB.style.display = 'none'; }
+  
+  document.getElementById('pendingRequests').innerHTML = pending.length
+    ? pending.map(s => pendingItemHTML(s)).join('')
+    : emptyState('Yangi so\'rov yo\'q');
+}
+
+function emptyState(msg) {
+  return `<div class="empty-state">${msg}</div>`;
+}
+
+function sessionItemHTML(s) {
+  const statusBadge = {
+    pending: '<span class="badge b-gold">Kutilmoqda</span>',
+    confirmed: '<span class="badge b-teal">Tasdiqlangan</span>',
+    completed: '<span class="badge b-gray">Tugallandi</span>',
+    cancelled: '<span class="badge b-red">Bekor</span>'
+  };
+  const pts = s.session_type === 'individual' ? 8000 : s.session_type === 'group' ? 2000 : 0;
+  const name = s.student_name || 'Foydalanuvchi';
+  const typeLabel = s.session_type === 'individual' ? 'Individual' : s.session_type === 'group' ? 'Guruh' : (s.session_type||'').toUpperCase();
+  
+  return `<div class="session-item" onclick="openSessionDetail('${s.id}')">
+    <div class="si-avatar" style="background:${strColor(name)}">${name[0]}</div>
+    <div class="si-info">
+      <div class="si-name">${escHtml(name)}</div>
+      <div class="si-meta">${typeLabel}</div>
+      <div class="si-tags">${statusBadge[s.status] || ''}</div>
+    </div>
+    <div class="si-right">
+      <div class="si-time">${fmtDate(s.scheduled_at)}</div>
+      ${s.status === 'completed' ? `<div class="si-points">+${fmt(pts)}</div>` : ''}
+    </div>
+  </div>`;
+}
+
+function pendingItemHTML(s) {
+  const name = s.student_name || 'Foydalanuvchi';
+  const typeLabel = s.session_type === 'individual' ? 'Individual' : s.session_type === 'group' ? 'Guruh' : (s.session_type||'').toUpperCase();
+  return `<div class="session-item">
+    <div class="si-avatar" style="background:${strColor(name)}">${name[0]}</div>
+    <div class="si-info">
+      <div class="si-name">${escHtml(name)}</div>
+      <div class="si-meta">${typeLabel} · ${fmtDate(s.scheduled_at)}</div>
+      <div class="si-tags" style="margin-top:8px;gap:8px">
+        <button class="btn btn-teal btn-sm" onclick="event.stopPropagation();confirmSession('${s.id}')">✓ Tasdiqlash</button>
+        <button class="btn btn-red btn-sm" onclick="event.stopPropagation();rejectSession('${s.id}')">✕ Rad</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ─── PROFILE ─── */
+function renderProfile() {
+  const name = currentUser.full_name || 'Mentor';
+  document.getElementById('pAvatarText').textContent = name[0].toUpperCase();
+  document.getElementById('pName').textContent = name;
+  document.getElementById('pSub').textContent = currentUser.username ? '@'+currentUser.username : '@mentor';
+  
+  document.getElementById('ilName').textContent = name;
+  
+  if(mentorData) {
+    document.getElementById('ilUni').textContent = mentorData.university || '—';
+    document.getElementById('ilFaculty').textContent = mentorData.faculty || '—';
+    document.getElementById('ilYear').textContent = mentorData.year ? mentorData.year+'-kurs' : '—';
+    document.getElementById('ilGpa').textContent = mentorData.gpa || '—';
+    document.getElementById('bioText').value = mentorData.bio || '';
+    
+    if(mentorData.card_last4) {
+      const num = '•••• •••• •••• ' + mentorData.card_last4;
+      document.getElementById('cdNumber').textContent = num;
+      document.getElementById('cdHolder').textContent = mentorData.card_holder || '—';
+      document.getElementById('wdCardNum').textContent = num;
+      document.getElementById('wdCardHolder').textContent = mentorData.card_holder || '—';
+    }
+    
+    // Verify badge
+    if(mentorData.is_verified) {
+      document.getElementById('pVerifyBadge').innerHTML = '<span class="badge b-green" style="margin-top:4px">✓ Tasdiqlangan</span>';
+    }
+  }
+  
+  // Avatar
+  if(currentUser.avatar_url) {
+    const av = document.getElementById('pAvatar');
+    let img = av.querySelector('img');
+    if(!img) { img = document.createElement('img'); av.appendChild(img); }
+    img.src = currentUser.avatar_url;
+  }
+}
+
+/* ─── EDIT FIELD MODAL ─── */
+let editFieldKey = null;
+
+function openEditModal(field, label, type='text') {
+  editFieldKey = field;
+  document.getElementById('editModalTitle').textContent = label + ' ni tahrirlash';
+  document.getElementById('editModalLabel').textContent = label;
+  const inp = document.getElementById('editModalInput');
+  inp.type = type;
+  
+  // Mavjud qiymatni to'ldirish
+  const vals = {
+    name: currentUser.full_name,
+    university: mentorData?.university,
+    faculty: mentorData?.faculty,
+    year: mentorData?.year,
+    gpa: mentorData?.gpa
+  };
+  inp.value = vals[field] || '';
+  
+  openModal('editModal');
+  setTimeout(() => inp.focus(), 300);
+}
+
+async function saveEditField() {
+  const val = document.getElementById('editModalInput').value.trim();
+  if(!val) { showToast('Qiymat kiriting', 'err'); return; }
+  
+  try {
+    let body = {};
+    if(editFieldKey === 'name') {
+      body = {full_name: val};
+    } else {
+      body = {[editFieldKey]: val};
+    }
+    
+    const res = await fetch('/api/profile', {
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body),
+      credentials:'include'
+    });
+    const data = await res.json();
+    
+    if(data.success) {
+      // Local state yangilash
+      if(editFieldKey === 'name') {
+        currentUser.full_name = val;
+        document.getElementById('pName').textContent = val;
+        document.getElementById('pAvatarText').textContent = val[0].toUpperCase();
+        document.getElementById('ilName').textContent = val;
+      } else {
+        if(!mentorData) mentorData = {};
+        mentorData[editFieldKey] = val;
+        const elMap = {university:'ilUni',faculty:'ilFaculty',year:'ilYear',gpa:'ilGpa'};
+        const el = document.getElementById(elMap[editFieldKey]);
+        if(el) el.textContent = editFieldKey === 'year' ? val+'-kurs' : val;
+      }
+      closeModal('editModal');
+      showToast('Saqlandi ✓');
+    } else {
+      showToast(data.error || 'Xatolik', 'err');
+    }
+  } catch(e) {
+    showToast('Server xatosi', 'err');
+  }
+}
+
+async function saveBio() {
+  const bio = document.getElementById('bioText').value;
+  try {
+    const res = await fetch('/api/profile', {
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({bio}),
+      credentials:'include'
+    });
+    const data = await res.json();
+    if(data.success) {
+      if(mentorData) mentorData.bio = bio;
+      showToast('Bio saqlandi ✓');
+    } else {
+      showToast(data.error || 'Xatolik', 'err');
+    }
+  } catch(e) {
+    showToast('Server xatosi', 'err');
+  }
+}
+
+/* ─── AVATAR / COVER ─── */
+async function handleAvatar(input) {
+  const file = input.files[0];
+  if(!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const base64 = e.target.result;
+    try {
+      const res = await fetch('/api/profile/avatar', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({avatar_url: base64}),
+        credentials:'include'
+      });
+      const data = await res.json();
+      if(data.success) {
+        const av = document.getElementById('pAvatar');
+        let img = av.querySelector('img');
+        if(!img) { img = document.createElement('img'); av.appendChild(img); }
+        img.src = data.avatar_url || base64;
+        showToast('Rasm yuklandi ✓');
+      } else {
+        showToast(data.error || 'Xatolik', 'err');
+      }
+    } catch(e) {
+      showToast('Yuklashda xato', 'err');
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleCover(input) {
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const cover = document.getElementById('profileCover');
+    cover.style.backgroundImage = `url(${e.target.result})`;
+    cover.style.backgroundSize = 'cover';
+    cover.style.backgroundPosition = 'center';
+    showToast('Cover o\'zgartirildi ✓');
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ─── CARD ─── */
+function formatCard(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,16);
+  el.value = v.replace(/(\d{4})/g,'$1 ').trim();
+}
+
+async function saveCard() {
+  const num = document.getElementById('cardNumber').value.replace(/\s/g,'');
+  const holder = document.getElementById('cardHolder').value.toUpperCase().trim();
+  if(num.length < 16 || !holder) { showToast('Ma\'lumotlarni to\'liq kiriting', 'err'); return; }
+  
+  try {
+    const res = await fetch('/api/mentor/card', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({card_last4: num.slice(-4), card_holder: holder}),
+      credentials:'include'
+    });
+    const data = await res.json();
+    if(data.success) {
+      if(!mentorData) mentorData = {};
+      mentorData.card_last4 = num.slice(-4);
+      mentorData.card_holder = holder;
+      const masked = '•••• •••• •••• ' + num.slice(-4);
+      document.getElementById('cdNumber').textContent = masked;
+      document.getElementById('cdHolder').textContent = holder;
+      document.getElementById('wdCardNum').textContent = masked;
+      document.getElementById('wdCardHolder').textContent = holder;
+      closeModal('cardModal');
+      showToast('Karta saqlandi ✓');
+    } else {
+      showToast(data.error || 'Xatolik', 'err');
+    }
+  } catch(e) {
+    showToast('Server xatosi', 'err');
+  }
+}
+
+/* ─── CERTS ─── */
+function renderCerts() {
+  document.getElementById('certsList').innerHTML = certificates.length
+    ? certificates.map(c => `
+      <div class="cert-card">
+        <div class="cert-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 15l-2 5-1-5-5-1 5-2 1-5 2 5 5 1-5 2z" stroke="var(--gold)" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-4" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cert-info">
+          <div class="cert-title">${escHtml(c.title)}</div>
+          <div class="cert-issuer">${escHtml(c.issuer||'—')} · ${c.issued_date||c.date||'—'}</div>
+          <div class="cert-actions">
+            ${c.file_url ? `<button class="btn btn-surface btn-sm" onclick="window.open('${c.file_url}','_blank')">Ko'rish</button>` : ''}
+            <button class="btn btn-red btn-sm" onclick="deleteCert('${c.id}')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><polyline points="3,6 5,6 21,6" stroke="currentColor" stroke-width="2"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2" stroke="currentColor" stroke-width="2"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>`).join('')
+    : '<div class="empty-state">Sertifikat yo\'q</div>';
+}
+
+async function addCert() {
+  const title = document.getElementById('certTitle').value.trim();
+  const issuer = document.getElementById('certIssuer').value.trim();
+  const date = document.getElementById('certDate').value;
+  
+  if(!title) { showToast('Nom kiriting', 'err'); return; }
+  
+  try {
+    const res = await fetch('/api/mentor/certificates', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({title, issuer: issuer||null, date: date||null}),
+      credentials:'include'
+    });
+    const data = await res.json();
+    if(data.success) {
+      certificates.push(data.certificate);
+      renderCerts();
+      closeModal('certModal');
+      document.getElementById('certTitle').value='';
+      document.getElementById('certIssuer').value='';
+      document.getElementById('certDate').value='';
+      showToast('Sertifikat qo\'shildi ✓');
+    } else {
+      showToast(data.error||'Xatolik','err');
+    }
+  } catch(e) {
+    showToast('Server xatosi','err');
+  }
+}
+
+async function deleteCert(id) {
+  if(!confirm('Sertifikatni o\'chirasizmi?')) return;
+  try {
+    const res = await fetch(`/api/mentor/certificates/${id}`, {
+      method:'DELETE', credentials:'include'
+    });
+    const data = await res.json();
+    if(data.success) {
+      certificates = certificates.filter(c=>c.id!==id);
+      renderCerts();
+      showToast('O\'chirildi');
+    }
+  } catch(e) {
+    showToast('O\'chirishda xato','err');
+  }
+}
+
+/* ─── STUDENT ID UPLOAD ─── */
+async function uploadStudentId(input) {
+  if(!input.files[0]) return;
+  const file = input.files[0];
+  const formData = new FormData();
+  formData.append('student_id', file);
+  
+  const zone = document.getElementById('studentIdZone');
+  zone.innerHTML = '<div style="padding:24px;text-align:center"><div class="spinner"></div><p style="margin-top:12px;font-size:13px;color:var(--text2)">Yuklanmoqda...</p></div>';
+  
+  try {
+    const res = await fetch('/api/mentor/upload-student-id', {
+      method:'POST', body:formData, credentials:'include'
+    });
+    const data = await res.json();
+    if(data.success) {
+      showToast('✅ Guvohnoma yuklandi!');
+      await loadVerificationStatus();
+    } else {
+      restoreStudentIdZone();
+      showToast('❌ ' + (data.error||'Yuklashda xato'), 'err');
+    }
+  } catch(e) {
+    restoreStudentIdZone();
+    showToast('❌ Server bilan bog\'lanib bo\'lmadi','err');
+  }
+}
+
+function restoreStudentIdZone() {
+  document.getElementById('studentIdZone').innerHTML = `
+    <div class="uz-icon" id="studentIdIcon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="var(--gold)" stroke-width="1.8"/><path d="M7 9h5M7 13h8M7 17h4" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </div>
+    <div class="uz-title" id="studentIdTitle">Talaba guvohnomasi</div>
+    <div class="uz-sub" id="studentIdSub">JPG, PNG yoki PDF · 5 MB gacha</div>
+    <div id="studentIdStatus" style="margin-top:8px;font-size:12px;font-weight:600"></div>`;
+}
+
+async function uploadCV(input) {
+  if(!input.files[0]) return;
+  const file = input.files[0];
+  const formData = new FormData();
+  formData.append('document', file);
+  formData.append('type', 'cv');
+  
+  try {
+    const res = await fetch('/api/mentor/documents', {
+      method:'POST', body:formData, credentials:'include'
+    });
+    const data = await res.json();
+    if(data.success) showToast('CV yuklandi ✓');
+    else showToast(data.error||'Xatolik','err');
+  } catch(e) {
+    showToast('Yuklashda xato','err');
+  }
+}
+
+/* ─── VERIFICATION UI ─── */
+function updateVerificationUI(data) {
+  const bannerPending = document.getElementById('bannerPending');
+  const bannerVerified = document.getElementById('bannerVerified');
+  const homeBanner = document.getElementById('homeVerifyBanner');
+
+  if(data.is_verified) {
+    // Profile page
+    bannerPending.style.display = 'none';
+    bannerVerified.style.display = 'flex';
+    // Home page - yashir
+    if(homeBanner) homeBanner.style.display = 'none';
+    // Certs page
+    updateStudentIdZone('verified');
+
+  } else if(data.student_id_url) {
+    // Yuklagan, kutilmoqda
+    bannerPending.style.display = 'flex';
+    bannerVerified.style.display = 'none';
+    document.getElementById('bannerTitle').textContent = '⏳ Tekshiruv kutilmoqda';
+    document.getElementById('bannerMsg').textContent = 'Guvohnoma yuklandi, admin tekshirishi kutilmoqda';
+    // Home banner - yashil emas, sariq
+    if(homeBanner) {
+      homeBanner.style.display = 'flex';
+      homeBanner.style.background = 'rgba(240,165,0,0.1)';
+      homeBanner.style.border = '1px solid rgba(240,165,0,0.25)';
+      homeBanner.style.color = 'var(--gold)';
+      document.getElementById('hvbTitle').textContent = '⏳ Tekshiruv kutilmoqda';
+      const daysText = data.days_left !== undefined
+        ? (data.days_left > 0 ? `${data.days_left} kun qoldi` : data.days_left===0 ? 'Bugun so\'nggi kun!' : 'Muddati o\'tgan!')
+        : 'Admin tekshirishi kutilmoqda';
+      document.getElementById('hvbMsg').textContent = daysText;
+    }
+    updateStudentIdZone('pending', data.days_left);
+
+  } else {
+    // Yuklamagan
+    bannerPending.style.display = 'flex';
+    bannerVerified.style.display = 'none';
+    document.getElementById('bannerTitle').textContent = '⚠️ Verifikatsiya talab qilinadi';
+    document.getElementById('bannerMsg').textContent = '3 kun ichida guvohnomangizni yuklamasangiz, profil o\'chiriladi';
+    // Home banner - qizil ogohlantirish
+    if(homeBanner) {
+      homeBanner.style.display = 'flex';
+      const urgent = (data.days_left !== undefined && data.days_left <= 1);
+      homeBanner.style.background = urgent ? 'rgba(255,77,106,0.12)' : 'rgba(240,165,0,0.1)';
+      homeBanner.style.border = `1px solid ${urgent ? 'rgba(255,77,106,0.3)' : 'rgba(240,165,0,0.25)'}`;
+      homeBanner.style.color = urgent ? 'var(--red)' : 'var(--gold)';
+      if(data.days_left !== undefined) {
+        document.getElementById('hvbTitle').textContent =
+          data.days_left <= 0 ? '🚨 Muddati o\'tdi! Profil o\'chiriladi'
+          : data.days_left === 1 ? '⚠️ Bugun so\'nggi kun!'
+          : `⚠️ ${data.days_left} kun qoldi`;
+      } else {
+        document.getElementById('hvbTitle').textContent = '⚠️ Verifikatsiya talab qilinadi';
+      }
+      document.getElementById('hvbMsg').textContent = '3 kun ichida guvohnomangizni yuklang';
+    }
+    updateStudentIdZone('none');
+  }
+}
+
+function updateStudentIdZone(status, daysLeft) {
+  const zone = document.getElementById('studentIdZone');
+  if(!zone) return;
+  
+  const icons = {
+    verified: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+    pending: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="var(--gold)" stroke-width="1.8"/><path d="M12 7v5l3 3" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+    none: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="var(--gold)" stroke-width="1.8"/><path d="M7 9h5M7 13h8M7 17h4" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round"/></svg>`
+  };
+  const configs = {
+    verified: {border:'var(--green)',bg:'rgba(34,197,94,.05)',title:'✓ Guvohnoma tasdiqlangan',sub:'Admin tekshiruvidan o\'tgan',status:'<span style="color:var(--green)">✓ Tasdiqlangan</span>',clickable:false},
+    pending: {border:'var(--gold)',bg:'rgba(240,165,0,.05)',title:'⏳ Guvohnoma yuklangan',sub:'Admin tekshiruvi kutilmoqda',status:`<span style="color:var(--gold)">⏳ Kutilmoqda${daysLeft!==undefined?' · '+daysLeft+' kun':''}</span>`,clickable:true},
+    none: {border:'var(--border2)',bg:'var(--s1)',title:'Talaba guvohnomasi',sub:'JPG, PNG yoki PDF · 5 MB gacha',status:'<span style="color:var(--red)">✕ Yuklanmagan</span>',clickable:true}
+  };
+  const c = configs[status] || configs.none;
+  
+  zone.style.borderColor = c.border;
+  zone.style.background = c.bg;
+  zone.style.cursor = c.clickable ? 'pointer' : 'default';
+  zone.onclick = c.clickable ? () => document.getElementById('studentIdInput').click() : null;
+  
+  zone.innerHTML = `
+    <div class="uz-icon">${icons[status]}</div>
+    <div class="uz-title">${c.title}</div>
+    <div class="uz-sub">${c.sub}</div>
+    <div style="margin-top:8px;font-size:12px;font-weight:600">${c.status}</div>`;
+}
+
+/* ─── EARNINGS ─── */
+function renderEarnings() {
+  const totalEarned = pointsHistory.filter(p=>p.points>0).reduce((s,p)=>s+p.points,0);
+  const paidOut = pointsHistory.filter(p=>p.points<0&&p.reason==='withdrawal').reduce((s,p)=>s+Math.abs(p.points),0);
+  
+  document.getElementById('totalEarned').textContent = fmt(totalEarned);
+  document.getElementById('pendingPayout').textContent = fmt(mentorData?.balance||0);
+  document.getElementById('paidOut').textContent = fmt(paidOut);
+  document.getElementById('sessCount').textContent = mentorData?.total_sessions||0;
+  
+  const reasonText = {
+    session_completed:'Sessiya yakunlandi',
+    bonus:'Bonus',
+    withdrawal:'Pul yechildi',
+    penalty:'Jarima',
+    refund:'Qaytarildi'
+  };
+  
+  document.getElementById('pointsHistory').innerHTML = pointsHistory.length
+    ? pointsHistory.map(p => `
+      <div class="point-item">
+        <div class="pi-left">
+          <h4>${escHtml(p.reason_text || reasonText[p.reason] || p.reason || 'Tranzaksiya')}</h4>
+          <p>${fmtDateShort(p.created_at)}</p>
+        </div>
+        <div class="pi-amount ${p.points>0?'pi-plus':'pi-minus'}">
+          ${p.points>0?'+':''}${fmt(p.points)} so'm
+        </div>
+      </div>`).join('')
+    : '<div class="empty-state">Tranzaksiya tarixi yo\'q</div>';
+}
+
+/* ─── SESSIONS ─── */
+function filterSessions(filter, btn) {
+  document.querySelectorAll('.sf-chip').forEach(c=>c.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderSessions(filter);
+}
+
+function renderSessions(filter) {
+  const list = filter==='all' ? sessions : sessions.filter(s=>s.status===filter);
+  document.getElementById('sessionsListMentor').innerHTML = list.length
+    ? list.map(s=>sessionItemHTML(s)).join('')
+    : emptyState('Sessiya yo\'q');
+}
+
+async function confirmSession(id) {
+  try {
+    const res = await fetch(`/api/sessions/${id}/confirm`, {method:'POST', credentials:'include'});
+    const data = await res.json();
+    if(data.success) {
+      const s = sessions.find(x=>x.id===id);
+      if(s) s.status = 'confirmed';
+      renderHome();
+      renderSessions('all');
+      showToast('Sessiya tasdiqlandi ✓');
+    } else {
+      showToast(data.error||'Xatolik','err');
+    }
+  } catch(e) {
+    showToast('Server xatosi','err');
+  }
+}
+
+async function rejectSession(id) {
+  try {
+    const res = await fetch(`/api/sessions/${id}/reject`, {method:'POST', credentials:'include'});
+    const data = await res.json();
+    if(data.success) {
+      const s = sessions.find(x=>x.id===id);
+      if(s) s.status = 'cancelled';
+      renderHome();
+      renderSessions('all');
+      showToast('Rad etildi');
+    } else {
+      showToast(data.error||'Xatolik','err');
+    }
+  } catch(e) {
+    showToast('Server xatosi','err');
+  }
+}
+
+function openSessionDetail(id) {
+  const s = sessions.find(x=>x.id===id);
+  if(!s) return;
+  
+  const pts = s.session_type==='individual' ? 8000 : s.session_type==='group' ? 2000 : 0;
+  const statusBadge = {
+    pending:'<span class="badge b-gold">Kutilmoqda</span>',
+    confirmed:'<span class="badge b-teal">Tasdiqlangan</span>',
+    completed:'<span class="badge b-green">Tugallandi</span>',
+    cancelled:'<span class="badge b-red">Bekor qilindi</span>'
+  };
+  
+  document.getElementById('sessionDetailContent').innerHTML = `
+    <div style="padding:0 0 16px">
+      <div class="modal-title">${escHtml(s.student_name||'Foydalanuvchi')}</div>
+      <div style="margin-top:4px">${statusBadge[s.status]||''}</div>
+    </div>
+    <div class="info-list" style="margin:0 0 16px">
+      <div class="il-row"><span class="il-label">Tur</span><span class="il-val">${s.session_type==='individual'?'Individual':s.session_type==='group'?'Guruh':s.session_type||'—'}</span></div>
+      <div class="il-row"><span class="il-label">Vaqt</span><span class="il-val">${fmtDate(s.scheduled_at)}</span></div>
+      <div class="il-row"><span class="il-label">Davomiyligi</span><span class="il-val">${s.duration_min||60} daqiqa</span></div>
+      <div class="il-row"><span class="il-label">To'lov</span><span class="il-val" style="color:var(--teal)">${fmt(pts)} so'm</span></div>
+      ${s.notes?`<div class="il-row"><span class="il-label">Izoh</span><span class="il-val" style="font-size:12px">${escHtml(s.notes)}</span></div>`:''}
+    </div>
+    ${s.status==='pending'?`
+    <div class="modal-btns">
+      <button class="btn btn-teal" onclick="confirmSession('${s.id}');closeModal('sessionDetailModal')">✓ Tasdiqlash</button>
+      <button class="btn btn-red" onclick="rejectSession('${s.id}');closeModal('sessionDetailModal')">✕ Rad etish</button>
+    </div>`:''}
+    ${s.meet_link?`<a href="${s.meet_link}" target="_blank" class="btn btn-purple" style="margin-top:10px">🎥 Meeting ga kirish</a>`:''}`;
+  
+  openModal('sessionDetailModal');
+}
+
+/* ─── WITHDRAW ─── */
+function openWithdrawModal() {
+  document.getElementById('withdrawSub').textContent = 'Mavjud balans: ' + fmt(mentorData?.balance||0) + ' so\'m';
+  document.getElementById('withdrawAmount').value = '';
+  openModal('withdrawModal');
+}
+
+async function submitWithdraw() {
+  const amt = parseInt(document.getElementById('withdrawAmount').value);
+  const balance = mentorData?.balance || 0;
+  
+  if(!amt || amt < 50000) { showToast('Minimal 50,000 so\'m', 'err'); return; }
+  if(amt > balance) { showToast('Balans yetarli emas', 'err'); return; }
+  if(!(mentorData?.card_last4)) { showToast('Avval karta raqamini kiriting', 'err'); closeModal('withdrawModal'); openModal('cardModal'); return; }
+  
+  try {
+    const res = await fetch('/api/mentor/withdraw', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({amount:amt}),
+      credentials:'include'
+    });
+    const data = await res.json();
+    if(data.success) {
+      closeModal('withdrawModal');
+      showToast('So\'rov yuborildi ✓ Admin tasdiqlashi kutilmoqda');
+    } else {
+      showToast(data.error||'Xatolik','err');
+    }
+  } catch(e) {
+    showToast('Server xatosi','err');
+  }
+}
+
+/* ─── NAV ─── */
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  const pg = document.getElementById('pg-'+name);
+  if(pg) pg.classList.add('active');
+  const ni = document.getElementById('ni-'+name);
+  if(ni) ni.classList.add('active');
+  document.querySelector('.content')?.scrollTo(0,0);
+}
+
+/* ─── MODAL ─── */
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ─── LOGOUT ─── */
+async function logout() {
+  try {
+    await fetch('/api/logout', {method:'POST', credentials:'include'});
+  } catch(e){}
+  window.location.href = 'login.html';
+}
+
+/* ─── UTILS ─── */
+function fmt(n) {
+  if(n===undefined||n===null) return '0';
+  return Math.abs(n).toLocaleString('uz-UZ');
+}
+
+function fmtDate(dateStr) {
+  if(!dateStr) return '—';
+  const d = new Date(dateStr);
+  const now = new Date();
+  const diff = d - now;
+  if(diff < 0) {
+    const ago = Math.floor(-diff/86400000);
+    return ago===0 ? 'Bugun' : ago===1 ? 'Kecha' : `${ago} kun oldin`;
+  }
+  const days = Math.floor(diff/86400000);
+  const t = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  if(days===0) return `Bugun ${t}`;
+  if(days===1) return `Ertaga ${t}`;
+  return `${d.getDate()}.${d.getMonth()+1} ${t}`;
+}
+
+function fmtDateShort(dateStr) {
+  if(!dateStr) return '—';
+  const d = new Date(dateStr);
+  return `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`;
+}
+
+function strColor(str) {
+  let h=0;
+  for(let i=0;i<str.length;i++) h=str.charCodeAt(i)+((h<<5)-h);
+  const colors=['#1e3a6e','#2d1b69','#1a3a2a','#3a1a2a','#6e1e3a','#1e4040','#2a1a40'];
+  return colors[Math.abs(h)%colors.length];
+}
+
+function escHtml(str) {
+  if(!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let toastTimer;
+function showToast(msg, type='ok') {
+  clearTimeout(toastTimer);
+  let el = document.getElementById('_toast');
+  if(!el) {
+    el = document.createElement('div');
+    el.id = '_toast';
+    el.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1A2A4A;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.5);white-space:nowrap;transition:opacity .3s;pointer-events:none;max-width:90vw;text-align:center';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.borderLeft = type==='err' ? '3px solid var(--red)' : '3px solid var(--teal)';
+  el.style.opacity = '1';
+  toastTimer = setTimeout(() => el.style.opacity='0', 2800);
+}
+
+/* ─── START ─── */
+window.addEventListener('load', init);
+</script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ConnectU — Admin Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#040810;--s1:#0A1020;--s2:#0F1830;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);
+  --gold:#F0A500;--gold-d:rgba(240,165,0,0.1);
+  --teal:#00BFA6;--red:#FF4D6A;--green:#22C55E;
+  --text:#EEF2FF;--text2:#6B7FA0;
+  --r:14px;--r-sm:10px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+
+body {
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;padding:20px;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(240,165,0,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(0,191,166,0.04) 0%, transparent 60%),
+    var(--bg);
+}
+
+.container { width:100%;max-width:400px; }
+.logo { text-align:center;margin-bottom:32px; }
+.logo-text { font-size:28px;font-weight:800;letter-spacing:-0.5px; }
+.logo-text span { color:var(--gold); }
+.logo-sub {
+  font-size:12px;font-weight:600;letter-spacing:3px;
+  color:var(--text2);margin-top:6px;text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;
+}
+
+.card {
+  background:var(--s1);border:1px solid var(--border);border-radius:20px;
+  padding:32px;position:relative;overflow:hidden;
+}
+.card::before {
+  content:'';position:absolute;top:-80px;right:-80px;
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(240,165,0,0.06),transparent 70%);
+  pointer-events:none;
+}
+
+.card-title { font-size:20px;font-weight:700;margin-bottom:4px; }
+.card-sub { font-size:13px;color:var(--text2);margin-bottom:24px; }
+
+.field { margin-bottom:16px; }
+.field-label {
+  font-size:11px;font-weight:600;color:var(--text2);
+  letter-spacing:1px;text-transform:uppercase;
+  margin-bottom:6px;display:block;
+}
+.field-wrap { position:relative; }
+.field-icon {
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  color:var(--text2);pointer-events:none;display:flex;align-items:center;
+}
+.field-input {
+  width:100%;padding:13px 14px 13px 42px;
+  background:var(--s2);border:1.5px solid var(--border);
+  border-radius:var(--r-sm);color:var(--text);
+  font-family:'JetBrains Mono',monospace;font-size:14px;
+  outline:none;transition:border-color .2s, background .2s;
+  -webkit-appearance:none;
+}
+.field-input:focus { border-color:var(--gold);background:#111E35; }
+.field-input::placeholder { color:var(--text2);font-size:13px; }
+.field-input[type="password"] { letter-spacing:2px; }
+.field-input[type="password"]::placeholder { letter-spacing:0; }
+
+.eye-btn {
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--text2);
+  cursor:pointer;padding:4px;display:flex;align-items:center;transition:color .2s;
+}
+.eye-btn:hover { color:var(--text); }
+
+.btn-submit {
+  width:100%;padding:14px;background:var(--gold);color:#040810;
+  border:none;border-radius:var(--r-sm);
+  font-family:inherit;font-size:15px;font-weight:700;
+  cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;
+}
+.btn-submit:hover { background:#FFB830;transform:translateY(-1px); }
+.btn-submit:active { transform:scale(0.98); }
+.btn-submit:disabled { opacity:.5;cursor:not-allowed;transform:none; }
+
+.error-box {
+  background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.25);
+  border-radius:var(--r-sm);padding:12px 14px;font-size:13px;color:var(--red);
+  margin-bottom:16px;display:none;align-items:center;gap:8px;
+}
+.error-box.show { display:flex; }
+
+.back-link { text-align:center;margin-top:20px;font-size:13px;color:var(--text2); }
+.back-link a { color:var(--gold);font-weight:600;text-decoration:none; }
+
+.security-badge {
+  display:flex;align-items:center;gap:8px;padding:10px 14px;
+  background:rgba(0,191,166,.06);border:1px solid rgba(0,191,166,.15);
+  border-radius:var(--r-sm);font-size:12px;color:var(--teal);margin-bottom:20px;
+}
+
+.spinner {
+  width:18px;height:18px;border:2px solid rgba(4,8,16,.3);
+  border-top-color:#040810;border-radius:50%;animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.attempts-warn { font-size:12px;color:var(--text2);text-align:center;margin-top:12px; }
+.attempts-warn strong { color:var(--red); }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="logo">
+    <div class="logo-text">Connect<span>-U</span></div>
+    <div class="logo-sub">Admin Panel</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Xush kelibsiz 👋</div>
+    <div class="card-sub">Admin hisobingizga kiring</div>
+
+    <div class="security-badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Himoyalangan ulanish · SSL/TLS
+    </div>
+
+    <div class="error-box" id="errorBox">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+        <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span id="errorText">Xatolik yuz berdi</span>
+    </div>
+
+    <form onsubmit="return false">
+      <div class="field">
+        <label class="field-label">Login / Username</label>
+        <div class="field-wrap">
+          <div class="field-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </div>
+          <input class="field-input" id="username" type="text" placeholder="admin yoki +998..." autocomplete="username" autocapitalize="none" spellcheck="false">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Parol</label>
+        <div class="field-wrap">
+          <div class="field-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" stroke-width="2"/>
+              <path d="M7 11V7a5 5 0 0110 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <input class="field-input" id="password" type="password" placeholder="Parolni kiriting" autocomplete="current-password">
+          <button class="eye-btn" type="button" onclick="togglePassword()" id="eyeBtn">
+            <svg id="eyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/>
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <button class="btn-submit" id="submitBtn" onclick="doLogin()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Kirish
+      </button>
+    </form>
+
+    <div class="attempts-warn" id="attemptsWarn" style="display:none">
+      ⚠ <strong id="attemptsLeft"></strong> ta urinish qoldi
+    </div>
+  </div>
+</div>
+
+<script>
+let failedAttempts = 0;
+let lockUntil = 0;
+
+document.getElementById('password').addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });
+document.getElementById('username').addEventListener('keydown', e => { if(e.key === 'Enter') document.getElementById('password').focus(); });
+
+function togglePassword() {
+  const inp = document.getElementById('password');
+  const icon = document.getElementById('eyeIcon');
+  if(inp.type === 'password') {
+    inp.type = 'text';
+    icon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24M1 1l22 22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`;
+  } else {
+    inp.type = 'password';
+    icon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>`;
+  }
+}
+
+function showError(msg) {
+  const box = document.getElementById('errorBox');
+  document.getElementById('errorText').textContent = msg;
+  box.classList.add('show');
+}
+function hideError() { document.getElementById('errorBox').classList.remove('show'); }
+
+async function doLogin() {
+  const now = Date.now();
+  if(lockUntil > now) {
+    const secsLeft = Math.ceil((lockUntil - now) / 1000);
+    showError(`Juda ko'p urinish. ${secsLeft} soniyadan keyin qayta urinib ko'ring.`);
+    return;
+  }
+
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+
+  if(!username) { showError('Login kiriting'); document.getElementById('username').focus(); return; }
+  if(!password) { showError('Parol kiriting'); document.getElementById('password').focus(); return; }
+
+  hideError();
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div>';
+
+  try {
+    const res = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({username, password}),
+      credentials: 'include'
+    });
+    const data = await res.json();
+
+    if(data.success) {
+      failedAttempts = 0;
+      btn.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg> Muvaffaqiyatli...`;
+      btn.style.background = '#22C55E';
+      setTimeout(() => { window.location.href = 'admin.html'; }, 600);
+    } else {
+      failedAttempts++;
+      if(failedAttempts >= 5) {
+        lockUntil = Date.now() + 60000;
+        showError('Juda ko\'p noto\'g\'ri urinish. 60 soniyadan keyin qayta urinib ko\'ring.');
+      } else {
+        const left = 5 - failedAttempts;
+        showError(data.error || 'Login yoki parol noto\'g\'ri');
+        if(left <= 3) {
+          document.getElementById('attemptsWarn').style.display = 'block';
+          document.getElementById('attemptsLeft').textContent = left;
+        }
+      }
+      const pwField = document.getElementById('password');
+      pwField.style.borderColor = 'var(--red)';
+      pwField.value = '';
+      setTimeout(() => { pwField.style.borderColor = ''; pwField.focus(); }, 500);
+
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Kirish`;
+    }
+  } catch(e) {
+    showError('Server bilan bog\'lanib bo\'lmadi. Qayta urinib ko\'ring.');
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Kirish`;
+  }
+}
+
+window.addEventListener('load', () => { document.getElementById('username').focus(); });
+</script>
+</body>
+</html>

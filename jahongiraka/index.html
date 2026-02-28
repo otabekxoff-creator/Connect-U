@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yoshlar yagona elektron platformasi</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:       #0D1F3C;
+  --navy-mid:   #163354;
+  --navy-light: #1E4976;
+  --blue:       #2563EB;
+  --blue-soft:  #3B82F6;
+  --blue-light: #DBEAFE;
+  --gold:       #B8860B;
+  --gold-light: #F59E0B;
+  --gold-bg:    #FFFBEB;
+  --gold-border:#FDE68A;
+  --teal:       #0D9488;
+  --teal-bg:    #CCFBF1;
+  --green:      #16A34A;
+  --green-bg:   #DCFCE7;
+  --red:        #DC2626;
+  --red-bg:     #FEE2E2;
+  --amber:      #D97706;
+  --amber-bg:   #FEF3C7;
+  --purple:     #7C3AED;
+  --purple-bg:  #EDE9FE;
+  --white:      #FFFFFF;
+  --off:        #F8FAFC;
+  --border:     #E2E8F0;
+  --gray:       #64748B;
+  --dark:       #1E293B;
+  --sidebar-w:  248px;
+  --header-h:   58px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--off);color:var(--dark);min-height:100vh;overflow-x:hidden;font-size:14px}
+
+/* ── SIDEBAR ─────────────────────────────── */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);background:var(--navy);display:flex;flex-direction:column;z-index:100;transition:transform .3s}
+.sb-logo{padding:16px 16px 12px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:10px}
+.sb-logo-icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--gold-light),var(--gold));display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logo-icon svg{width:18px;height:18px;fill:#fff}
+.sb-logo-text{color:#fff;font-size:12.5px;font-weight:700;line-height:1.3}
+.sb-logo-text span{display:block;font-size:10px;font-weight:400;color:rgba(195,214,238,.6);margin-top:1px}
+.sb-section{padding:10px 10px 2px}
+.sb-label{font-size:9.5px;font-weight:700;color:rgba(195,214,238,.4);letter-spacing:.1em;text-transform:uppercase;padding:0 8px;margin-bottom:3px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;transition:all .15s;font-size:12.5px;font-weight:500;color:rgba(255,255,255,.5);margin-bottom:1px;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.85)}
+.nav-item.active{background:linear-gradient(135deg,var(--blue),#1D4ED8);color:#fff;box-shadow:0 2px 12px rgba(37,99,235,.4)}
+.nav-item svg{width:15px;height:15px;flex-shrink:0;opacity:.7}
+.nav-item.active svg{opacity:1}
+.nav-badge{margin-left:auto;background:rgba(255,255,255,.15);color:#fff;font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:20px;font-family:'JetBrains Mono',monospace}
+.nav-item.active .nav-badge{background:rgba(255,255,255,.2)}
+.sb-bottom{margin-top:auto;padding:12px 10px;border-top:1px solid rgba(255,255,255,.07)}
+.user-card{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:7px;cursor:pointer;transition:background .15s}
+.user-card:hover{background:rgba(255,255,255,.06)}
+.user-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--gold-light),var(--gold));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:10px;color:rgba(195,214,238,.5);margin-top:1px}
+
+/* ── TOPBAR ──────────────────────────────── */
+.topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--header-h);background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:14px;z-index:90;transition:left .3s}
+.topbar-info{}
+.topbar-title{font-size:14px;font-weight:700;color:var(--navy)}
+.topbar-sub{font-size:11px;color:var(--gray);margin-top:1px}
+.topbar-spacer{flex:1}
+.search-box{display:flex;align-items:center;gap:7px;background:var(--off);border:1px solid var(--border);border-radius:8px;padding:6px 12px;transition:border-color .2s}
+.search-box:focus-within{border-color:var(--blue-soft)}
+.search-box svg{width:14px;height:14px;color:var(--gray);flex-shrink:0}
+.search-box input{border:none;background:none;outline:none;font-family:inherit;font-size:12.5px;color:var(--dark);width:170px}
+.topbar-btn{width:34px;height:34px;border-radius:7px;border:1px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;position:relative}
+.topbar-btn:hover{background:var(--off);border-color:#CBD5E1}
+.topbar-btn svg{width:16px;height:16px;color:var(--gray)}
+.notif-dot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:#EF4444;border:2px solid #fff}
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px}
+.hamburger svg{width:22px;height:22px;color:var(--navy)}
+
+/* ── MAIN ────────────────────────────────── */
+.main{margin-left:var(--sidebar-w);margin-top:var(--header-h);padding:20px;min-height:calc(100vh - var(--header-h));transition:margin-left .3s}
+
+/* ── PAGES ───────────────────────────────── */
+.page{display:none}
+.page.active{display:block;animation:fadeUp .22s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* ── SECTION HEADER ─────────────────────── */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.sec-title{font-size:15px;font-weight:700;color:var(--navy)}
+.sec-sub{font-size:11.5px;color:var(--gray);margin-top:2px}
+
+/* ── KPI CARDS ───────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin-bottom:18px}
+.kpi-card{background:var(--white);border:1px solid var(--border);border-radius:11px;padding:14px 16px;position:relative;overflow:hidden;transition:box-shadow .2s,transform .2s;cursor:default}
+.kpi-card:hover{box-shadow:0 4px 18px rgba(13,31,60,.07);transform:translateY(-2px)}
+.kpi-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kc,var(--blue))}
+.kpi-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.kpi-icon-box{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.kpi-icon-box svg{width:18px;height:18px}
+.kpi-delta{font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:20px;display:inline-flex;align-items:center;gap:2px}
+.kpi-val{font-size:26px;font-weight:800;color:var(--navy);font-family:'JetBrains Mono',monospace;line-height:1;letter-spacing:-.5px}
+.kpi-lbl{font-size:11px;color:var(--gray);margin-top:3px;font-weight:500}
+.dg{background:var(--green-bg);color:var(--green)}
+.dr{background:var(--red-bg);color:var(--red)}
+.dn{background:var(--amber-bg);color:var(--amber)}
+.dp{background:var(--purple-bg);color:var(--purple)}
+
+/* ── GRID ────────────────────────────────── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.g65{display:grid;grid-template-columns:1.6fr 1fr;gap:14px;margin-bottom:18px}
+.g_org{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+
+/* ── CARD ────────────────────────────────── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:11px;padding:16px;overflow:hidden}
+.card-title{font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.card-title svg{width:15px;height:15px;flex-shrink:0}
+.card-title-actions{margin-left:auto}
+
+/* ── BAR CHART ───────────────────────────── */
+.bar-chart{display:flex;flex-direction:column;gap:9px}
+.bar-row{display:grid;grid-template-columns:130px 1fr 52px;align-items:center;gap:9px}
+.bar-row.cmp{grid-template-columns:100px 1fr 42px}
+.bar-lbl{font-size:11px;font-weight:500;color:var(--gray);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-track{background:var(--off);border-radius:4px;height:7px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.bar-num{font-size:11px;font-weight:700;color:var(--navy);text-align:right;font-family:'JetBrains Mono',monospace}
+
+/* ── LINE CHART (SVG) ────────────────────── */
+.chart-svg{width:100%;overflow:visible}
+
+/* ── BADGES ──────────────────────────────── */
+.badge{font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.badge.green{background:var(--green-bg);color:var(--green)}
+.badge.red{background:var(--red-bg);color:var(--red)}
+.badge.blue{background:var(--blue-light);color:var(--blue)}
+.badge.amber{background:var(--amber-bg);color:var(--amber)}
+.badge.gray{background:#F1F5F9;color:#64748B}
+.badge.purple{background:var(--purple-bg);color:var(--purple)}
+.badge.gold{background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border)}
+
+/* ── TABLE ───────────────────────────────── */
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table th{background:var(--off);color:var(--gray);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;padding:9px 12px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--border)}
+.data-table td{padding:9px 12px;border-bottom:1px solid var(--off);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:#FAFBFE}
+.td-bold{font-weight:600;color:var(--navy)}
+.td-mono{font-family:'JetBrains Mono',monospace;font-size:11px}
+
+/* ── PROGRESS ────────────────────────────── */
+.prog{display:flex;align-items:center;gap:7px}
+.prog-track{flex:1;height:5px;background:var(--off);border-radius:3px;overflow:hidden;min-width:40px}
+.prog-fill{height:100%;border-radius:3px;transition:width 1s}
+.prog-pct{font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:28px}
+
+/* ── STATS PILLS ─────────────────────────── */
+.stat-pills{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.stat-pill{flex:1;min-width:100px;background:var(--white);border:1px solid var(--border);border-radius:9px;padding:11px 13px;display:flex;align-items:center;gap:9px}
+.spi{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.spi svg{width:17px;height:17px}
+.sp-val{font-size:17px;font-weight:800;color:var(--navy);font-family:'JetBrains Mono',monospace;line-height:1}
+.sp-lbl{font-size:10px;color:var(--gray);margin-top:1px}
+
+/* ── MEETING ROW ─────────────────────────── */
+.mrow{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--off)}
+.mrow:last-child{border-bottom:none}
+.mav{width:34px;height:34px;border-radius:50%;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--blue);flex-shrink:0}
+.minfo{flex:1;min-width:0}
+.mname{font-size:12px;font-weight:600;color:var(--navy)}
+.mmeta{font-size:10.5px;color:var(--gray);margin-top:1px}
+
+/* ── BUTTONS ─────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.btn svg{width:13px;height:13px}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:#1D4ED8}
+.btn-gold{background:linear-gradient(135deg,var(--gold-light),var(--gold));color:#fff}
+.btn-gold:hover{opacity:.9}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--dark)}
+.btn-outline:hover{background:var(--off)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid #FECACA}
+.btn-danger:hover{background:#FEE2E2}
+
+/* ── MODAL ───────────────────────────────── */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:300;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:13px;width:min(480px,100%);max-height:calc(100vh - 40px);overflow-y:auto;animation:mIn .2s ease}
+.modal-lg{width:min(640px,100%)}
+@keyframes mIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+.modal-hdr{padding:16px 18px 12px;border-bottom:1px solid var(--off);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;z-index:1}
+.modal-title{font-size:14px;font-weight:700;color:var(--navy)}
+.modal-close{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.modal-close svg{width:14px;height:14px;color:var(--gray)}
+.modal-body{padding:16px 18px}
+.modal-footer{padding:12px 18px;border-top:1px solid var(--off);display:flex;gap:7px;justify-content:flex-end}
+.form-group{margin-bottom:13px}
+.form-label{font-size:10.5px;font-weight:700;color:var(--gray);margin-bottom:4px;display:block;text-transform:uppercase;letter-spacing:.04em}
+.form-input{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;color:var(--dark);outline:none;transition:border-color .2s;background:#fff}
+.form-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+
+/* ── NOTIF PANEL ─────────────────────────── */
+.notif-panel{position:fixed;top:calc(var(--header-h) + 6px);right:14px;width:290px;background:var(--white);border:1px solid var(--border);border-radius:11px;box-shadow:0 8px 24px rgba(15,23,42,.1);z-index:200;display:none}
+.notif-panel.open{display:block;animation:fadeUp .18s}
+.notif-hdr{padding:12px 14px 9px;border-bottom:1px solid var(--off);display:flex;justify-content:space-between;align-items:center}
+.notif-ttl{font-size:12.5px;font-weight:700;color:var(--navy)}
+.notif-clr{font-size:11px;color:var(--blue);cursor:pointer;font-weight:500}
+.notif-item{padding:9px 14px;border-bottom:1px solid var(--off);display:flex;gap:9px;cursor:pointer;transition:background .12s}
+.notif-item:hover{background:var(--off)}
+.notif-item:last-child{border-bottom:none}
+.ndot{width:7px;height:7px;border-radius:50%;background:var(--blue);margin-top:4px;flex-shrink:0}
+.ndot.read{background:#CBD5E1}
+.ntxt{font-size:11px;color:var(--dark);line-height:1.4}
+.ntime{font-size:10px;color:var(--gray);margin-top:1px}
+
+/* ── TOAST ───────────────────────────────── */
+.toast-wrap{position:fixed;bottom:18px;right:18px;z-index:400;display:flex;flex-direction:column;gap:7px}
+.toast{background:var(--navy);color:#fff;padding:9px 14px;border-radius:9px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;animation:toIn .25s;max-width:260px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.toast svg{width:14px;height:14px;flex-shrink:0}
+.toast.ok{border-left:3px solid var(--green)}
+.toast.err{border-left:3px solid var(--red)}
+@keyframes toIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+
+/* ── SIDEBAR OVERLAY ─────────────────────── */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:99}
+
+/* ── DASTUR ITEM ─────────────────────────── */
+.dastur-item{border:1px solid var(--border);border-radius:9px;padding:13px 14px;margin-bottom:8px;transition:box-shadow .15s}
+.dastur-item:hover{box-shadow:0 2px 10px rgba(13,31,60,.06)}
+.dastur-item.green-border{border-left:3px solid var(--green)}
+.dastur-item.amber-border{border-left:3px solid var(--amber)}
+.dastur-item.red-border{border-left:3px solid var(--red)}
+.dastur-item.blue-border{border-left:3px solid var(--blue)}
+.di-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:5px}
+.di-title{font-size:13px;font-weight:600;color:var(--navy)}
+.di-meta{font-size:11px;color:var(--gray);margin-top:2px}
+.di-actions{display:flex;gap:6px;flex-shrink:0}
+
+/* ── AI TASDIQLASH ───────────────────────── */
+.ai-panel{background:var(--navy);border-radius:11px;padding:16px;color:#fff}
+.ai-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.ai-sub{font-size:11px;color:rgba(195,214,238,.6);margin-bottom:14px}
+.ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ai-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:11px;transition:background .15s}
+.ai-card:hover{background:rgba(255,255,255,.1)}
+.ai-card-title{font-size:11.5px;font-weight:600;color:#fff;display:flex;align-items:center;gap:7px;margin-bottom:3px}
+.ai-card-title svg{width:14px;height:14px}
+.ai-card-sub{font-size:10px;color:rgba(195,214,238,.6)}
+.ai-ok{font-size:10px;font-weight:600;color:#4ADE80;display:flex;align-items:center;gap:4px;margin-top:5px}
+.ai-ok svg{width:11px;height:11px}
+.ai-footer{margin-top:12px;font-size:10.5px;color:rgba(195,214,238,.5);display:flex;justify-content:space-between}
+
+/* ── XAVF ────────────────────────────────── */
+.xavf-item{padding:11px 13px;border-radius:8px;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between}
+.xavf-lbl{font-size:12px;font-weight:600}
+.xavf-sub{font-size:10.5px;opacity:.7;margin-top:1px}
+.xavf-pct{font-size:16px;font-weight:800;font-family:'JetBrains Mono',monospace}
+
+/* ── ORG CARD ────────────────────────────── */
+.org-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:14px}
+.org-hdr{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+.org-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.org-icon svg{width:18px;height:18px}
+.org-name{font-size:12.5px;font-weight:700;color:var(--navy)}
+.org-sub{font-size:10.5px;color:var(--gray);margin-top:1px}
+.org-stat{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.org-stat-lbl{font-size:11px;color:var(--gray)}
+.org-stat-val{font-size:13px;font-weight:700;color:var(--navy);font-family:'JetBrains Mono',monospace}
+
+/* ── REYTING LIST ────────────────────────── */
+.reyting-item{display:flex;align-items:center;gap:12px;padding:10px 13px;border-bottom:1px solid var(--off);transition:background .12s}
+.reyting-item:last-child{border-bottom:none}
+.reyting-item:hover{background:var(--off)}
+.r-rank{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.r-name{flex:1;font-size:12.5px;font-weight:600;color:var(--navy)}
+.r-sub{font-size:10.5px;color:var(--gray);margin-top:1px}
+.r-val{font-size:15px;font-weight:700;color:var(--navy);font-family:'JetBrains Mono',monospace;text-align:right}
+.r-delta{font-size:10px;font-weight:600;padding:2px 7px;border-radius:12px;display:inline-flex;align-items:center;gap:2px}
+
+/* ── STATISTIKA CARDS ────────────────────── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:11px;margin-bottom:18px}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:13px;display:flex;align-items:center;gap:11px;transition:box-shadow .15s}
+.stat-card:hover{box-shadow:0 3px 14px rgba(13,31,60,.07)}
+.sc-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sc-icon svg{width:19px;height:19px}
+.sc-val{font-size:20px;font-weight:800;color:var(--navy);font-family:'JetBrains Mono',monospace;line-height:1}
+.sc-lbl{font-size:11px;color:var(--gray);margin-top:2px}
+.sc-badge{margin-top:4px}
+
+/* ── MONTH TIMELINE (dastur) ─────────────── */
+.timeline{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin-top:8px}
+.tm-cell{height:14px;border-radius:3px;cursor:pointer;transition:opacity .15s;position:relative}
+.tm-cell:hover{opacity:.8}
+.tm-labels{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin-bottom:3px}
+.tm-lbl{font-size:8px;color:var(--gray);text-align:center;font-weight:600}
+
+/* ── RESPONSIVE ──────────────────────────── */
+@media(max-width:960px){.g2,.g65{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}.g_org{grid-template-columns:1fr 1fr}}
+@media(max-width:680px){
+  :root{--sidebar-w:0px}
+  .sidebar{transform:translateX(-248px);width:248px}
+  .sidebar.open{transform:translateX(0)}
+  .sb-overlay.open{display:block}
+  .topbar{left:0!important;padding:0 12px}
+  .hamburger{display:block}
+  .main{margin-left:0;padding:12px}
+  .search-box{display:none}
+  .kpi-grid{grid-template-columns:1fr 1fr;gap:9px}
+  .g2,.g3,.g65,.g_org{grid-template-columns:1fr}
+  .g4{grid-template-columns:1fr 1fr}
+  .bar-row{grid-template-columns:75px 1fr 34px}
+  .ai-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+}
+@media(max-width:400px){.kpi-grid{grid-template-columns:1fr 1fr}.g4{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2L4 6v6c0 5.5 3.8 10.7 8 12 4.2-1.3 8-6.5 8-12V6l-8-4z"/></svg>
+    </div>
+    <div class="sb-logo-text">Yoshlar yagona elektron<span>platformasi · v2.0</span></div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label">Asosiy</div>
+    <button class="nav-item active" onclick="showPage('bosh',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Bosh sahifa <span class="nav-badge" id="nb-bosh">●</span>
+    </button>
+    <button class="nav-item" onclick="showPage('yoshlar',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Yoshlar ro'yxati <span class="nav-badge" id="nb-yoshlar">47</span>
+    </button>
+    <button class="nav-item" onclick="showPage('uchrashuvlar',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+      Uchrashuvlar <span class="nav-badge" id="nb-uch">6</span>
+    </button>
+    <button class="nav-item" onclick="showPage('dasturlar',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Dasturlar
+    </button>
+    <button class="nav-item" onclick="showPage('reyting',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Reyting
+    </button>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label">Tahlil</div>
+    <button class="nav-item" onclick="showPage('statistika',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Statistika
+    </button>
+    <button class="nav-item" onclick="showPage('hisobot',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+      Hisobotlar
+    </button>
+    <button class="nav-item" onclick="showPage('soglomlash',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      So'glamlashtirish
+    </button>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label">Tizim</div>
+    <button class="nav-item" onclick="showPage('audit',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Audit log
+    </button>
+    <button class="nav-item" onclick="showPage('sozlamalar',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M20 12h1M3 12H2M12 20v1M12 3V2"/></svg>
+      Sozlamalar
+    </button>
+  </div>
+
+  <div class="sb-bottom">
+    <div class="user-card" onclick="openModal('profileModal')">
+      <div class="user-av" id="sbAv">TA</div>
+      <div style="flex:1;min-width:0">
+        <div class="user-name" id="sbName">Toshmatov Alisher</div>
+        <div class="user-role" id="sbRole">Mas'ul Xodim · Toshkent</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- TOPBAR -->
+<header class="topbar" id="topbar">
+  <button class="hamburger" onclick="toggleSidebar()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <div class="topbar-info">
+    <div class="topbar-title" id="topTitle">Bosh Sahifa</div>
+    <div class="topbar-sub" id="topDate"></div>
+  </div>
+  <div class="topbar-spacer"></div>
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Qidirish..." id="searchInp" oninput="onSearch(this.value)">
+  </div>
+  <button class="topbar-btn" onclick="toggleNotif()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span class="notif-dot" id="ndot"></span>
+  </button>
+  <button class="topbar-btn" onclick="openModal('profileModal')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+  </button>
+</header>
+
+<!-- NOTIFICATIONS -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-hdr">
+    <span class="notif-ttl">Bildirishnomalar</span>
+    <span class="notif-clr" onclick="clearNotifs()">Barchasini o'qish</span>
+  </div>
+  <div id="notifList"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGES
+══════════════════════════════════════════════════════════════ -->
+<main class="main">
+
+<!-- ═══ BOSH SAHIFA ═══ -->
+<div class="page active" id="page-bosh">
+  <!-- KPI Row 1: Tashkilotlar -->
+  <div style="margin-bottom:6px"><span style="font-size:11px;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.05em">Tashkilotlar bo'yicha yoshlar</span></div>
+  <div class="kpi-grid" style="margin-bottom:14px">
+    <div class="kpi-card" style="--kc:var(--gold-light)">
+      <div class="kpi-top">
+        <div class="kpi-icon-box" style="background:var(--gold-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <span class="kpi-delta dn">Jami 8 toifa</span>
+      </div>
+      <div class="kpi-val">29 717</div>
+      <div class="kpi-lbl">Umumiy yoshlar</div>
+    </div>
+    <div class="kpi-card" style="--kc:#1E40AF">
+      <div class="kpi-top">
+        <div class="kpi-icon-box" style="background:#EFF6FF"><svg viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <span class="kpi-delta dg">↑ 32%</span>
+      </div>
+      <div class="kpi-val">9 897</div>
+      <div class="kpi-lbl">Ichki Ishlar Vazirligi</div>
+    </div>
+    <div class="kpi-card" style="--kc:#15803D">
+      <div class="kpi-top">
+        <div class="kpi-icon-box" style="background:var(--green-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+        <span class="kpi-delta dg">↑ 44%</span>
+      </div>
+      <div class="kpi-val">7 921</div>
+      <div class="kpi-lbl">Mudofaa Vazirligi</div>
+    </div>
+    <div class="kpi-card" style="--kc:var(--red)">
+      <div class="kpi-top">
+        <div class="kpi-icon-box" style="background:var(--red-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <span class="kpi-delta dr">↓ 71%</span>
+      </div>
+      <div class="kpi-val">2 150</div>
+      <div class="kpi-lbl">FV Vazirligi</div>
+    </div>
+    <div class="kpi-card" style="--kc:var(--purple)">
+      <div class="kpi-top">
+        <div class="kpi-icon-box" style="background:var(--purple-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <span class="kpi-delta dg">↑ 55%</span>
+      </div>
+      <div class="kpi-val">1 584</div>
+      <div class="kpi-lbl">Bosh Prokuratura</div>
+    </div>
+    <div class="kpi-card" style="--kc:var(--teal)">
+      <div class="kpi-top">
+        <div class="kpi-icon-box" style="background:var(--teal-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+        <span class="kpi-delta dg">↑ 50%</span>
+      </div>
+      <div class="kpi-val">2 001</div>
+      <div class="kpi-lbl">Xokimiyat</div>
+    </div>
+    <div class="kpi-card" style="--kc:#EA580C">
+      <div class="kpi-top">
+        <div class="kpi-icon-box" style="background:#FFF7ED"><svg viewBox="0 0 24 24" fill="none" stroke="#EA580C" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <span class="kpi-delta dg">↑ 77%</span>
+      </div>
+      <div class="kpi-val">1 558</div>
+      <div class="kpi-lbl">Milliy Gvardiya</div>
+    </div>
+    <div class="kpi-card" style="--kc:var(--gold)">
+      <div class="kpi-top">
+        <div class="kpi-icon-box" style="background:var(--gold-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+        <span class="kpi-delta dg">↑ 82%</span>
+      </div>
+      <div class="kpi-val">82</div>
+      <div class="kpi-lbl">O'rtacha reyting bali</div>
+    </div>
+  </div>
+
+  <!-- Charts row -->
+  <div class="g65">
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Toifalar bo'yicha yoshlar
+      </div>
+      <div class="bar-chart" id="toifaChart"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Oylik reyting dinamikasi
+      </div>
+      <svg class="chart-svg" id="lineChart" height="120" viewBox="0 0 300 120"></svg>
+      <div style="display:flex;gap:12px;margin-top:6px;flex-wrap:wrap" id="lineChartLbl"></div>
+    </div>
+  </div>
+
+  <!-- Bottom row -->
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Uchrashuvlar holati
+        <div class="card-title-actions">
+          <button class="btn btn-sm btn-primary" onclick="showPage('uchrashuvlar',null)">Barchasi</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div style="background:var(--navy);border-radius:9px;padding:12px;text-align:center">
+          <div style="font-size:28px;font-weight:800;color:#fff;font-family:'JetBrains Mono',monospace">82</div>
+          <div style="font-size:11px;color:rgba(195,214,238,.7);margin-top:2px">Uchrashilgan</div>
+        </div>
+        <div style="background:var(--navy-light);border-radius:9px;padding:12px;text-align:center">
+          <div style="font-size:28px;font-weight:800;color:#fff;font-family:'JetBrains Mono',monospace">12</div>
+          <div style="font-size:11px;color:rgba(195,214,238,.7);margin-top:2px">Uchrashmagan</div>
+        </div>
+      </div>
+      <div style="height:6px;background:var(--off);border-radius:3px;overflow:hidden;margin-bottom:6px"><div style="width:87%;height:100%;background:var(--blue);border-radius:3px"></div></div>
+      <div style="font-size:11px;color:var(--gray)">87% uchrashilgan · <b style="color:var(--amber)">6 ta</b> tasdiqlash kutilmoqda</div>
+      <div style="margin-top:13px">
+        <div style="font-size:11.5px;font-weight:700;color:var(--navy);margin-bottom:9px">Yaqin uchrashuvlar</div>
+        <div id="upcomingList"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        Bo'sh vaqtni mazmunli o'tkazish
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="leisureGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ YOSHLAR ═══ -->
+<div class="page" id="page-yoshlar">
+  <div class="sec-hdr">
+    <div><div class="sec-title">Yoshlar Ro'yxati</div><div class="sec-sub" id="yoshCount">Jami 15 nafar ko'rsatilmoqda</div></div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <select class="form-input" style="width:auto;padding:5px 9px;font-size:11.5px" id="tfFilter" onchange="filterYoshlar()">
+        <option value="">Barcha toifalar</option>
+        <option value="I">I — Probatsiya</option><option value="II">II — Yod g'oya</option>
+        <option value="III">III — Sudlangan</option><option value="IV">IV — Ma'muriy</option>
+        <option value="V">V — Voyaga yet.</option><option value="VI">VI — Giyohvand</option>
+        <option value="VII">VII — Mehr. uyi</option><option value="VIII">VIII — Agressiv</option>
+      </select>
+      <select class="form-input" style="width:auto;padding:5px 9px;font-size:11.5px" id="stFilter" onchange="filterYoshlar()">
+        <option value="">Barcha holat</option>
+        <option>Bajarilgan</option><option>Jarayonda</option><option>Kechiktirilgan</option>
+      </select>
+      <button class="btn btn-gold btn-sm" onclick="openModal('addYoshModal')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Qo'shish
+      </button>
+    </div>
+  </div>
+  <div class="card" style="overflow-x:auto">
+    <table class="data-table">
+      <thead><tr><th>#</th><th>FIO</th><th>Toifa</th><th>Dastur ijrosi</th><th>Oxirgi uchrashuv</th><th>Reyting</th><th>Holat</th><th>Amal</th></tr></thead>
+      <tbody id="yoshTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ UCHRASHUVLAR ═══ -->
+<div class="page" id="page-uchrashuvlar">
+  <div class="sec-hdr">
+    <div><div class="sec-title">Uchrashuvlar Jurnali</div><div class="sec-sub">FaceID + OneID + GPS nazorat</div></div>
+    <button class="btn btn-primary btn-sm" onclick="openModal('addUchModal')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Yangi uchrashuv
+    </button>
+  </div>
+  <div class="stat-pills">
+    <div class="stat-pill"><div class="spi" style="background:var(--green-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><div><div class="sp-val">82</div><div class="sp-lbl">Bajarilgan</div></div></div>
+    <div class="stat-pill"><div class="spi" style="background:var(--amber-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div class="sp-val">6</div><div class="sp-lbl">Kutilmoqda</div></div></div>
+    <div class="stat-pill"><div class="spi" style="background:var(--red-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div><div class="sp-val">12</div><div class="sp-lbl">Bajarilmagan</div></div></div>
+    <div class="stat-pill"><div class="spi" style="background:var(--blue-light)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div><div class="sp-val">94</div><div class="sp-lbl">Jami</div></div></div>
+    <div class="stat-pill"><div class="spi" style="background:var(--gold-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div><div class="sp-val">82.4</div><div class="sp-lbl">O'rt. ball</div></div></div>
+  </div>
+  <div class="card" style="overflow-x:auto">
+    <table class="data-table">
+      <thead><tr><th>#</th><th>FIO</th><th>Toifa</th><th>Sana / Vaqt</th><th>Joy</th><th>FaceID</th><th>Holat</th><th>Ball</th></tr></thead>
+      <tbody id="uchTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ DASTURLAR ═══ -->
+<div class="page" id="page-dasturlar">
+  <div class="sec-hdr">
+    <div>
+      <div class="sec-title">Dasturlar Moduli</div>
+      <div class="sec-sub">Har bir yosh uchun toifasiga ko'ra namunaviy dastur</div>
+    </div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <select class="form-input" style="width:auto;padding:5px 9px;font-size:11.5px" id="dasturYoshFilter" onchange="renderDasturPage()">
+        <option value="">Yoshni tanlang...</option>
+      </select>
+      <button class="btn btn-gold btn-sm" onclick="openModal('createDasturModal')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Dastur yaratish
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="g3" style="margin-bottom:16px">
+    <div class="kpi-card" style="--kc:var(--green)">
+      <div class="kpi-top"><div class="kpi-icon-box" style="background:var(--green-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="kpi-val" style="color:var(--green)">72%</div>
+      <div class="kpi-lbl">Bajarilgan bandlar</div>
+    </div>
+    <div class="kpi-card" style="--kc:var(--blue)">
+      <div class="kpi-top"><div class="kpi-icon-box" style="background:var(--blue-light)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg></div></div>
+      <div class="kpi-val" style="color:var(--blue)">18%</div>
+      <div class="kpi-lbl">Jarayonda</div>
+    </div>
+    <div class="kpi-card" style="--kc:var(--red)">
+      <div class="kpi-top"><div class="kpi-icon-box" style="background:var(--red-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div></div>
+      <div class="kpi-val" style="color:var(--red)">10%</div>
+      <div class="kpi-lbl">Kechiktirilgan</div>
+    </div>
+  </div>
+
+  <!-- Active programs table -->
+  <div class="g65">
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Faol dasturlar
+        <div class="card-title-actions"><button class="btn btn-sm btn-outline" onclick="openModal('createDasturModal')">+ Yangi</button></div>
+      </div>
+      <div id="aktivDasturlar"></div>
+    </div>
+
+    <!-- AI Tasdiqlash Panel -->
+    <div>
+      <div class="ai-panel">
+        <div class="ai-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold-light)" stroke-width="2" style="width:16px;height:16px"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          AI Tasdiqlash tizimi
+        </div>
+        <div class="ai-sub">Avtomatlashtirilgan nazorat</div>
+        <div class="ai-grid">
+          <div class="ai-card">
+            <div class="ai-card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              FaceID
+            </div>
+            <div class="ai-card-sub">Yuz aniqlash orqali tasdiqlangan</div>
+            <div class="ai-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Faollashtirilgan</div>
+          </div>
+          <div class="ai-card">
+            <div class="ai-card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+              OneID
+            </div>
+            <div class="ai-card-sub">Biometrik tasdiqlov</div>
+            <div class="ai-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Tasdiqlangan</div>
+          </div>
+          <div class="ai-card">
+            <div class="ai-card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+              Geo nazorat
+            </div>
+            <div class="ai-card-sub">Joylashuv koordinatalari</div>
+            <div class="ai-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Real-time</div>
+          </div>
+          <div class="ai-card">
+            <div class="ai-card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Vaqt nazorati
+            </div>
+            <div class="ai-card-sub">Avtomatik timestamp</div>
+            <div class="ai-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Sinxronlashgan</div>
+          </div>
+        </div>
+        <div class="ai-footer">
+          <span>Oxirgi tekshiruv:</span>
+          <span id="aiLastCheck"></span>
+        </div>
+      </div>
+
+      <!-- Xavf tahlili -->
+      <div class="card" style="margin-top:14px">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+          Xavf darajasi tahlili
+        </div>
+        <div class="xavf-item" style="background:var(--green-bg)">
+          <div><div class="xavf-lbl" style="color:var(--green)">Past xavf</div><div class="xavf-sub" style="color:var(--green)">1,245 nafar</div></div>
+          <div class="xavf-pct" style="color:var(--green)">67.6%</div>
+        </div>
+        <div class="xavf-item" style="background:var(--amber-bg)">
+          <div><div class="xavf-lbl" style="color:var(--amber)">O'rta xavf</div><div class="xavf-sub" style="color:var(--amber)">485 nafar</div></div>
+          <div class="xavf-pct" style="color:var(--amber)">26.4%</div>
+        </div>
+        <div class="xavf-item" style="background:var(--red-bg)">
+          <div><div class="xavf-lbl" style="color:var(--red)">Yuqori xavf</div><div class="xavf-sub" style="color:var(--red)">110 nafar</div></div>
+          <div class="xavf-pct" style="color:var(--red)">6.0%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ REYTING ═══ -->
+<div class="page" id="page-reyting">
+  <div class="sec-hdr">
+    <div><div class="sec-title">Tashkilotlar Reytingi</div><div class="sec-sub">Top 10 tashkilot · Real-time yangilanadi</div></div>
+  </div>
+  <div class="g65">
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Tashkilotlar reytingi
+      </div>
+      <div id="reytingList"></div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Tashkilotlar statistikasi
+        </div>
+        <div id="orgStatList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ STATISTIKA ═══ -->
+<div class="page" id="page-statistika">
+  <div class="sec-hdr">
+    <div><div class="sec-title">Statistika va Tahlil</div><div class="sec-sub">Tizim foydalanuvchilari tomonidan amalga oshirilgan ishlar hisobotlari</div></div>
+    <button class="btn btn-sm btn-outline" onclick="toast('Statistika yangilanmoqda...','ok')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+      Yangilash
+    </button>
+  </div>
+
+  <!-- Main stats grid -->
+  <div class="stat-grid" id="statGrid"></div>
+
+  <!-- Charts -->
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Oylik dinamika (uchrashuv soni)
+      </div>
+      <svg class="chart-svg" id="statLineChart" height="120" viewBox="0 0 300 120"></svg>
+    </div>
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Bandlik holati taqsimoti
+      </div>
+      <div class="bar-chart" id="bandlikChart"></div>
+    </div>
+  </div>
+
+  <!-- Full indicators -->
+  <div class="card">
+    <div class="card-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      20+ ko'rsatkich monitoringi (batafsil)
+    </div>
+    <div class="bar-chart" id="fullIndChart"></div>
+  </div>
+
+  <!-- Org stats -->
+  <div style="margin-top:16px">
+    <div class="sec-title" style="margin-bottom:12px">Tashkilotlar bo'yicha statistika</div>
+    <div class="g_org" id="orgCardsGrid"></div>
+  </div>
+</div>
+
+<!-- ═══ HISOBOTLAR ═══ -->
+<div class="page" id="page-hisobot">
+  <div class="sec-hdr">
+    <div><div class="sec-title">Hisobotlar</div><div class="sec-sub">Faqat PDF formatda · 24 soat tasdiqlash</div></div>
+    <button class="btn btn-gold btn-sm" onclick="toast('PDF tayyorlanmoqda...','ok')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      PDF yuklab olish
+    </button>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>So'nggi hisobotlar</div><div id="hisobotList"></div></div>
+    <div class="card"><div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Tasdiqlash navbati <span style="margin-left:4px" class="badge amber">24 soat</span></div><div id="tasdiqList"></div></div>
+  </div>
+  <div class="card" style="margin-top:0">
+    <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Muhim eslatmalar</div>
+    <div style="background:var(--blue-light);border-radius:8px;padding:12px;font-size:12px;color:#1E40AF;line-height:1.7">
+      📌 Tizimga <b>faqat PDF</b> formatdagi fayllar yuklanadi (gpg, pptx, doc, xlsx formatlar qabul qilinmaydi)<br>
+      📌 Hisobotlar <b>24 soat</b> ichida yuqori vakil tomonidan, so'ng MFY yoshlar yetakchisi tomonidan tasdiqlanadi<br>
+      📌 Muddat o'tgan vazifalar reyting balliga <b>salbiy ta'sir</b> qiladi<br>
+      📌 Qayta jinoyat sodir etganlik va kechiktirilgan bajarilishlar uchun reyting <b>tushib ketadi</b>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SO'GLAMLASHTIRISH ═══ -->
+<div class="page" id="page-soglomlash">
+  <div class="sec-hdr">
+    <div><div class="sec-title">So'glamlashtirish</div><div class="sec-sub">MFY yetakchisi tavsiyasi asosida</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>So'glamlashtirilgan yoshlar</div>
+      <div style="background:var(--green);border-radius:10px;padding:16px;color:#fff;margin-bottom:12px">
+        <div style="font-size:36px;font-weight:800;font-family:'JetBrains Mono',monospace">420</div>
+        <div style="font-size:11px;opacity:.8;margin-top:4px">Umumiy maqsad: 550 — 76% bajarildi</div>
+        <div style="height:6px;background:rgba(255,255,255,.3);border-radius:3px;overflow:hidden;margin-top:8px"><div style="width:76%;height:100%;background:#fff;border-radius:3px"></div></div>
+      </div>
+      <div class="bar-chart" id="soglomlashChart"></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>So'glamlashtirish tartibi</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">1</div>
+          <div><div style="font-size:12.5px;font-weight:600;color:var(--navy)">Dastur bandlarini bajarish</div><div style="font-size:11px;color:var(--gray);margin-top:2px">Barcha belgilangan vazifalar to'liq bajarilishi</div></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">2</div>
+          <div><div style="font-size:12.5px;font-weight:600;color:var(--navy)">Yo'naltirish bo'limi ochiladi</div><div style="font-size:11px;color:var(--gray);margin-top:2px">Yashash manzili bo'yicha yo'naltiriladi</div></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">3</div>
+          <div><div style="font-size:12.5px;font-weight:600;color:var(--navy)">MFY yettiligidan tavsiyoma</div><div style="font-size:11px;color:var(--gray);margin-top:2px">Haqiqatan so'glamlashtirilganligi tan olinadi</div></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div style="width:26px;height:26px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">4</div>
+          <div><div style="font-size:12.5px;font-weight:600;color:var(--navy)">So'glamlashtirilgan hisoblanadi</div><div style="font-size:11px;color:var(--gray);margin-top:2px">Tizimda "so'glamlashtirilgan" statusiga o'tadi</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ AUDIT LOG ═══ -->
+<div class="page" id="page-audit">
+  <div class="sec-hdr"><div><div class="sec-title">Audit Log</div><div class="sec-sub">Tizim harakatlari tarixi</div></div></div>
+  <div class="card" style="overflow-x:auto">
+    <table class="data-table">
+      <thead><tr><th>Vaqt</th><th>Foydalanuvchi</th><th>Harakat</th><th>Ob'ekt</th><th>IP</th><th>Holat</th></tr></thead>
+      <tbody id="auditTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ SOZLAMALAR ═══ -->
+<div class="page" id="page-sozlamalar">
+  <div class="sec-hdr"><div><div class="sec-title">Sozlamalar</div></div></div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profil ma'lumotlari</div>
+      <div class="form-group"><label class="form-label">To'liq FIO</label><input type="text" class="form-input" id="setName" value="Toshmatov Alisher"></div>
+      <div class="form-group"><label class="form-label">Hudud</label>
+        <select class="form-input" id="setRegion">
+          <option>Toshkent shahri</option><option>Toshkent viloyati</option><option>Samarqand viloyati</option>
+          <option>Farg'ona viloyati</option><option>Andijon viloyati</option><option>Namangan viloyati</option>
+          <option>Buxoro viloyati</option><option>Qashqadaryo viloyati</option><option>Surxandaryo viloyati</option>
+          <option>Xorazm viloyati</option><option>Navoiy viloyati</option><option>Jizzax viloyati</option>
+          <option>Sirdaryo viloyati</option><option>Qoraqalpog'iston</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Lavozim</label>
+        <select class="form-input"><option>Mas'ul Xodim</option><option>Yuqori Vakil</option><option>MFY Yoshlar Yetakchisi</option><option>Administrator</option></select>
+      </div>
+      <button class="btn btn-gold" onclick="saveSettings()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Saqlash
+      </button>
+    </div>
+    <div class="card">
+      <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>Bildirishnoma sozlamalari</div>
+      <div id="notifSettings"></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- ══════════════ MODALS ══════════════ -->
+
+<!-- Profile Modal -->
+<div class="modal-overlay" id="profileModal">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title">Profil</span><button class="modal-close" onclick="closeModal('profileModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:center;gap:13px;margin-bottom:16px">
+        <div class="user-av" style="width:52px;height:52px;font-size:20px;border-radius:50%" id="profAv">TA</div>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--navy)" id="profName">Toshmatov Alisher</div>
+          <div style="font-size:12px;color:var(--gray)" id="profRole">Mas'ul Xodim · Toshkent shahri</div>
+          <span class="badge green" style="margin-top:5px">● Online</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div><div style="font-size:11px;color:var(--gray);margin-bottom:4px;font-weight:600">KPI Reyting</div><div style="display:flex;align-items:center;gap:8px"><div class="prog-track" style="flex:1;height:9px"><div class="prog-fill" style="width:82%;background:var(--blue)"></div></div><span style="font-size:12px;font-weight:700;font-family:'JetBrains Mono'">82/100</span></div></div>
+        <div><div style="font-size:11px;color:var(--gray);margin-bottom:4px;font-weight:600">Uchrashuv bajarish</div><div style="display:flex;align-items:center;gap:8px"><div class="prog-track" style="flex:1;height:9px"><div class="prog-fill" style="width:87%;background:var(--green)"></div></div><span style="font-size:12px;font-weight:700;font-family:'JetBrains Mono'">87%</span></div></div>
+        <div><div style="font-size:11px;color:var(--gray);margin-bottom:4px;font-weight:600">Dastur ijrosi</div><div style="display:flex;align-items:center;gap:8px"><div class="prog-track" style="flex:1;height:9px"><div class="prog-fill" style="width:72%;background:var(--gold)"></div></div><span style="font-size:12px;font-weight:700;font-family:'JetBrains Mono'">72%</span></div></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('profileModal')">Yopish</button>
+      <button class="btn btn-primary" onclick="showPage('sozlamalar',null);closeModal('profileModal')">Tahrirlash</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Yosh -->
+<div class="modal-overlay" id="addYoshModal">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title">Yangi Yosh Qo'shish</span><button class="modal-close" onclick="closeModal('addYoshModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">To'liq FIO</label><input type="text" class="form-input" id="nyName" placeholder="Familiya Ism Otasining ismi"></div>
+      <div class="form-group"><label class="form-label">Toifa</label>
+        <select class="form-input" id="nyToifa">
+          <option value="I">I — Probatsiya nazoratidagilar</option>
+          <option value="II">II — Yod g'oyalar ta'siriga tushganlar</option>
+          <option value="III">III — Ilgari sudlanganlar</option>
+          <option value="IV">IV — Ma'muriy huquqbuzarlik</option>
+          <option value="V">V — Jinoyat qilgan voyaga yetmaganlar</option>
+          <option value="VI">VI — Giyohvandlar</option>
+          <option value="VII">VII — Mehribonlik uyidan chiqqanlar</option>
+          <option value="VIII">VIII — Agressiv xulq-atvorli yoshlar</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Tug'ilgan yil</label><input type="number" class="form-input" id="nyYil" placeholder="2000" min="1985" max="2010"></div>
+        <div class="form-group"><label class="form-label">Jins</label><select class="form-input" id="nyJins"><option>Erkak</option><option>Ayol</option></select></div>
+      </div>
+      <div class="form-group"><label class="form-label">Manzil</label><input type="text" class="form-input" id="nyManzil" placeholder="Tuman, ko'cha..."></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('addYoshModal')">Bekor</button>
+      <button class="btn btn-gold" onclick="addYosh()">Qo'shish</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Uchrashuv -->
+<div class="modal-overlay" id="addUchModal">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title">Yangi Uchrashuv</span><button class="modal-close" onclick="closeModal('addUchModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Yosh</label><select class="form-input" id="uchYosh"></select></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Sana</label><input type="date" class="form-input" id="uchSana"></div>
+        <div class="form-group"><label class="form-label">Vaqt</label><input type="time" class="form-input" id="uchVaqt" value="10:00"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Joy / Manzil</label><input type="text" class="form-input" id="uchJoy" placeholder="MFY, ko'cha..."></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('addUchModal')">Bekor</button>
+      <button class="btn btn-primary" onclick="addUch()">Belgilash</button>
+    </div>
+  </div>
+</div>
+
+<!-- Yosh detail -->
+<div class="modal-overlay" id="yoshDetailModal">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title" id="detailTitle">Yosh ma'lumotlari</span><button class="modal-close" onclick="closeModal('yoshDetailModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body" id="detailBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('yoshDetailModal')">Yopish</button>
+      <button class="btn btn-primary" onclick="closeModal('yoshDetailModal');openModal('addUchModal')">Uchrashuv belgilash</button>
+      <button class="btn btn-gold" onclick="closeModal('yoshDetailModal');openModal('createDasturModal')">Dastur yaratish</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Dastur Modal -->
+<div class="modal-overlay" id="createDasturModal">
+  <div class="modal modal-lg">
+    <div class="modal-hdr"><span class="modal-title">Dastur Yaratish</span><button class="modal-close" onclick="closeModal('createDasturModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Yosh</label><select class="form-input" id="cdYosh" onchange="loadTemplateDastur()"></select></div>
+        <div class="form-group"><label class="form-label">Toifasi</label><input type="text" class="form-input" id="cdToifa" readonly style="background:var(--off)"></div>
+      </div>
+      <div style="margin-bottom:13px">
+        <label class="form-label">Namunaviy dastur bandlari (toifaga ko'ra)</label>
+        <div id="dasturBandlar" style="border:1px solid var(--border);border-radius:8px;padding:12px;max-height:320px;overflow-y:auto"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Qo'shimcha muammo (ixtiyoriy)</label>
+        <textarea class="form-input" rows="2" placeholder="Aniqlangan muammo, izoh..." style="resize:vertical" id="cdIzoh"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('createDasturModal')">Bekor</button>
+      <button class="btn btn-gold" onclick="saveDastur()">Dastur yaratish</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+// ─────────────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────────────
+const YOSHLAR = [
+  {id:1,name:"Rahimov Bekzod",     toifa:"I",   ijro:72,uch:"24.02.2025",reyting:78,holat:"Jarayonda",    yil:2001,jins:"Erkak",manzil:"Yunusobod, 5-ko'cha"},
+  {id:2,name:"Xoliqov Jasur",      toifa:"VI",  ijro:45,uch:"20.02.2025",reyting:55,holat:"Kechiktirilgan",yil:1999,jins:"Erkak",manzil:"Chilonzor, 9-mavze"},
+  {id:3,name:"Tursunova Malika",   toifa:"VII", ijro:95,uch:"25.02.2025",reyting:92,holat:"Bajarilgan",   yil:2003,jins:"Ayol", manzil:"Mirzo Ulug'bek, 3-ko'cha"},
+  {id:4,name:"Mirzayev Sarvar",    toifa:"III", ijro:60,uch:"22.02.2025",reyting:67,holat:"Jarayonda",    yil:2000,jins:"Erkak",manzil:"Shayxontohur, 12-uy"},
+  {id:5,name:"Karimov Ulugbek",    toifa:"II",  ijro:33,uch:"18.02.2025",reyting:41,holat:"Kechiktirilgan",yil:2002,jins:"Erkak",manzil:"Olmazor, 7-ko'cha"},
+  {id:6,name:"Nazarova Dilnoza",   toifa:"VII", ijro:88,uch:"26.02.2025",reyting:85,holat:"Jarayonda",    yil:2004,jins:"Ayol", manzil:"Uchtepa, 2-mavze"},
+  {id:7,name:"Yusupov Sherzod",    toifa:"V",   ijro:54,uch:"21.02.2025",reyting:60,holat:"Jarayonda",    yil:2005,jins:"Erkak",manzil:"Bektemir, asosiy ko'cha"},
+  {id:8,name:"Qodirov Mansur",     toifa:"I",   ijro:80,uch:"23.02.2025",reyting:82,holat:"Jarayonda",    yil:2000,jins:"Erkak",manzil:"Yakkasaroy, 4-ko'cha"},
+  {id:9,name:"Askarova Zulfiya",   toifa:"IV",  ijro:100,uch:"26.02.2025",reyting:96,holat:"Bajarilgan",  yil:2001,jins:"Ayol", manzil:"Sergeli, 14-mavze"},
+  {id:10,name:"Tojiboyev Kamol",   toifa:"VIII",ijro:25,uch:"15.02.2025",reyting:32,holat:"Kechiktirilgan",yil:2003,jins:"Erkak",manzil:"Zangiota, 1-ko'cha"},
+  {id:11,name:"Holmatova Nargiza", toifa:"II",  ijro:70,uch:"24.02.2025",reyting:74,holat:"Jarayonda",    yil:2002,jins:"Ayol", manzil:"Qibray, 3-ko'cha"},
+  {id:12,name:"Sobirov Eldor",     toifa:"VI",  ijro:50,uch:"19.02.2025",reyting:58,holat:"Jarayonda",    yil:2001,jins:"Erkak",manzil:"Ohangaron, 6-ko'cha"},
+  {id:13,name:"Ergasheva Barno",   toifa:"III", ijro:90,uch:"25.02.2025",reyting:88,holat:"Bajarilgan",   yil:2000,jins:"Ayol", manzil:"Yangiyo'l, 8-ko'cha"},
+  {id:14,name:"Rustamov Bobur",    toifa:"I",   ijro:65,uch:"20.02.2025",reyting:70,holat:"Jarayonda",    yil:2004,jins:"Erkak",manzil:"Angren, asosiy ko'cha"},
+  {id:15,name:"Mahmudova Feruza",  toifa:"VII", ijro:98,uch:"26.02.2025",reyting:97,holat:"Bajarilgan",   yil:2003,jins:"Ayol", manzil:"Piskent, 2-ko'cha"},
+];
+
+const UCHRASHUVLAR = [
+  {id:1,name:"Rahimov Bekzod",  toifa:"I",  sana:"24.02.2025",vaqt:"10:00",joy:"Yunusobod MFY",      faceid:true, holat:"Bajarilgan",      ball:"+5"},
+  {id:2,name:"Xoliqov Jasur",   toifa:"VI", sana:"20.02.2025",vaqt:"14:30",joy:"Chilonzor 9-mavze",  faceid:true, holat:"Kechiktirilgan",  ball:"-2"},
+  {id:3,name:"Tursunova Malika",toifa:"VII",sana:"25.02.2025",vaqt:"09:00",joy:"Mirzo Ulug'bek MFY", faceid:true, holat:"Bajarilgan",      ball:"+5"},
+  {id:4,name:"Mirzayev Sarvar", toifa:"III",sana:"22.02.2025",vaqt:"11:00",joy:"Shayxontohur MFY",   faceid:false,holat:"Bajarilgan",      ball:"+4"},
+  {id:5,name:"Karimov Ulugbek", toifa:"II", sana:"18.02.2025",vaqt:"15:00",joy:"Olmazor 7-ko'cha",   faceid:false,holat:"Bajarilmagan",    ball:"0"},
+  {id:6,name:"Nazarova Dilnoza",toifa:"VII",sana:"28.02.2025",vaqt:"10:30",joy:"Uchtepa MFY",        faceid:false,holat:"Rejalashtirilgan", ball:"—"},
+  {id:7,name:"Yusupov Sherzod", toifa:"V",  sana:"28.02.2025",vaqt:"14:00",joy:"Bektemir MFY",       faceid:false,holat:"Rejalashtirilgan", ball:"—"},
+  {id:8,name:"Qodirov Mansur",  toifa:"I",  sana:"23.02.2025",vaqt:"09:30",joy:"Yakkasaroy MFY",     faceid:true, holat:"Bajarilgan",      ball:"+5"},
+];
+
+const NOTIFS = [
+  {text:"Karimov Ulugbek uchrashuvni o'tkazib yubordi",       time:"30 daqiqa oldin",read:false},
+  {text:"Tursunova Malika dasturini 100% bajarib bo'ldi",     time:"2 soat oldin",   read:false},
+  {text:"Xoliqov Jasur hisoboti tasdiqlash kutmoqda",         time:"Kecha",          read:false},
+  {text:"Yangi ko'rsatma: PDF formatda hisobot yuklash",      time:"Kecha",          read:true},
+  {text:"Tojiboyev Kamol reytingi 32 ga tushdi — diqqat!",    time:"2 kun oldin",    read:true},
+];
+
+const TOIFALAR = [
+  {r:"I",   n:"Probatsiya",          cnt:10919, col:"#1E40AF"},
+  {r:"II",  n:"Yod g'oya",           cnt:2653,  col:"#7C3AED"},
+  {r:"III", n:"Ilgari sudlangan",    cnt:1200,  col:"#0D9488"},
+  {r:"IV",  n:"Ma'muriy",            cnt:988,   col:"#2563EB"},
+  {r:"V",   n:"Voyaga yet.",         cnt:1835,  col:"#16A34A"},
+  {r:"VI",  n:"Giyohvand",           cnt:2286,  col:"#DC2626"},
+  {r:"VII", n:"Mehr. uyi",           cnt:1490,  col:"#D97706"},
+  {r:"VIII",n:"Agressiv",            cnt:4570,  col:"#0D1F3C"},
+];
+
+const LEISURE = [
+  {n:"VATANPARVARLIK",    pct:47, col:"#1E3A8A", items:[["Harbiy qism sayhati","12"],["Jasоrat maktabi","8"],["Vatanpar. musobaqalar","15"]]},
+  {n:"HUQUQIY SAVOD.",    pct:25, col:"#1E4976", items:[["Sayyor sudlar","6"],["Huquqiy targ'ibot","10"],["Rahbar+Yoshlar","5"]]},
+  {n:"MADANIY TADBIRLAR", pct:21, col:"#1D4ED8", items:[["Teatr va kino","9"],["Kitobxonlik","14"],["Turizm","7"]]},
+  {n:"MA'NAVIY TADBIRLAR",pct:7,  col:"#1E293B", items:[["Sport to'garak","11"],["Intellektual","8"],["5 Tashabbus","5"]]},
+];
+
+const OYLIK = [{l:"Yan",v:62},{l:"Fev",v:67},{l:"Mar",v:71},{l:"Apr",v:74},{l:"May",v:78},{l:"Iyun",v:82}];
+
+const REYTING_DATA = [
+  {rank:1,name:"IIB — Ichki Ishlar Vazirligi",       ball:9850, delta:"+12", up:true,  col:"#1E40AF"},
+  {rank:2,name:"Toshkent shahar hokimligi",           ball:9420, delta:"+8",  up:true,  col:"#0D9488"},
+  {rank:3,name:"Milliy Gvardiya",                     ball:9180, delta:"+15", up:true,  col:"#7C3AED"},
+  {rank:4,name:"Samarqand viloyat hokimligi",         ball:8950, delta:"+6",  up:true,  col:"#16A34A"},
+  {rank:5,name:"Prokuratura",                         ball:8720, delta:"0",   up:null,  col:"#64748B"},
+  {rank:6,name:"Andijon viloyat hokimligi",           ball:8450, delta:"+3",  up:true,  col:"#2563EB"},
+  {rank:7,name:"Mudofaa vazirligi",                   ball:8200, delta:"+9",  up:true,  col:"#15803D"},
+  {rank:8,name:"Farg'ona viloyat hokimligi",          ball:7980, delta:"+11", up:true,  col:"#D97706"},
+  {rank:9,name:"FVV — Favqulotda Vaziyatlar",        ball:7650, delta:"+5",  up:false, col:"#DC2626"},
+];
+
+const ORG_DATA = [
+  {name:"IIB",     sub:"Ichki ishlar vazirligi",  cnt:542, band:72.5, baj:389, col:"#1E40AF", bg:"#EFF6FF"},
+  {name:"Mudofaa", sub:"Mudofaa vazirligi",       cnt:234, band:68.3, baj:156, col:"#16A34A", bg:"#DCFCE7"},
+  {name:"FVV",     sub:"Favqulotda vaziyatlar",   cnt:187, band:65.8, baj:118, col:"#DC2626", bg:"#FEE2E2"},
+  {name:"Prokuratura",sub:"Bosh prokuratura",     cnt:298, band:70.1, baj:201, col:"#7C3AED", bg:"#EDE9FE"},
+  {name:"Milliy Gv.", sub:"Milliy Gvardiya",      cnt:176, band:74.2, baj:128, col:"#EA580C", bg:"#FFF7ED"},
+  {name:"Hokimliklar",sub:"Hokimliklar",          cnt:403, band:66.9, baj:267, col:"#0D9488", bg:"#CCFBF1"},
+];
+
+const STAT_FULL = [
+  {l:"Uchrashuvlar o'tkazilganligi",        n:1840, ico:"👥", col:"#2563EB",  pct:78},
+  {l:"Bandlik — rasmiy",                    n:747,  ico:"💼", col:"#16A34A",  pct:65},
+  {l:"Bandlik — norasmiy",                  n:312,  ico:"🏗️", col:"#D97706",  pct:38},
+  {l:"Bandlik — o'z-o'zini band qilgan",    n:189,  ico:"🛠️", col:"#0D9488",  pct:22},
+  {l:"Probatsiya nazoratidan chiqarilgan",  n:134,  ico:"✅", col:"#16A34A",  pct:28},
+  {l:"Profil. hisobdan chiqarilgan",        n:98,   ico:"📋", col:"#7C3AED",  pct:18},
+  {l:"Chet tili (Ibrat Farzadlari + MO)",   n:256,  ico:"🌍", col:"#1E40AF",  pct:32},
+  {l:"Kitobxonlik (5tashabbus.uz + Mutolaa)",n:198, ico:"📚", col:"#D97706",  pct:24},
+  {l:"UzChess intellektual o'yinlar",       n:87,   ico:"♟️", col:"#7C3AED",  pct:12},
+  {l:"Harbiy xizmatga yuborilgan",          n:189,  ico:"🎖️", col:"#1E3A8A",  pct:22},
+  {l:"Ekin yer maydoni ajratilgan",         n:167,  ico:"🌱", col:"#16A34A",  pct:18},
+  {l:"Asbob-uskuna ajratilgan",             n:223,  ico:"🔧", col:"#EA580C",  pct:26},
+  {l:"Kasb-hunar o'qitilgan (monomarkaz)",  n:342,  ico:"🎓", col:"#7C3AED",  pct:58},
+  {l:"Moddiy yordam olgan yoshlar",         n:312,  ico:"🤲", col:"#0D9488",  pct:35},
+  {l:"Tashqi migratsiya",                   n:45,   ico:"✈️", col:"#DC2626",  pct:5},
+  {l:"Ichki migratsiya",                    n:78,   ico:"🚌", col:"#D97706",  pct:8},
+  {l:"Qayta jinoyat sodir etgan",           n:23,   ico:"⚠️", col:"#DC2626",  pct:2},
+  {l:"So'glamlashtirilgan (SSQ tavsiyasi)", n:420,  ico:"💚", col:"#16A34A",  pct:76},
+  {l:"Harbiy xizmatga jo'natilgan",         n:189,  ico:"🪖", col:"#1E3A8A",  pct:22},
+  {l:"Vatanparvarlik tadbirlari (yosh)",    n:650,  ico:"🚩", col:"#1E40AF",  pct:47},
+  {l:"Vatanparvarlik tadbirlari (tadbir)",  n:124,  ico:"🎪", col:"#2563EB",  pct:43},
+  {l:"Huquqiy targ'ibot (yosh)",            n:480,  ico:"⚖️", col:"#7C3AED",  pct:38},
+  {l:"Huquqiy targ'ibot (tadbir)",          n:89,   ico:"🏛️", col:"#7C3AED",  pct:31},
+  {l:"So'glamlashtirilgan (MFY tavsiyasi)", n:420,  ico:"🏥", col:"#16A34A",  pct:76},
+];
+
+const BANDLIK_CHART = [
+  {l:"Rasmiy band",       pct:42},{l:"Norasmiy band",     pct:22},
+  {l:"O'z-o'zini band",   pct:13},{l:"Ishsiz",            pct:16},{l:"O'qiydi",           pct:7},
+];
+
+const HISOBOTLAR = [
+  {n:"Fevral 2025 oylik hisobot",date:"26.02.2025",sz:"2.4 MB",h:"Tasdiqlangan"},
+  {n:"Yanvar 2025 oylik hisobot",date:"31.01.2025",sz:"2.1 MB",h:"Tasdiqlangan"},
+  {n:"2024 yil yakuniy hisobot", date:"30.12.2024",sz:"8.6 MB",h:"Tasdiqlangan"},
+];
+const TASDIQLASH = [
+  {n:"Xoliqov Jasur — Fevral hisobot",h:"Kutilmoqda",d:"28.02.2025"},
+  {n:"Tojiboyev Kamol — Uchrashuv",   h:"Kutilmoqda",d:"01.03.2025"},
+  {n:"Karimov Ulugbek — Dastur",      h:"Qaytarilgan",d:"25.02.2025"},
+];
+
+const AUDIT_DATA = [
+  {t:"27.02.2025 14:35",u:"Toshmatov A.",a:"Hisobot yuklash",ob:"Tursunova Malika",ip:"10.0.1.45",h:"ok"},
+  {t:"27.02.2025 13:22",u:"Toshmatov A.",a:"Uchrashuv belgilash",ob:"Qodirov Mansur",ip:"10.0.1.45",h:"ok"},
+  {t:"27.02.2025 11:10",u:"Toshmatov A.",a:"Yosh qo'shish",ob:"Ergasheva Barno",ip:"10.0.1.45",h:"ok"},
+  {t:"26.02.2025 16:45",u:"Toshmatov A.",a:"Hisobot yuklash",ob:"Rahimov Bekzod",ip:"10.0.1.45",h:"ok"},
+  {t:"26.02.2025 09:30",u:"Toshmatov A.",a:"Kirish",ob:"Tizim",ip:"10.0.1.45",h:"ok"},
+];
+
+// Toifaga ko'ra namunaviy dastur bandlari
+const DASTUR_TEMPLATE = {
+  "I":  ["Probatsiya nazoratidan chiqarishga ko'maklashish","Bandligini ta'minlash","Kasb-hunarga o'qitish","Asbob-uskuna va mehnat qurollari ajratish","Ekin yer maydoni ajratilishiga ko'maklashish","Sport to'garaklariga jalb qilish","Fan va til to'garaklariga yo'naltirish"],
+  "II": ["Psixologik suhbatlar tashkil etish","Din ulamolari ishtirokida suhbatlar","Bandligini ta'minlash","Kasb-hunarga o'qitish","Ekin yer maydoni ajratilishiga ko'maklashish","Sport to'garaklariga jalb qilish","Muddatli harbiy xizmatga yuborish"],
+  "III":["Bandligini ta'minlash","Kasb-hunarga o'qitish","Ekin yer maydonlari ajratilishiga ko'maklashish","Tadbirkorlik uchun kredit","Sport to'garaklariga jalb qilish","Fan va til to'garaklariga yo'naltirish","Muddatli harbiy xizmatga yuborish"],
+  "IV": ["Hisobdan chiqarishga ko'maklashish","Profilaktik suhbatlar tashkil etish","Bandligini ta'minlash","Kasb-hunarga o'qitish","Psixolog qabuliga yuborish","Sport to'garaklariga jalb qilish"],
+  "V":  ["Ta'limga qaytarish","Kasb-hunarga o'qitish","Sport to'garaklariga jalb qilish","Chet tillarига o'qitish","IT sohasiga o'qitish","Fan to'garaklariga yo'naltirish"],
+  "VI": ["Statsionar tartibda davolash","Psixolog qabuliga yuborish","Bandligini ta'minlash","Kasb-hunarga o'qitish","Chet tillarига o'qitish","IT sohasiga o'qitish"],
+  "VII":["Bandligini ta'minlash","Kasb-hunarga o'qitish","Chet tillarига o'qitish","IT sohasiga o'qitish","Tadbirkorlik uchun kredit","Ekin yer maydoni ajratilishiga ko'maklashish","Asbob-uskuna va mehnat qurollari ajratish","Muddatli harbiy xizmatga yuborish"],
+  "VIII":["Bandligini ta'minlash","Psixolog qabuliga yuborish","Asbob-uskuna","Ekin yer maydoni ajratilishiga ko'maklashish","Kasb-hunarga o'qitish","Tadbirkorlik uchun kredit","Sport, fan va til to'garaklariga yo'naltirish","Sport musobaqalariga jalb qilish"],
+};
+
+// Created programs storage
+let DASTURLAR_DB = [
+  {id:1, yoshId:3, name:"Tursunova Malika", toifa:"VII", bandlar:[
+    {t:"Bandligini ta'minlash",         sana:"15.02.2025",deadline:"01.12.2025",holat:"Bajarilgan"},
+    {t:"Kasb-hunarga o'qitish",         sana:"20.08.2026",deadline:"01.12.2025",holat:"Jarayonda"},
+    {t:"Sport to'garaklariga jalb",     sana:"05.03.2026",deadline:"01.12.2025",holat:"Jarayonda"},
+    {t:"Vatanparvarlik tadbirlariga jalb",sana:"25.02.2026",deadline:"01.12.2025",holat:"Kechiktirilgan"},
+  ], izoh:""}
+];
+
+let filteredYoshlar = [...YOSHLAR];
+
+// ─────────────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────────────
+const PAGE_TITLES = {bosh:"Bosh Sahifa",yoshlar:"Yoshlar Ro'yxati",uchrashuvlar:"Uchrashuvlar",dasturlar:"Dasturlar",reyting:"Reyting",statistika:"Statistika",hisobot:"Hisobotlar",soglomlash:"So'glamlashtirish",audit:"Audit Log",sozlamalar:"Sozlamalar"};
+
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const p = document.getElementById('page-'+id);
+  if(p) p.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  else document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')?.includes("'"+id+"'"))n.classList.add('active');});
+  document.getElementById('topTitle').textContent = PAGE_TITLES[id]||id;
+  closeSidebar(); closeNotif();
+  // Re-render page-specific dynamic content
+  if(id==='statistika') { renderStatCharts(); renderOrgCards(); }
+  if(id==='reyting') { renderReyting(); renderOrgStats(); }
+  if(id==='dasturlar') { renderAktivDasturlar(); }
+  if(id==='soglomlash') { renderSoglomlashChart(); }
+}
+
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sbOverlay').classList.toggle('open');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sbOverlay').classList.remove('open');}
+
+// ─────────────────────────────────────────────────────
+// MODALS
+// ─────────────────────────────────────────────────────
+function openModal(id){closeNotif();document.getElementById(id).classList.add('open');if(id==='addUchModal')populateUchSel();if(id==='createDasturModal')populateCDModal();}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+// ─────────────────────────────────────────────────────
+// NOTIF
+// ─────────────────────────────────────────────────────
+function renderNotifs(){
+  document.getElementById('notifList').innerHTML = NOTIFS.map((n,i)=>`<div class="notif-item" onclick="markRead(${i})"><div class="ndot${n.read?' read':''}"></div><div><div class="ntxt">${n.text}</div><div class="ntime">${n.time}</div></div></div>`).join('');
+  updateNdot();
+}
+function updateNdot(){const u=NOTIFS.filter(n=>!n.read).length;document.getElementById('ndot').style.display=u?'block':'none';}
+function toggleNotif(){document.getElementById('notifPanel').classList.toggle('open');}
+function closeNotif(){document.getElementById('notifPanel').classList.remove('open');}
+function markRead(i){NOTIFS[i].read=true;renderNotifs();}
+function clearNotifs(){NOTIFS.forEach(n=>n.read=true);renderNotifs();}
+document.addEventListener('click',e=>{if(!document.getElementById('notifPanel').contains(e.target)&&!e.target.closest('.topbar-btn'))closeNotif();});
+
+// ─────────────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────────────
+function toast(msg,type='ok'){
+  const w=document.getElementById('toastWrap'),t=document.createElement('div');
+  const ico=type==='ok'?`<svg viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`:`<svg viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+  t.className=`toast ${type}`;t.innerHTML=ico+msg;w.appendChild(t);
+  setTimeout(()=>{t.style.cssText='opacity:0;transform:translateX(16px);transition:all .3s';setTimeout(()=>t.remove(),300);},3000);
+}
+
+// ─────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────
+function badge(h){
+  const m={'Bajarilgan':'green','Tasdiqlangan':'green','Jarayonda':'blue','Kechiktirilgan':'red','Bajarilmagan':'red','Qaytarilgan':'red','Rejalashtirilgan':'amber','Kutilmoqda':'amber','Muddat yaqin':'amber'};
+  const icons={'Bajarilgan':'✓','Tasdiqlangan':'✓','Jarayonda':'↻','Kechiktirilgan':'!','Bajarilmagan':'✗','Qaytarilgan':'↩','Rejalashtirilgan':'◷','Kutilmoqda':'◷','Muddat yaqin':'⚠'};
+  return `<span class="badge ${m[h]||'gray'}">${icons[h]||'•'} ${h}</span>`;
+}
+function prog(pct){
+  const c=pct>=70?'var(--green)':pct>=40?'var(--blue)':'var(--red)';
+  return `<div class="prog"><div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${c}"></div></div><span class="prog-pct" style="color:${c}">${pct}%</span></div>`;
+}
+
+// ─────────────────────────────────────────────────────
+// BOSH SAHIFA RENDERS
+// ─────────────────────────────────────────────────────
+function renderToifaChart(){
+  const max=Math.max(...TOIFALAR.map(t=>t.cnt));
+  document.getElementById('toifaChart').innerHTML=TOIFALAR.map(t=>`
+    <div class="bar-row cmp">
+      <div class="bar-lbl">${t.r}. ${t.n}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:0;background:${t.col}" data-w="${(t.cnt/max*100).toFixed(1)}"></div></div>
+      <div class="bar-num">${t.cnt.toLocaleString()}</div>
+    </div>`).join('');
+  setTimeout(()=>document.querySelectorAll('#toifaChart .bar-fill').forEach(b=>b.style.width=b.dataset.w+'%'),80);
+}
+
+function renderLineChart(elId, data){
+  const el=document.getElementById(elId);
+  if(!el)return;
+  const W=300,H=120,pad=20;
+  const min=Math.min(...data.map(d=>d.v)),max=Math.max(...data.map(d=>d.v));
+  const pts=data.map((d,i)=>{const x=pad+i*(W-pad*2)/(data.length-1);const y=H-pad-(d.v-min)/(max-min||1)*(H-pad*2);return[x,y];});
+  const path=pts.map((p,i)=>(i===0?'M':'L')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const fill=pts.map((p,i)=>(i===0?'M':'L')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ')+` L${pts[pts.length-1][0]} ${H} L${pts[0][0]} ${H} Z`;
+  el.innerHTML=`
+    <defs><linearGradient id="lg${elId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2563EB" stop-opacity=".18"/><stop offset="100%" stop-color="#2563EB" stop-opacity="0"/></linearGradient></defs>
+    <path d="${fill}" fill="url(#lg${elId})"/>
+    <path d="${path}" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    ${pts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="#2563EB" stroke="#fff" stroke-width="1.5"/>
+      <text x="${p[0]}" y="${p[1]-8}" text-anchor="middle" fill="#1E293B" font-size="9" font-weight="600" font-family="JetBrains Mono">${data[i].v}</text>
+      <text x="${p[0]}" y="${H-2}" text-anchor="middle" fill="#94A3B8" font-size="8.5" font-family="Inter">${data[i].l}</text>`).join('')}`;
+}
+
+function renderLeisure(){
+  document.getElementById('leisureGrid').innerHTML=LEISURE.map(l=>`
+    <div style="background:${l.col};border-radius:9px;padding:11px;cursor:pointer;transition:transform .15s" onclick="toast('${l.n}: ${l.pct}%','ok')" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform=''">
+      <div style="font-size:20px;font-weight:800;color:#fff;line-height:1">${l.pct}%</div>
+      <div style="font-size:9.5px;font-weight:700;color:rgba(255,255,255,.8);margin:3px 0 6px">${l.n}</div>
+      ${l.items.map(it=>`<div style="display:flex;justify-content:space-between;font-size:9.5px;color:rgba(255,255,255,.65);margin-bottom:2px"><span>${it[0]}</span><span style="font-family:'JetBrains Mono'">${it[1]}</span></div>`).join('')}
+    </div>`).join('');
+}
+
+function renderUpcoming(){
+  document.getElementById('upcomingList').innerHTML=YOSHLAR.slice(0,4).map(y=>`
+    <div class="mrow">
+      <div class="mav">${y.name.charAt(0)}</div>
+      <div class="minfo"><div class="mname">${y.name}</div><div class="mmeta">Toifa ${y.toifa} · ${y.manzil.split(',')[0]}</div></div>
+      ${badge(y.holat)}
+    </div>`).join('');
+}
+
+// ─────────────────────────────────────────────────────
+// YOSHLAR
+// ─────────────────────────────────────────────────────
+function renderYoshTable(){
+  const tb=document.getElementById('yoshTable');
+  if(!filteredYoshlar.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray)">Natija topilmadi</td></tr>';return;}
+  tb.innerHTML=filteredYoshlar.map((y,i)=>`
+    <tr>
+      <td class="td-mono">${String(i+1).padStart(2,'0')}</td>
+      <td><span class="td-bold" style="cursor:pointer;color:var(--blue)" onclick="showYoshDetail(${y.id})">${y.name}</span></td>
+      <td>${badge('Jarayonda').replace('Jarayonda','Toifa '+y.toifa)}<span class="badge blue">Toifa ${y.toifa}</span></td>
+      <td>${prog(y.ijro)}</td>
+      <td class="td-mono">${y.uch}</td>
+      <td style="font-family:'JetBrains Mono';font-size:12px;font-weight:700;color:${y.reyting>=70?'var(--green)':y.reyting>=50?'var(--blue)':'var(--red)'}">${y.reyting}</td>
+      <td>${badge(y.holat)}</td>
+      <td style="display:flex;gap:5px">
+        <button class="btn btn-outline btn-sm" onclick="showYoshDetail(${y.id})">Ko'rish</button>
+        <button class="btn btn-sm" style="background:var(--gold-bg);color:var(--gold);border:1px solid var(--gold-border)" onclick="openDasturFor(${y.id})">Dastur</button>
+      </td>
+    </tr>`).join('');
+  document.getElementById('yoshCount').textContent=`Jami ${filteredYoshlar.length} nafar ko'rsatilmoqda`;
+  document.getElementById('nb-yoshlar').textContent=YOSHLAR.length;
+}
+function filterYoshlar(){
+  const t=document.getElementById('tfFilter').value,s=document.getElementById('stFilter').value;
+  filteredYoshlar=YOSHLAR.filter(y=>(!t||y.toifa===t)&&(!s||y.holat===s));
+  renderYoshTable();
+}
+function onSearch(v){
+  if(!v.trim()){filteredYoshlar=[...YOSHLAR];}
+  else{const q=v.toLowerCase();filteredYoshlar=YOSHLAR.filter(y=>y.name.toLowerCase().includes(q)||y.toifa.toLowerCase().includes(q)||y.manzil.toLowerCase().includes(q));}
+  if(document.getElementById('page-yoshlar').classList.contains('active'))renderYoshTable();
+}
+function showYoshDetail(id){
+  const y=YOSHLAR.find(x=>x.id===id);if(!y)return;
+  document.getElementById('detailTitle').textContent=y.name;
+  const hasDastur=DASTURLAR_DB.find(d=>d.yoshId===id);
+  document.getElementById('detailBody').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px">
+      <div class="stat-pill"><div class="spi" style="background:var(--blue-light)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></div><div><div class="sp-val">${y.ijro}%</div><div class="sp-lbl">Dastur ijrosi</div></div></div>
+      <div class="stat-pill"><div class="spi" style="background:var(--gold-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div><div class="sp-val">${y.reyting}</div><div class="sp-lbl">Reyting bali</div></div></div>
+    </div>
+    <div style="font-size:12px;color:var(--gray);line-height:2.2">
+      <b style="color:var(--dark)">Toifa:</b> ${y.toifa}<br>
+      <b style="color:var(--dark)">Holat:</b> ${y.holat}<br>
+      <b style="color:var(--dark)">Tug'ilgan yil:</b> ${y.yil}<br>
+      <b style="color:var(--dark)">Jins:</b> ${y.jins}<br>
+      <b style="color:var(--dark)">Manzil:</b> ${y.manzil}<br>
+      <b style="color:var(--dark)">Oxirgi uchrashuv:</b> ${y.uch}
+    </div>
+    ${hasDastur?`<div style="margin-top:13px;padding:10px;background:var(--green-bg);border-radius:7px;font-size:12px;color:var(--green);font-weight:600">✓ Dastur mavjud — ${hasDastur.bandlar.length} ta band</div>`:`<div style="margin-top:13px;padding:10px;background:var(--amber-bg);border-radius:7px;font-size:12px;color:var(--amber);font-weight:600">⚠ Dastur hali yaratilmagan</div>`}`;
+  openModal('yoshDetailModal');
+}
+function openDasturFor(id){
+  closeModal('yoshDetailModal');
+  setTimeout(()=>{openModal('createDasturModal');document.getElementById('cdYosh').value=id;loadTemplateDastur();},100);
+}
+function addYosh(){
+  const name=document.getElementById('nyName').value.trim();
+  if(!name){toast('FIO kiriting!','err');return;}
+  const newY={id:YOSHLAR.length+1,name,toifa:document.getElementById('nyToifa').value,ijro:0,uch:"—",reyting:50,holat:"Jarayonda",yil:parseInt(document.getElementById('nyYil').value)||2000,jins:document.getElementById('nyJins').value,manzil:document.getElementById('nyManzil').value||'Toshkent'};
+  YOSHLAR.push(newY);filteredYoshlar=[...YOSHLAR];renderYoshTable();
+  closeModal('addYoshModal');document.getElementById('nyName').value='';
+  toast(`${name} muvaffaqiyatli qo'shildi!`,'ok');
+  NOTIFS.unshift({text:`${name} tizimga qo'shildi`,time:"Hozir",read:false});renderNotifs();
+  populateCDModal();
+}
+
+// ─────────────────────────────────────────────────────
+// UCHRASHUVLAR
+// ─────────────────────────────────────────────────────
+function renderUchTable(){
+  document.getElementById('uchTable').innerHTML=UCHRASHUVLAR.map((u,i)=>`
+    <tr>
+      <td class="td-mono">${String(i+1).padStart(2,'0')}</td>
+      <td class="td-bold">${u.name}</td>
+      <td><span class="badge blue">Toifa ${u.toifa}</span></td>
+      <td class="td-mono">${u.sana} ${u.vaqt}</td>
+      <td style="font-size:11.5px">${u.joy}</td>
+      <td>${u.faceid?'<span class="badge green">✓ OK</span>':'<span class="badge amber">◷ Kutilmoqda</span>'}</td>
+      <td>${badge(u.holat)}</td>
+      <td style="font-family:\'JetBrains Mono\';font-size:12px;font-weight:700;color:${u.ball.startsWith('+')?'var(--green)':u.ball==='-2'?'var(--red)':'var(--gray)'}">${u.ball}</td>
+    </tr>`).join('');
+  document.getElementById('nb-uch').textContent=UCHRASHUVLAR.filter(u=>u.holat==='Rejalashtirilgan').length;
+}
+function populateUchSel(){
+  document.getElementById('uchYosh').innerHTML=YOSHLAR.map(y=>`<option value="${y.id}">${y.name} (Toifa ${y.toifa})</option>`).join('');
+  document.getElementById('uchSana').value=new Date().toISOString().split('T')[0];
+}
+function addUch(){
+  const yoshId=document.getElementById('uchYosh').value,sana=document.getElementById('uchSana').value;
+  if(!sana){toast('Sanani tanlang!','err');return;}
+  const y=YOSHLAR.find(x=>x.id==yoshId);
+  UCHRASHUVLAR.push({id:UCHRASHUVLAR.length+1,name:y.name,toifa:y.toifa,sana:sana.split('-').reverse().join('.'),vaqt:document.getElementById('uchVaqt').value,joy:document.getElementById('uchJoy').value||'MFY',faceid:false,holat:"Rejalashtirilgan",ball:"—"});
+  renderUchTable();closeModal('addUchModal');toast(`${y.name} bilan uchrashuv belgilandi!`,'ok');
+}
+
+// ─────────────────────────────────────────────────────
+// DASTURLAR
+// ─────────────────────────────────────────────────────
+function populateCDModal(){
+  const sel=document.getElementById('cdYosh');
+  sel.innerHTML=YOSHLAR.map(y=>`<option value="${y.id}">${y.name} (Toifa ${y.toifa})</option>`).join('');
+  loadTemplateDastur();
+  populateDasturYoshFilter();
+}
+function populateDasturYoshFilter(){
+  document.getElementById('dasturYoshFilter').innerHTML='<option value="">Yoshni tanlang...</option>'+YOSHLAR.map(y=>`<option value="${y.id}">${y.name}</option>`).join('');
+}
+function loadTemplateDastur(){
+  const yoshId=document.getElementById('cdYosh').value;
+  const y=YOSHLAR.find(x=>x.id==yoshId);if(!y)return;
+  document.getElementById('cdToifa').value=`Toifa ${y.toifa} — ${({I:"Probatsiya",II:"Yod g'oya",III:"Sudlangan",IV:"Ma'muriy",V:"Voyaga yet.",VI:"Giyohvand",VII:"Mehr. uyi",VIII:"Agressiv"})[y.toifa]||''}`;
+  const bandlar=DASTUR_TEMPLATE[y.toifa]||[];
+  const now=new Date(),months=['Yan','Fev','Mar','Apr','May','Iyun','Iyul','Avg','Sen','Okt','Noy','Dek'];
+  document.getElementById('dasturBandlar').innerHTML=bandlar.map((b,i)=>`
+    <div style="display:flex;align-items:center;gap:9px;padding:8px;border-bottom:1px solid var(--off);${i===bandlar.length-1?'border-bottom:none':''}">
+      <input type="checkbox" checked id="band_${i}" style="accent-color:var(--gold);width:14px;height:14px;flex-shrink:0">
+      <label for="band_${i}" style="font-size:12.5px;color:var(--dark);flex:1;cursor:pointer">${b}</label>
+      <span style="font-size:10px;color:var(--gray);font-family:'JetBrains Mono';white-space:nowrap">Yil davomida</span>
+    </div>`).join('');
+}
+function saveDastur(){
+  const yoshId=document.getElementById('cdYosh').value;
+  const y=YOSHLAR.find(x=>x.id==yoshId);if(!y){toast('Yoshni tanlang!','err');return;}
+  const bandlar=DASTUR_TEMPLATE[y.toifa]||[];
+  const checked=[...document.querySelectorAll('#dasturBandlar input[type=checkbox]:checked')].map(c=>parseInt(c.id.replace('band_','')));
+  const now=new Date();
+  const newD={id:DASTURLAR_DB.length+1,yoshId:parseInt(yoshId),name:y.name,toifa:y.toifa,
+    bandlar:checked.map(i=>({t:bandlar[i],sana:now.toLocaleDateString('uz-UZ'),deadline:"01.12.2025",holat:"Jarayonda"})),
+    izoh:document.getElementById('cdIzoh').value};
+  DASTURLAR_DB=DASTURLAR_DB.filter(d=>d.yoshId!==parseInt(yoshId));
+  DASTURLAR_DB.push(newD);
+  renderAktivDasturlar();
+  closeModal('createDasturModal');
+  toast(`${y.name} uchun dastur yaratildi!`,'ok');
+}
+function renderAktivDasturlar(){
+  const el=document.getElementById('aktivDasturlar');if(!el)return;
+  if(!DASTURLAR_DB.length){el.innerHTML='<div style="text-align:center;padding:30px;color:var(--gray);font-size:13px">Hali dastur yaratilmagan</div>';return;}
+  el.innerHTML=DASTURLAR_DB.map(d=>`
+    <div style="border:1px solid var(--border);border-radius:9px;padding:13px;margin-bottom:9px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--navy)">${d.name}</div>
+          <span class="badge blue" style="margin-top:3px">Toifa ${d.toifa}</span>
+        </div>
+        <button class="btn btn-sm btn-outline" onclick="viewDastur(${d.id})">Ko'rish</button>
+      </div>
+      <div style="margin-bottom:7px">
+        ${d.bandlar.slice(0,3).map(b=>`
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--off);font-size:11.5px">
+            <span style="color:var(--dark);flex:1">${b.t}</span>
+            ${badge(b.holat)}
+          </div>`).join('')}
+        ${d.bandlar.length>3?`<div style="font-size:11px;color:var(--gray);margin-top:4px">+${d.bandlar.length-3} ta band yana bor</div>`:''}
+      </div>
+    </div>`).join('');
+}
+function renderDasturPage(){
+  renderAktivDasturlar();
+}
+function viewDastur(id){
+  const d=DASTURLAR_DB.find(x=>x.id===id);if(!d)return;
+  const now=new Date();
+  const monthNames=['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentabr','Oktabr','Noyabr','Dekabr'];
+  let html=`<div style="margin-bottom:12px"><b style="color:var(--navy);font-size:14px">${d.name}</b> — Toifa ${d.toifa}</div>`;
+  html+=`<div style="font-size:11px;color:var(--gray);margin-bottom:10px">Oy bo'yicha bajarilish holati:</div>`;
+  d.bandlar.forEach(b=>{
+    const deadline=new Date('2025-12-01');
+    const color=b.holat==='Bajarilgan'?'var(--green)':b.holat==='Kechiktirilgan'?'var(--red)':'var(--blue)';
+    html+=`<div style="margin-bottom:12px;padding:10px;border:1px solid var(--border);border-radius:8px;border-left:3px solid ${color}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <span style="font-size:12.5px;font-weight:600;color:var(--navy)">${b.t}</span>
+        ${badge(b.holat)}
+      </div>
+      <div style="font-size:10.5px;color:var(--gray)">Muddat: ${b.sana} — ${b.deadline}</div>
+      <div class="timeline" style="margin-top:8px">
+        ${monthNames.map((m,i)=>{
+          const month=i+1;const isActive=b.holat==='Bajarilgan'&&month<=now.getMonth()+1;
+          const isFuture=month>now.getMonth()+1;const isLate=b.holat==='Kechiktirilgan'&&month<=now.getMonth()+1;
+          const bg=isLate?'var(--red)':isActive?'var(--green)':isFuture?'var(--off)':'#CBD5E1';
+          return `<div class="tm-cell" style="background:${bg}" title="${m}: ${isActive?'Bajarilgan':isLate?'Kechiktirilgan':isFuture?'Rejalashtirilgan':'Jarayonda'}"></div>`;
+        }).join('')}
+      </div>
+      <div class="tm-labels" style="margin-top:3px">${monthNames.map(m=>`<div class="tm-lbl">${m.slice(0,3)}</div>`).join('')}</div>
+    </div>`;
+  });
+  if(d.izoh) html+=`<div style="padding:9px;background:var(--amber-bg);border-radius:7px;font-size:12px;color:var(--amber);margin-top:5px"><b>Izoh:</b> ${d.izoh}</div>`;
+  document.getElementById('detailTitle').textContent=`${d.name} — Dastur`;
+  document.getElementById('detailBody').innerHTML=html;
+  openModal('yoshDetailModal');
+}
+
+// ─────────────────────────────────────────────────────
+// REYTING
+// ─────────────────────────────────────────────────────
+function renderReyting(){
+  const colors=['#B8860B','#94A3B8','#B45309','#2563EB','#2563EB','#2563EB','#2563EB','#2563EB','#2563EB'];
+  const bgs=['#FFFBEB','#F8FAFC','#FFF7ED'];
+  document.getElementById('reytingList').innerHTML=REYTING_DATA.map((r,i)=>`
+    <div class="reyting-item">
+      <div class="r-rank" style="background:${bgs[i]||'var(--off)'};color:${colors[i]||'var(--gray)'}">${r.rank}</div>
+      <div><div class="r-name">${r.name}</div><div class="r-sub">Ball: ${r.ball.toLocaleString()}</div></div>
+      <div style="text-align:right">
+        <div class="r-val">${r.ball.toLocaleString()}</div>
+        <span class="r-delta" style="background:${r.up===true?'var(--green-bg)':r.up===false?'var(--red-bg)':'var(--off)'};color:${r.up===true?'var(--green)':r.up===false?'var(--red)':'var(--gray)'}">
+          ${r.up===true?'↑':r.up===false?'↓':'→'} ${r.delta}
+        </span>
+      </div>
+    </div>`).join('');
+}
+function renderOrgStats(){
+  document.getElementById('orgStatList').innerHTML=ORG_DATA.map(o=>`
+    <div class="org-card" style="margin-bottom:10px">
+      <div class="org-hdr">
+        <div class="org-icon" style="background:${o.bg}"><svg viewBox="0 0 24 24" fill="none" stroke="${o.col}" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div><div class="org-name">${o.name}</div><div class="org-sub">${o.sub}</div></div>
+      </div>
+      <div class="org-stat"><span class="org-stat-lbl">Yoshlar soni</span><span class="org-stat-val" style="color:${o.col}">${o.cnt}</span></div>
+      <div style="height:5px;background:var(--off);border-radius:3px;overflow:hidden;margin:5px 0"><div style="width:${o.band}%;height:100%;background:${o.col};border-radius:3px"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:10.5px"><span style="color:var(--gray)">Bandlik foizi</span><span style="font-weight:700;color:${o.col}">${o.band}%</span></div>
+      <div class="org-stat" style="margin-top:7px"><span class="org-stat-lbl">Bajarilgan dasturlar</span><span class="org-stat-val" style="color:var(--green)">${o.baj}</span></div>
+    </div>`).join('');
+}
+
+// ─────────────────────────────────────────────────────
+// STATISTIKA
+// ─────────────────────────────────────────────────────
+function renderStatCharts(){
+  const max=Math.max(...BANDLIK_CHART.map(d=>d.pct));
+  document.getElementById('bandlikChart').innerHTML=BANDLIK_CHART.map(d=>`
+    <div class="bar-row cmp">
+      <div class="bar-lbl">${d.l}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:0;background:var(--blue)" data-w="${d.pct}"></div></div>
+      <div class="bar-num">${d.pct}%</div>
+    </div>`).join('');
+  setTimeout(()=>document.querySelectorAll('#bandlikChart .bar-fill').forEach(b=>b.style.width=b.dataset.w+'%'),80);
+
+  const oylik=[{l:"Yan",v:1200},{l:"Fev",v:1380},{l:"Mar",v:1510},{l:"Apr",v:1450},{l:"May",v:1650},{l:"Iyun",v:1820}];
+  renderLineChart('statLineChart',oylik);
+
+  const max2=Math.max(...STAT_FULL.map(d=>d.pct));
+  document.getElementById('fullIndChart').innerHTML=STAT_FULL.map(d=>`
+    <div class="bar-row">
+      <div class="bar-lbl" title="${d.l}">${d.l}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:0;background:${d.col}" data-w="${d.pct}"></div></div>
+      <div class="bar-num" style="color:${d.col}">${d.n.toLocaleString()}</div>
+    </div>`).join('');
+  setTimeout(()=>document.querySelectorAll('#fullIndChart .bar-fill').forEach(b=>b.style.width=b.dataset.w+'%'),80);
+}
+function renderOrgCards(){
+  document.getElementById('orgCardsGrid').innerHTML=ORG_DATA.map(o=>`
+    <div class="org-card">
+      <div class="org-hdr">
+        <div class="org-icon" style="background:${o.bg}"><svg viewBox="0 0 24 24" fill="none" stroke="${o.col}" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div><div class="org-name">${o.name}</div><div class="org-sub">${o.sub}</div></div>
+      </div>
+      <div class="org-stat"><span class="org-stat-lbl">Yoshlar soni</span><span class="org-stat-val">${o.cnt}</span></div>
+      <div class="org-stat"><span class="org-stat-lbl">Bandlik foizi</span><span class="org-stat-val" style="color:${o.col}">${o.band}%</span></div>
+      <div style="height:5px;background:var(--off);border-radius:3px;overflow:hidden;margin:6px 0"><div style="width:${o.band}%;height:100%;background:${o.col};border-radius:3px"></div></div>
+      <div class="org-stat" style="margin-top:2px"><span class="org-stat-lbl">Bajarilgan dasturlar</span><span class="org-stat-val" style="color:var(--green)">${o.baj}</span></div>
+    </div>`).join('');
+}
+
+// ─────────────────────────────────────────────────────
+// STAT GRID (top cards)
+// ─────────────────────────────────────────────────────
+function renderStatGrid(){
+  const top=[
+    {l:"Uchrashuvlar",n:1840,pct:78,col:"#2563EB",bg:"#EFF6FF"},
+    {l:"Bandlik ta'minlangan",n:747,pct:65,col:"#16A34A",bg:"#DCFCE7"},
+    {l:"Kasb-hunar o'qitilgan",n:342,pct:58,col:"#7C3AED",bg:"#EDE9FE"},
+    {l:"Chet tili o'rgangan",n:256,pct:32,col:"#0D9488",bg:"#CCFBF1"},
+    {l:"Harbiy xizmat",n:189,pct:22,col:"#1E3A8A",bg:"#EFF6FF"},
+    {l:"Probatsiyadan chiqdi",n:134,pct:28,col:"#16A34A",bg:"#DCFCE7"},
+    {l:"Profilaktik hisobdan",n:98,pct:18,col:"#D97706",bg:"#FEF3C7"},
+    {l:"So'glamlashtirilgan",n:420,pct:76,col:"#16A34A",bg:"#DCFCE7"},
+    {l:"Moddiy yordam",n:312,pct:35,col:"#0D9488",bg:"#CCFBF1"},
+    {l:"Ekin yer maydoni",n:167,pct:18,col:"#D97706",bg:"#FEF3C7"},
+    {l:"Asbob-uskuna",n:223,pct:26,col:"#EA580C",bg:"#FFF7ED"},
+    {l:"Qayta jinoyat",n:23,pct:2,col:"#DC2626",bg:"#FEE2E2"},
+  ];
+  document.getElementById('statGrid').innerHTML=top.map(s=>`
+    <div class="stat-card">
+      <div class="sc-icon" style="background:${s.bg}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="${s.col}" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      </div>
+      <div>
+        <div class="sc-val" style="color:${s.col}">${s.n.toLocaleString()}</div>
+        <div class="sc-lbl">${s.l}</div>
+        <div class="sc-badge"><div style="display:flex;align-items:center;gap:5px;margin-top:4px"><div style="flex:1;height:4px;background:var(--off);border-radius:2px;overflow:hidden"><div style="width:${s.pct}%;height:100%;background:${s.col}"></div></div><span style="font-size:9.5px;font-weight:700;font-family:'JetBrains Mono';color:${s.col}">${s.pct}%</span></div></div>
+      </div>
+    </div>`).join('');
+}
+
+// ─────────────────────────────────────────────────────
+// HISOBOT
+// ─────────────────────────────────────────────────────
+function renderHisobot(){
+  document.getElementById('hisobotList').innerHTML=HISOBOTLAR.map(h=>`
+    <div class="mrow">
+      <div class="mav" style="background:var(--blue-light);border-radius:8px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" style="width:16px;height:16px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+      <div class="minfo"><div class="mname">${h.n}</div><div class="mmeta">${h.date} · ${h.sz}</div></div>
+      <button class="btn btn-sm btn-outline" onclick="toast('PDF yuklab olinmoqda...','ok')">⬇</button>
+    </div>`).join('');
+  document.getElementById('tasdiqList').innerHTML=TASDIQLASH.map(t=>`
+    <div class="mrow">
+      <div class="mav" style="background:var(--amber-bg);border-radius:8px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" style="width:16px;height:16px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div class="minfo"><div class="mname">${t.n}</div><div class="mmeta">Muddat: ${t.d}</div></div>
+      ${badge(t.h)}
+    </div>`).join('');
+}
+
+// ─────────────────────────────────────────────────────
+// SO'GLAMLASHTIRISH
+// ─────────────────────────────────────────────────────
+function renderSoglomlashChart(){
+  const data=[{l:"IIB",v:180},{l:"Mudofaa",v:95},{l:"Prokuratura",v:67},{l:"Gvardiya",v:48},{l:"FVV",v:30}];
+  const max=Math.max(...data.map(d=>d.v));
+  const el=document.getElementById('soglomlashChart');
+  if(el) el.innerHTML=data.map(d=>`<div class="bar-row cmp"><div class="bar-lbl">${d.l}</div><div class="bar-track"><div class="bar-fill" style="width:0;background:var(--green)" data-w="${(d.v/max*100).toFixed(1)}"></div></div><div class="bar-num">${d.v}</div></div>`).join('');
+  setTimeout(()=>document.querySelectorAll('#soglomlashChart .bar-fill').forEach(b=>b.style.width=b.dataset.w+'%'),80);
+}
+
+// ─────────────────────────────────────────────────────
+// AUDIT
+// ─────────────────────────────────────────────────────
+function renderAudit(){
+  document.getElementById('auditTable').innerHTML=AUDIT_DATA.map(a=>`
+    <tr>
+      <td class="td-mono">${a.t}</td>
+      <td class="td-bold">${a.u}</td>
+      <td>${a.a}</td>
+      <td style="font-size:11.5px">${a.ob}</td>
+      <td class="td-mono">${a.ip}</td>
+      <td>${badge('Bajarilgan')}</td>
+    </tr>`).join('');
+}
+
+// ─────────────────────────────────────────────────────
+// SOZLAMALAR NOTIF
+// ─────────────────────────────────────────────────────
+function renderNotifSets(){
+  const items=["Yangi uchrashuv eslatmasi","Kechiktirilgan hisobot","Reyting o'zgarishi","MFY tasdiqlash","Yangi ko'rsatma"];
+  document.getElementById('notifSettings').innerHTML=items.map((it,i)=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--off)">
+      <span style="font-size:12px;color:var(--dark)">${it}</span>
+      <label style="position:relative;display:inline-block;width:34px;height:19px;cursor:pointer;flex-shrink:0">
+        <input type="checkbox" ${i<3?'checked':''} style="opacity:0;width:0;height:0" onchange="toast('Sozlama saqlandi','ok')">
+        <span style="position:absolute;inset:0;background:${i<3?'var(--blue)':'#CBD5E1'};border-radius:20px;transition:.3s"></span>
+        <span style="position:absolute;top:3px;left:${i<3?'17':'3'}px;width:13px;height:13px;background:#fff;border-radius:50%;transition:.3s"></span>
+      </label>
+    </div>`).join('');
+}
+function saveSettings(){
+  const n=document.getElementById('setName').value;
+  document.getElementById('sbName').textContent=n;
+  document.getElementById('profName').textContent=n;
+  const ini=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('sbAv').textContent=ini;
+  document.getElementById('profAv').textContent=ini;
+  toast('Sozlamalar saqlandi!','ok');
+}
+
+// ─────────────────────────────────────────────────────
+// DATE + AI timestamp
+// ─────────────────────────────────────────────────────
+function setDate(){
+  const d=new Date();
+  const days=['Yakshanba','Dushanba','Seshanba','Chorshanba','Payshanba','Juma','Shanba'];
+  const months=['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentabr','Oktabr','Noyabr','Dekabr'];
+  document.getElementById('topDate').textContent=`${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  const t=d.toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'});
+  const el=document.getElementById('aiLastCheck');if(el)el.textContent=`${d.toLocaleDateString('ru-RU')}, ${t}`;
+}
+
+// ─────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────
+function init(){
+  setDate();
+  renderNotifs();
+  renderToifaChart();
+  renderLineChart('lineChart',OYLIK);
+  renderLeisure();
+  renderUpcoming();
+  renderYoshTable();
+  renderUchTable();
+  renderAktivDasturlar();
+  renderStatGrid();
+  renderHisobot();
+  renderAudit();
+  renderNotifSets();
+  populateDasturYoshFilter();
+  // Real-time clock
+  setInterval(setDate, 60000);
+  // Status bar footer for reyting page
+  const footer=document.createElement('div');
+  footer.style.cssText='position:fixed;bottom:0;left:var(--sidebar-w);right:0;padding:6px 20px;background:var(--white);border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:10.5px;color:var(--gray);transition:left .3s;z-index:50';
+  footer.innerHTML='<span style="display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block"></span>Tizim TEST rejimda ishlayapti</span><span id="footerTime"></span>';
+  document.body.appendChild(footer);
+  const updateFooter=()=>{const t=new Date();const el=document.getElementById('footerTime');if(el)el.textContent='Oxirgi yangilanish: '+t.toLocaleDateString('ru-RU')+', '+t.toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'});};
+  updateFooter();setInterval(updateFooter,60000);
+}
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>

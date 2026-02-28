@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connect-U — University Decision & Mentorship Marketplace</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0F1F4E;
+    --navy-mid: #1A2F6B;
+    --navy-light: #243A82;
+    --gold: #E8A020;
+    --gold-light: #F5BC50;
+    --cream: #FAF7F2;
+    --white: #FFFFFF;
+    --gray: #6B7280;
+    --light-gray: #F3F4F6;
+    --accent: #00C49A;
+    --text: #1A1A2E;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* ── CUSTOM CURSOR ── */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--gold);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease;
+    mix-blend-mode: multiply;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--navy);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+    opacity: 0.5;
+  }
+  a:hover ~ .cursor, button:hover ~ .cursor { transform: scale(2.5); }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1200;
+    padding: 20px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.4s ease;
+  }
+  nav.scrolled {
+    background: rgba(15, 31, 78, 0.97);
+    backdrop-filter: blur(20px);
+    padding: 14px 60px;
+    box-shadow: 0 2px 40px rgba(0,0,0,0.2);
+  }
+  nav.menu-open {
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--white);
+    letter-spacing: 2px;
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-links { display: flex; gap: 36px; align-items: center; }
+  .nav-links a {
+    color: rgba(255,255,255,0.75);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-cta {
+    background: var(--gold);
+    color: var(--navy) !important;
+    padding: 10px 24px;
+    border-radius: 2px;
+    font-weight: 600 !important;
+    letter-spacing: 1px;
+    font-size: 13px !important;
+  }
+  .nav-cta:hover { background: var(--gold-light) !important; color: var(--navy) !important; }
+
+  /* ── HAMBURGER ── */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 40px;
+    height: 40px;
+    cursor: none;
+    z-index: 1100;
+    padding: 4px;
+    background: none;
+    border: none;
+    flex-shrink: 0;
+  }
+  .hamburger span {
+    display: block;
+    height: 2px;
+    background: var(--white);
+    border-radius: 2px;
+    transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+    transform-origin: center;
+  }
+  .hamburger span:nth-child(1) { width: 28px; }
+  .hamburger span:nth-child(2) { width: 20px; }
+  .hamburger span:nth-child(3) { width: 24px; }
+  .hamburger.open span:nth-child(1) { width: 26px; transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger.open span:nth-child(3) { width: 26px; transform: translateY(-7px) rotate(-45deg); }
+
+  /* ── MOBILE MENU OVERLAY ── */
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--navy);
+    z-index: 1100;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .mobile-menu.open {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .mobile-menu-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(232,160,32,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,160,32,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+  .mobile-menu-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    padding: 0 32px;
+  }
+  .mobile-menu-links a {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.75);
+    text-decoration: none;
+    padding: 14px 0;
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    transition: color 0.2s, transform 0.2s;
+    opacity: 0;
+    transform: translateY(20px);
+    letter-spacing: 1px;
+  }
+  .mobile-menu.open .mobile-menu-links a {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .mobile-menu.open .mobile-menu-links a:nth-child(1) { transition: all 0.4s 0.1s ease; }
+  .mobile-menu.open .mobile-menu-links a:nth-child(2) { transition: all 0.4s 0.15s ease; }
+  .mobile-menu.open .mobile-menu-links a:nth-child(3) { transition: all 0.4s 0.2s ease; }
+  .mobile-menu.open .mobile-menu-links a:nth-child(4) { transition: all 0.4s 0.25s ease; }
+  .mobile-menu.open .mobile-menu-links a:nth-child(5) { transition: all 0.4s 0.3s ease; }
+  .mobile-menu-links a:hover { color: var(--gold); transform: translateX(6px); }
+  .mobile-menu-links a:last-child {
+    border-bottom: none;
+    margin-top: 16px;
+    background: var(--gold);
+    color: var(--navy) !important;
+    font-size: 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 18px 0;
+  }
+  .mobile-menu-links a:last-child:hover { background: var(--gold-light); transform: none; }
+  .mobile-menu-footer {
+    position: absolute;
+    bottom: 40px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.2);
+    z-index: 1;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    background: var(--navy);
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+  .hero-bg-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(232,160,32,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,160,32,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridMove 20s linear infinite;
+  }
+  @keyframes gridMove {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(60px); }
+  }
+  .hero-glow {
+    position: absolute;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(232,160,32,0.08) 0%, transparent 70%);
+    top: -200px; right: -100px;
+    animation: glowPulse 6s ease-in-out infinite;
+  }
+  .hero-glow-2 {
+    position: absolute;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,196,154,0.06) 0%, transparent 70%);
+    bottom: -100px; left: 100px;
+    animation: glowPulse 8s ease-in-out infinite reverse;
+  }
+  @keyframes glowPulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+  }
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 60px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(232,160,32,0.12);
+    border: 1px solid rgba(232,160,32,0.3);
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    padding: 6px 16px;
+    border-radius: 2px;
+    margin-bottom: 28px;
+    animation: fadeUp 0.8s ease forwards;
+    opacity: 0;
+  }
+  .hero-tag::before { content: ''; width: 6px; height: 6px; background: var(--gold); border-radius: 50%; }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 68px;
+    font-weight: 900;
+    line-height: 1.05;
+    color: var(--white);
+    margin-bottom: 24px;
+    animation: fadeUp 0.8s 0.1s ease forwards;
+    opacity: 0;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+  .hero-sub {
+    font-size: 17px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 44px;
+    font-weight: 300;
+    animation: fadeUp 0.8s 0.2s ease forwards;
+    opacity: 0;
+  }
+  .hero-btns {
+    display: flex;
+    gap: 16px;
+    animation: fadeUp 0.8s 0.3s ease forwards;
+    opacity: 0;
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: var(--navy);
+    padding: 16px 36px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border: none;
+    cursor: none;
+    transition: all 0.25s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 12px 40px rgba(232,160,32,0.35); }
+  .btn-outline {
+    border: 1px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.8);
+    padding: 16px 36px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: none;
+    transition: all 0.25s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* Hero right side - stat cards */
+  .hero-right {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    animation: fadeUp 0.8s 0.4s ease forwards;
+    opacity: 0;
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 28px 24px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 2px;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+  .stat-card:hover::before { transform: scaleX(1); }
+  .stat-card:hover { background: rgba(255,255,255,0.07); transform: translateY(-4px); }
+  .stat-card.accent::before { background: var(--accent); }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-card.accent .stat-num { color: var(--accent); }
+  .stat-label { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 400; line-height: 1.4; }
+
+  /* ── MUAMMO SECTION ── */
+  .problems {
+    background: var(--cream);
+    padding: 120px 60px;
+    position: relative;
+  }
+  .section-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--navy);
+    margin-bottom: 20px;
+  }
+  .section-sub {
+    font-size: 17px;
+    color: var(--gray);
+    line-height: 1.7;
+    max-width: 560px;
+    font-weight: 300;
+  }
+  .problems-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 60px;
+    background: #E5E7EB;
+  }
+  .problem-card {
+    background: var(--white);
+    padding: 44px 36px;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  .problem-card:hover {
+    background: var(--navy);
+    z-index: 2;
+  }
+  .problem-card:hover .prob-num { color: rgba(255,255,255,0.15); }
+  .problem-card:hover .prob-title { color: var(--white); }
+  .problem-card:hover .prob-text { color: rgba(255,255,255,0.6); }
+  .problem-card:hover .prob-stat { background: var(--gold); color: var(--navy); }
+  .prob-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 80px;
+    font-weight: 900;
+    color: rgba(15,31,78,0.06);
+    line-height: 1;
+    margin-bottom: -20px;
+    transition: all 0.3s;
+  }
+  .prob-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 12px;
+    transition: all 0.3s;
+  }
+  .prob-text {
+    font-size: 14px;
+    color: var(--gray);
+    line-height: 1.6;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+  }
+  .prob-stat {
+    display: inline-block;
+    background: var(--light-gray);
+    color: var(--navy);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 2px;
+    font-family: 'DM Mono', monospace;
+    transition: all 0.3s;
+  }
+
+  /* ── YECHIM / SOLUTION ── */
+  .solution {
+    background: var(--navy);
+    padding: 120px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .solution-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(232,160,32,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,160,32,0.03) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+  .solution-content { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; }
+  .solution-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 60px; flex-wrap: wrap; gap: 24px; }
+  .solution-header .section-title { color: var(--white); margin-bottom: 0; }
+  .solution-header .section-sub { color: rgba(255,255,255,0.5); }
+  .layers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .layer-card {
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 44px 36px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    cursor: none;
+  }
+  .layer-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(232,160,32,0.06), transparent);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .layer-card:hover { border-color: var(--gold); transform: translateY(-6px); }
+  .layer-card:hover::after { opacity: 1; }
+  .layer-card.accent-card:hover { border-color: var(--accent); }
+  .layer-card.accent-card::after { background: linear-gradient(135deg, rgba(0,196,154,0.06), transparent); }
+  .layer-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 64px;
+    font-weight: 900;
+    color: rgba(255,255,255,0.05);
+    line-height: 1;
+    margin-bottom: -10px;
+  }
+  .layer-icon {
+    width: 52px; height: 52px;
+    background: rgba(232,160,32,0.12);
+    border: 1px solid rgba(232,160,32,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+  }
+  .layer-card:hover .layer-icon { background: rgba(232,160,32,0.2); }
+  .layer-card.accent-card .layer-icon { background: rgba(0,196,154,0.12); border-color: rgba(0,196,154,0.25); }
+  .layer-title { font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 12px; }
+  .layer-text { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.7; margin-bottom: 24px; font-weight: 300; }
+  .layer-features { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .layer-features li {
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+    padding-left: 20px;
+    position: relative;
+  }
+  .layer-features li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+  }
+  .accent-card .layer-features li::before { color: var(--accent); }
+
+  /* ── PRICING ── */
+  .pricing {
+    background: var(--cream);
+    padding: 120px 60px;
+  }
+  .pricing-header { text-align: center; margin-bottom: 60px; }
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    max-width: 1100px;
+    margin: 0 auto;
+    border: 1px solid #E5E7EB;
+  }
+  .price-card {
+    padding: 40px 28px;
+    border-right: 1px solid #E5E7EB;
+    position: relative;
+    transition: all 0.3s ease;
+    background: var(--white);
+  }
+  .price-card:last-child { border-right: none; }
+  .price-card.featured {
+    background: var(--navy);
+    z-index: 2;
+    box-shadow: 0 0 0 2px var(--gold), 0 20px 60px rgba(15,31,78,0.25);
+    transform: scaleY(1.04);
+    border-right-color: transparent;
+  }
+  .price-card:hover:not(.featured) { background: var(--light-gray); }
+  .price-tier {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    font-weight: 500;
+    color: var(--gray);
+    margin-bottom: 16px;
+    display: block;
+  }
+  .featured .price-tier { color: var(--gold); }
+  .price-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .featured .price-val { color: var(--white); }
+  .price-period { font-size: 13px; color: var(--gray); margin-bottom: 28px; }
+  .featured .price-period { color: rgba(255,255,255,0.5); }
+  .price-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+  .price-features li {
+    font-size: 13px;
+    color: #4B5563;
+    padding-left: 20px;
+    position: relative;
+    line-height: 1.4;
+  }
+  .price-features li::before { content: '✓'; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+  .featured .price-features li { color: rgba(255,255,255,0.7); }
+  .price-btn {
+    display: block;
+    text-align: center;
+    padding: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border: 1.5px solid #E5E7EB;
+    color: var(--navy);
+    text-decoration: none;
+    transition: all 0.25s;
+    cursor: none;
+  }
+  .price-btn:hover { border-color: var(--navy); background: var(--navy); color: var(--white); }
+  .featured .price-btn { background: var(--gold); border-color: var(--gold); color: var(--navy); }
+  .featured .price-btn:hover { background: var(--gold-light); }
+  .price-badge {
+    position: absolute;
+    top: -12px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 4px 14px;
+    white-space: nowrap;
+  }
+
+  /* ── HOW IT WORKS ── */
+  .how {
+    background: var(--navy);
+    padding: 120px 60px;
+    overflow: hidden;
+  }
+  .how-content { max-width: 1200px; margin: 0 auto; }
+  .how-header { margin-bottom: 80px; }
+  .how-header .section-title { color: var(--white); }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    position: relative;
+  }
+  .steps::before {
+    content: '';
+    position: absolute;
+    top: 28px;
+    left: 5%;
+    right: 5%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(232,160,32,0.3), rgba(232,160,32,0.3), transparent);
+  }
+  .step { padding: 0 20px; }
+  .step-num {
+    width: 56px; height: 56px;
+    border: 1px solid rgba(232,160,32,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 28px;
+    background: var(--navy);
+    position: relative;
+    z-index: 1;
+  }
+  .step-title { font-size: 18px; font-weight: 700; color: var(--white); margin-bottom: 12px; }
+  .step-text { font-size: 14px; color: rgba(255,255,255,0.45); line-height: 1.6; font-weight: 300; }
+
+  /* ── MENTORS ── */
+  .mentors {
+    background: var(--cream);
+    padding: 120px 60px;
+  }
+  .mentors-content { max-width: 1200px; margin: 0 auto; }
+  .mentors-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 60px; flex-wrap: wrap; gap: 20px; }
+  .mentor-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .mentor-card {
+    background: var(--white);
+    padding: 36px;
+    border: 1px solid #E5E7EB;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .mentor-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--accent));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .mentor-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(15,31,78,0.1); }
+  .mentor-card:hover::before { transform: scaleX(1); }
+  .mentor-avatar {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    margin-bottom: 16px;
+    font-size: 28px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-family: 'Playfair Display', serif;
+    color: var(--white);
+  }
+  .mentor-name { font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .mentor-uni { font-size: 13px; color: var(--gold); font-weight: 600; margin-bottom: 12px; font-family: 'DM Mono', monospace; letter-spacing: 0.5px; }
+  .mentor-bio { font-size: 13.5px; color: var(--gray); line-height: 1.6; margin-bottom: 20px; font-weight: 300; }
+  .mentor-stats { display: flex; gap: 20px; }
+  .m-stat { display: flex; flex-direction: column; }
+  .m-stat-val { font-size: 18px; font-weight: 700; color: var(--navy); }
+  .m-stat-label { font-size: 11px; color: var(--gray); }
+  .mentor-rating { position: absolute; top: 24px; right: 24px; background: var(--light-gray); padding: 4px 10px; font-size: 13px; font-weight: 700; color: var(--navy); }
+
+  /* ── STATS ── */
+  .stats-section {
+    background: var(--gold);
+    padding: 80px 60px;
+  }
+  .stats-grid {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-left: 1px solid rgba(15,31,78,0.15);
+  }
+  .stat-item {
+    padding: 20px 40px;
+    border-right: 1px solid rgba(15,31,78,0.15);
+    text-align: center;
+  }
+  .stat-item-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--navy);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .stat-item-label { font-size: 13px; color: rgba(15,31,78,0.6); font-weight: 500; }
+
+  /* ── CTA ── */
+  .cta-section {
+    background: var(--navy);
+    padding: 140px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(232,160,32,0.08), transparent 70%);
+  }
+  .cta-content { position: relative; z-index: 1; }
+  .cta-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    margin-bottom: 24px;
+    display: block;
+  }
+  .cta-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 60px;
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.1;
+    margin-bottom: 24px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .cta-title em { font-style: italic; color: var(--gold); }
+  .cta-sub { font-size: 17px; color: rgba(255,255,255,0.5); margin-bottom: 48px; font-weight: 300; }
+  .cta-btns { display: flex; gap: 16px; justify-content: center; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: #070D1F;
+    padding: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--white);
+    letter-spacing: 2px;
+  }
+  .footer-logo span { color: var(--gold); }
+  .footer-links { display: flex; gap: 28px; }
+  .footer-links a { color: rgba(255,255,255,0.35); font-size: 13px; text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--gold); }
+  .footer-copy { color: rgba(255,255,255,0.2); font-size: 12px; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* ── FAQ ── */
+  .faq { background: var(--cream); padding: 100px 60px; }
+  .faq-content { max-width: 800px; margin: 0 auto; }
+  .faq-header { text-align: center; margin-bottom: 60px; }
+  .faq-item { border-bottom: 1px solid #E5E7EB; }
+  .faq-q {
+    padding: 24px 0;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--navy);
+    cursor: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+  }
+  .faq-q::after {
+    content: '+';
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--gold);
+    transition: transform 0.3s;
+  }
+  .faq-item.open .faq-q::after { transform: rotate(45deg); }
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    font-size: 15px;
+    color: var(--gray);
+    line-height: 1.7;
+    font-weight: 300;
+    transition: max-height 0.4s ease, padding 0.4s ease;
+  }
+  .faq-item.open .faq-a { max-height: 200px; padding-bottom: 24px; }
+
+  /* ── MARQUEE ── */
+  .marquee-wrap {
+    background: var(--navy);
+    padding: 18px 0;
+    overflow: hidden;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .marquee-track {
+    display: flex;
+    gap: 60px;
+    animation: marquee 20s linear infinite;
+    white-space: nowrap;
+    width: max-content;
+  }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .marquee-item {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 2px;
+  }
+  .marquee-item span { color: var(--gold); margin: 0 12px; }
+
+  @media (max-width: 900px) {
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    .mobile-menu { display: flex; }
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    nav.scrolled { padding: 12px 24px; }
+    .hero-content { grid-template-columns: 1fr; padding: 0 24px; gap: 40px; padding-top: 100px; }
+    .hero-title { font-size: 44px; }
+    .hero-right { grid-template-columns: 1fr 1fr; }
+    .problems { padding: 80px 24px; }
+    .problems-grid { grid-template-columns: 1fr; }
+    .solution { padding: 80px 24px; }
+    .layers { grid-template-columns: 1fr; }
+    .pricing { padding: 80px 24px; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .price-card.featured { transform: none; }
+    .how { padding: 80px 24px; }
+    .steps { grid-template-columns: 1fr 1fr; gap: 40px; }
+    .steps::before { display: none; }
+    .mentors { padding: 80px 24px; }
+    .mentor-cards { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .cta-section { padding: 100px 24px; }
+    .cta-title { font-size: 40px; }
+    .cta-btns { flex-direction: column; align-items: center; }
+    footer { padding: 40px 24px; flex-direction: column; text-align: center; }
+    .faq { padding: 80px 24px; }
+    .section-title { font-size: 38px; }
+    .mobile-menu-links a { font-size: 28px; }
+    .stats-section { padding: 60px 24px; }
+    .stat-item { padding: 20px 16px; }
+    .stat-item-val { font-size: 36px; }
+    .solution-header { flex-direction: column; align-items: flex-start; }
+    .mentors-header { flex-direction: column; align-items: flex-start; }
+  }
+
+  @media (max-width: 480px) {
+    .hero-title { font-size: 36px; }
+    .hero-btns { flex-direction: column; }
+    .hero-right { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat-num { font-size: 32px; }
+    .steps { grid-template-columns: 1fr; }
+    .cta-title { font-size: 32px; }
+    .section-title { font-size: 32px; }
+    .mobile-menu-links a { font-size: 24px; padding: 12px 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">Connect<span>-U</span></a>
+  <div class="nav-links">
+    <a href="#muammo">Muammo</a>
+    <a href="#yechim">Yechim</a>
+    <a href="#narxlar">Narxlar</a>
+    <a href="#mentorlar">Mentorlar</a>
+    <a href="#cta" class="nav-cta">Boshlash</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-menu-bg"></div>
+  <div class="mobile-menu-links">
+    <a href="#muammo" class="mob-link">Muammo</a>
+    <a href="#yechim" class="mob-link">Yechim</a>
+    <a href="#narxlar" class="mob-link">Narxlar</a>
+    <a href="#mentorlar" class="mob-link">Mentorlar</a>
+    <a href="#cta" class="mob-link">Boshlash →</a>
+  </div>
+  <div class="mobile-menu-footer">CONNECT-U © 2024</div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+  <div class="hero-content">
+    <div class="hero-left">
+      <div class="hero-tag">O'zbekiston №1 mentorlik platformasi</div>
+      <h1 class="hero-title">To'g'ri<br><em>universitet</em> —<br>to'g'ri hayot.</h1>
+      <p class="hero-sub">Verifikatsiyalangan talaba-mentorlar orqali universitetni tanlab, tayyorlanib, <strong style="color:rgba(255,255,255,0.85)">ishonchli qaror qiling.</strong></p>
+      <div class="hero-btns">
+        <a href="#narxlar" class="btn-primary">Bepul boshlash</a>
+        <a href="#mentorlar" class="btn-outline">Mentorlarni ko'rish</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="stat-card">
+        <div class="stat-num">200K+</div>
+        <div class="stat-label">Yillik abituriyent O'zbekistonda</div>
+      </div>
+      <div class="stat-card accent">
+        <div class="stat-num">68%</div>
+        <div class="stat-label">1-kursda yo'nalishdan norozi</div>
+      </div>
+      <div class="stat-card accent">
+        <div class="stat-num">4.8★</div>
+        <div class="stat-label">Mentor sifat reytingi</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">$0</div>
+        <div class="stat-label">Bepul kirish imkoni</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">TOSHKENT DAVLAT YURIDIK UNIVERSITETI <span>✦</span></span>
+    <span class="marquee-item">DIPLOMATIYA INSTITUTI <span>✦</span></span>
+    <span class="marquee-item">TDTU <span>✦</span></span>
+    <span class="marquee-item">TDIU <span>✦</span></span>
+    <span class="marquee-item">WEBSTER UNIVERSITY <span>✦</span></span>
+    <span class="marquee-item">TOSHKENT TIBBIYOT AKADEMIYASI <span>✦</span></span>
+    <span class="marquee-item">TOSHKENT DAVLAT YURIDIK UNIVERSITETI <span>✦</span></span>
+    <span class="marquee-item">DIPLOMATIYA INSTITUTI <span>✦</span></span>
+    <span class="marquee-item">TDTU <span>✦</span></span>
+    <span class="marquee-item">TDIU <span>✦</span></span>
+    <span class="marquee-item">WEBSTER UNIVERSITY <span>✦</span></span>
+    <span class="marquee-item">TOSHKENT TIBBIYOT AKADEMIYASI <span>✦</span></span>
+  </div>
+</div>
+
+<!-- MUAMMO -->
+<section class="problems" id="muammo">
+  <div style="max-width:1200px; margin:0 auto;">
+    <span class="section-tag reveal">01 — MUAMMO</span>
+    <h2 class="section-title reveal">Nima uchun bu muhim?</h2>
+    <p class="section-sub reveal">O'zbekistonda har yili yuz minglab abituriyent katta xato qiladi — ma'lumot bor, lekin <strong>to'g'ri yo'nalish yo'q.</strong></p>
+    <div class="problems-grid">
+      <div class="problem-card reveal">
+        <div class="prob-num">01</div>
+        <div class="prob-title">Noto'g'ri tanlov</div>
+        <div class="prob-text">Ko'pchilik otaona ta'siri yoki do'stlar maslahatiga ko'ra universitetni tanlaydi. Real ma'lumotga asoslangan qaror juda kam.</div>
+        <span class="prob-stat">42% 1-kursda norozi</span>
+      </div>
+      <div class="problem-card reveal reveal-delay-1">
+        <div class="prob-num">02</div>
+        <div class="prob-title">Raqobatni bilmaslik</div>
+        <div class="prob-text">Kirish ballari va real raqobat statistikasi tarqoq, eskirgan yoki umuman topilmaydi. Abituriyent ko'r-ko'rona ariza topshiradi.</div>
+        <span class="prob-stat">Ballar har yil o'zgaradi</span>
+      </div>
+      <div class="problem-card reveal reveal-delay-2">
+        <div class="prob-num">03</div>
+        <div class="prob-title">Insider yo'q</div>
+        <div class="prob-text">Universitetning ichki muhiti, o'qitish sifati, hayot tarzini faqat rasmiy reklamalardan bilib bo'lmaydi. Haqiqat yashirin.</div>
+        <span class="prob-stat">Faqat reklamalar bor</span>
+      </div>
+      <div class="problem-card reveal reveal-delay-1">
+        <div class="prob-num">04</div>
+        <div class="prob-title">Ota-ona bosimi</div>
+        <div class="prob-text">68% abituriyent o'z istagi emas, oila qarori bilan ketadi. Natija: motivatsiya yo'qolishi, 4 yil noto'g'ri kasbda.</div>
+        <span class="prob-stat">68% oila qaror qiladi</span>
+      </div>
+      <div class="problem-card reveal reveal-delay-2">
+        <div class="prob-num">05</div>
+        <div class="prob-title">Moslashish krizi</div>
+        <div class="prob-text">1-semestrda ko'pchilik akademik depressiyaga tushadi. Yangi muhit, talablar va hayot tarzi bilan kurashish juda og'ir.</div>
+        <span class="prob-stat">31% akademik kriz</span>
+      </div>
+      <div class="problem-card reveal reveal-delay-3" style="background:var(--navy); cursor:none;">
+        <div class="prob-num" style="color:rgba(255,255,255,0.08)">→</div>
+        <div class="prob-title" style="color:var(--white); font-size:28px; font-family:'Playfair Display',serif; font-style:italic;">Connect-U bu muammoni hal qiladi.</div>
+        <div class="prob-text" style="color:rgba(255,255,255,0.5)">Strukturali guidance, real insider access va verifikatsiyalangan mentor.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- YECHIM -->
+<section class="solution" id="yechim">
+  <div class="solution-bg"></div>
+  <div class="solution-content">
+    <div class="solution-header">
+      <div>
+        <span class="section-tag reveal" style="color:var(--gold)">02 — YECHIM</span>
+        <h2 class="section-title reveal">3 qatlamli <em style="font-style:italic;color:var(--gold)">qaror infratuzilmasi</em></h2>
+      </div>
+      <p class="section-sub reveal" style="max-width:380px;">Biz shunchaki ma'lumot bermaymiz. Biz qaror qilish jarayonini strukturalashtiramiz.</p>
+    </div>
+    <div class="layers">
+      <div class="layer-card reveal">
+        <div class="layer-num">01</div>
+        <div class="layer-icon">📊</div>
+        <div class="layer-title">Data Layer</div>
+        <div class="layer-text">Real statistika va raqobat ma'lumotlari. Har bir yo'nalish uchun aniq kirish ballari, kvotalar va dinamika.</div>
+        <ul class="layer-features">
+          <li>Kirish ballari (3 yil dinamikasi)</li>
+          <li>Raqobat koeffitsienti</li>
+          <li>Bitiruvchi bandligi statistikasi</li>
+          <li>Universitet reytingi</li>
+        </ul>
+      </div>
+      <div class="layer-card reveal reveal-delay-1">
+        <div class="layer-num">02</div>
+        <div class="layer-icon">🗺️</div>
+        <div class="layer-title">Roadmap Layer</div>
+        <div class="layer-text">Strukturali qaror qilish tizimi. Qiziqish matritsa testidan DTMO cheklistigacha — to'liq yo'l.</div>
+        <ul class="layer-features">
+          <li>Yo'nalish moslik testi</li>
+          <li>Haftalik tayyorgarlik checklisti</li>
+          <li>Raqobat pozitsiyasi kalkulyatori</li>
+          <li>Ota-ona bilan muloqot script</li>
+        </ul>
+      </div>
+      <div class="layer-card accent-card reveal reveal-delay-2">
+        <div class="layer-num">03</div>
+        <div class="layer-icon">🎓</div>
+        <div class="layer-title">Mentor Layer</div>
+        <div class="layer-text">O'sha universitetda hozir o'qiyotgan talabalar bilan to'g'ridan-to'g'ri muloqot. Real, ishonchli, verifikatsiyalangan.</div>
+        <ul class="layer-features" style="--li-color:var(--accent)">
+          <li>Verifikatsiyalangan talabalar</li>
+          <li>1-on-1 yoki guruh sessiya</li>
+          <li>Reyting va sharh tizimi</li>
+          <li>Accountability tracking</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NARXLAR -->
+<section class="pricing" id="narxlar">
+  <div class="pricing-header">
+    <span class="section-tag reveal">03 — NARXLAR</span>
+    <h2 class="section-title reveal">Hamma uchun imkoniyat</h2>
+    <p style="color:var(--gray);font-size:16px;font-weight:300;margin-top:12px;" class="reveal">Bepuldan elitgacha — o'z ehtiyojingizga mos tanlang</p>
+  </div>
+  <div class="pricing-grid reveal">
+    <div class="price-card">
+      <span class="price-tier">FREE</span>
+      <div class="price-val">Bepul</div>
+      <div class="price-period">Hamisha bepul</div>
+      <ul class="price-features">
+        <li>Universitet statistikasi</li>
+        <li>Yo'nalish overview</li>
+        <li>Ochiq Q&A</li>
+        <li>Oylik umumiy webinar</li>
+      </ul>
+      <a href="#" class="price-btn">Boshlash</a>
+    </div>
+    <div class="price-card">
+      <span class="price-tier">GROUP PRO</span>
+      <div class="price-val">79,000</div>
+      <div class="price-period">so'm / oy</div>
+      <ul class="price-features">
+        <li>Strukturali roadmap</li>
+        <li>Haftalik checklist</li>
+        <li>Oyiga 2x guruh mentoring</li>
+        <li>Yopiq community</li>
+        <li>Test analiz shablonlari</li>
+      </ul>
+      <a href="#" class="price-btn">Tanlash</a>
+    </div>
+    <div class="price-card featured">
+      <div class="price-badge">⭐ ENG MASHHUR</div>
+      <span class="price-tier">1-ON-1 BASIC</span>
+      <div class="price-val">249,000</div>
+      <div class="price-period">so'm / oy</div>
+      <ul class="price-features">
+        <li>Oyiga 2 individual session</li>
+        <li>Shaxsiy strategiya</li>
+        <li>Mentor feedback</li>
+        <li>Chat support</li>
+        <li>Guruh imkoniyatlari</li>
+      </ul>
+      <a href="#" class="price-btn">Tanlash</a>
+    </div>
+    <div class="price-card">
+      <span class="price-tier">ELITE</span>
+      <div class="price-val">499K+</div>
+      <div class="price-period">so'm / oy · Limitli</div>
+      <ul class="price-features">
+        <li>Oyiga 4 individual session</li>
+        <li>Ota-ona session</li>
+        <li>Motivatsion monitoring</li>
+        <li>Uni hayotga tayyorlash</li>
+        <li>Priority qo'llab-quvvatlash</li>
+      </ul>
+      <a href="#" class="price-btn">So'rash</a>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how">
+  <div class="how-content">
+    <div class="how-header">
+      <span class="section-tag reveal" style="color:var(--gold)">04 — JARAYON</span>
+      <h2 class="section-title reveal" style="color:var(--white)">Qanday ishlaydi?</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">1</div>
+        <div class="step-title">Ro'yxatdan o'ting</div>
+        <div class="step-text">Bepul profil yarating. Qiziqishlaringiz va maqsadingizni belgilang. 2 daqiqa.</div>
+      </div>
+      <div class="step reveal reveal-delay-1">
+        <div class="step-num">2</div>
+        <div class="step-title">Ma'lumot oling</div>
+        <div class="step-text">Universitetlar statistikasi, yo'nalish tahlili va raqobat baholash natijalarini ko'ring.</div>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <div class="step-num">3</div>
+        <div class="step-title">Mentor tanlang</div>
+        <div class="step-text">O'sha universitetda o'qiyotgan verifikatsiyalangan mentor bilan session buyurtmang.</div>
+      </div>
+      <div class="step reveal reveal-delay-3">
+        <div class="step-num">4</div>
+        <div class="step-title">Qaror qiling</div>
+        <div class="step-text">To'liq ma'lumot asosida ishonch bilan to'g'ri universitetni tanlang va kiring.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MENTORLAR -->
+<section class="mentors" id="mentorlar">
+  <div class="mentors-content">
+    <div class="mentors-header">
+      <div>
+        <span class="section-tag reveal">05 — MENTORLAR</span>
+        <h2 class="section-title reveal">Haqiqiy talabalar,<br>haqiqiy tajriba</h2>
+      </div>
+      <p class="section-sub reveal" style="max-width:320px;">Har bir mentor yuridik tekshiruvdan o'tgan va faol o'qiyotgan talaba.</p>
+    </div>
+    <div class="mentor-cards">
+      <div class="mentor-card reveal">
+        <div class="mentor-rating">4.9 ★</div>
+        <div class="mentor-avatar" style="background: linear-gradient(135deg, #1A2B5F, #00C49A);">A</div>
+        <div class="mentor-name">Aziz Karimov</div>
+        <div class="mentor-uni">TDYU — Huquqshunoslik · 3-kurs</div>
+        <div class="mentor-bio">Kirish jarayonini yaxshi bilaman. Ballaringizni tahlil qilib, real ehtimolni aytib beraman. 2 yil davomida 40+ abituriyentga yordam berdim.</div>
+        <div class="mentor-stats">
+          <div class="m-stat"><span class="m-stat-val">40+</span><span class="m-stat-label">Mentee</span></div>
+          <div class="m-stat"><span class="m-stat-val">38</span><span class="m-stat-label">Session</span></div>
+          <div class="m-stat"><span class="m-stat-val">2 yil</span><span class="m-stat-label">Tajriba</span></div>
+        </div>
+      </div>
+      <div class="mentor-card reveal reveal-delay-1">
+        <div class="mentor-rating">4.8 ★</div>
+        <div class="mentor-avatar" style="background: linear-gradient(135deg, #7C3AED, #E8A020);">M</div>
+        <div class="mentor-name">Malika Yusupova</div>
+        <div class="mentor-uni">Diplomatiya Instituti · 2-kurs</div>
+        <div class="mentor-bio">Diplomatiya institutiga kirish juda raqobatli. Qanday tayyorlanish, qanday esse yozish va interview dan o'tishni biladiganmen.</div>
+        <div class="mentor-stats">
+          <div class="m-stat"><span class="m-stat-val">28+</span><span class="m-stat-label">Mentee</span></div>
+          <div class="m-stat"><span class="m-stat-val">25</span><span class="m-stat-label">Session</span></div>
+          <div class="m-stat"><span class="m-stat-val">1.5 yil</span><span class="m-stat-label">Tajriba</span></div>
+        </div>
+      </div>
+      <div class="mentor-card reveal reveal-delay-2">
+        <div class="mentor-rating">5.0 ★</div>
+        <div class="mentor-avatar" style="background: linear-gradient(135deg, #DC2626, #E8A020);">J</div>
+        <div class="mentor-name">Jasur Toshmatov</div>
+        <div class="mentor-uni">TDTU — IT Muhandislik · 4-kurs</div>
+        <div class="mentor-bio">Texnik yo'nalishda o'qiyotgan sifatida nima kutilishini, qanday o'qilishini va kasbiy imkoniyatlarni batafsil tushuntirib beraman.</div>
+        <div class="mentor-stats">
+          <div class="m-stat"><span class="m-stat-val">55+</span><span class="m-stat-label">Mentee</span></div>
+          <div class="m-stat"><span class="m-stat-val">62</span><span class="m-stat-label">Session</span></div>
+          <div class="m-stat"><span class="m-stat-val">3 yil</span><span class="m-stat-label">Tajriba</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-section">
+  <div class="stats-grid">
+    <div class="stat-item reveal">
+      <div class="stat-item-val">200K+</div>
+      <div class="stat-item-label">Yillik ta'sir doirasi</div>
+    </div>
+    <div class="stat-item reveal reveal-delay-1">
+      <div class="stat-item-val">30+</div>
+      <div class="stat-item-label">Verifikatsiyalangan mentor</div>
+    </div>
+    <div class="stat-item reveal reveal-delay-2">
+      <div class="stat-item-val">4.8★</div>
+      <div class="stat-item-label">O'rtacha mentor reytingi</div>
+    </div>
+    <div class="stat-item reveal reveal-delay-3">
+      <div class="stat-item-val">10+</div>
+      <div class="stat-item-label">Universitetlar qamrovi</div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="faq-content">
+    <div class="faq-header">
+      <span class="section-tag">06 — FAQ</span>
+      <h2 class="section-title reveal">Savol-javoblar</h2>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q">Mentorlar haqiqatan verifikatsiyalanganmi?</div>
+      <div class="faq-a">Ha. Har bir mentor talaba guvohnomasi, GPA tasdiqnomasi va video suhbatdan o'tadi. Hujjatlar tekshirilgandan keyin profil aktivlashtiriladi.</div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q">Birinchi session'ni sinab ko'rish mumkinmi?</div>
+      <div class="faq-a">Ha, bepul tier orqali umumiy Q&A sessiyalariga kirish mumkin. Premium tier uchun birinchi sessiondan oldin 15 daqiqalik intro call bepul.</div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q">Agar mentor yoqmasa nima bo'ladi?</div>
+      <div class="faq-a">Mentor o'zgartirish imkoniyati bor. Birinchi session yoqmasa — to'liq qaytarish kafolati. Sifat bizning asosiy ustuvorligimiz.</div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q">Qaysi universitetlar qamrab olingan?</div>
+      <div class="faq-a">Hozir TDYU, Diplomatiya Instituti, TDTU, TDIU, Webster University va yana 5+ universitetda mentorlarimiz bor. Ro'yxat doimiy kengaymoqda.</div>
+    </div>
+    <div class="faq-item reveal">
+      <div class="faq-q">To'lov qanday amalga oshiriladi?</div>
+      <div class="faq-a">Payme yoki Click orqali — O'zbekistonning barcha to'lov tizimlari qo'llab-quvvatlanadi. Oylik obuna, istalgan vaqt bekor qilish mumkin.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+  <div class="cta-bg"></div>
+  <div class="cta-content">
+    <span class="cta-label reveal">HOZIROQ BOSHLANG</span>
+    <h2 class="cta-title reveal">Har bir abituriyent <em>to'g'ri qaror</em> qilishga haqli.</h2>
+    <p class="cta-sub reveal">Bepul ro'yxatdan o'ting. Statistikani ko'ring. Mentor tanlang.</p>
+    <div class="cta-btns reveal">
+      <a href="#" class="btn-primary">Bepul boshlash →</a>
+      <a href="#" class="btn-outline">Mentorlarni ko'rish</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Connect<span>-U</span></div>
+  <div class="footer-links">
+    <a href="#">Muammo</a>
+    <a href="#">Yechim</a>
+    <a href="#">Narxlar</a>
+    <a href="#">Mentorlar</a>
+    <a href="#">Bog'lanish</a>
+  </div>
+  <div class="footer-copy">© 2024 Connect-U. Barcha huquqlar himoyalangan.</div>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx - 6 + 'px';
+    cursor.style.top = my - 6 + 'px';
+  });
+  function animateRing() {
+    rx += (mx - rx - 18) * 0.12;
+    ry += (my - ry - 18) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // Nav scroll
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  // Hamburger menu
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  let menuOpen = false;
+
+  function toggleMenu(open) {
+    menuOpen = open;
+    hamburger.classList.toggle('open', open);
+    mobileMenu.classList.toggle('open', open);
+    navbar.classList.toggle('menu-open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+
+  hamburger.addEventListener('click', () => toggleMenu(!menuOpen));
+
+  document.querySelectorAll('.mob-link').forEach(link => {
+    link.addEventListener('click', () => toggleMenu(false));
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && menuOpen) toggleMenu(false);
+  });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // FAQ
+  document.querySelectorAll('.faq-q').forEach(q => {
+    q.addEventListener('click', () => {
+      const item = q.parentElement;
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!wasOpen) item.classList.add('open');
+    });
+  });
+
+  // Counter animation
+  function animateCounter(el, target, suffix = '') {
+    let start = 0;
+    const duration = 1500;
+    const step = target / (duration / 16);
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= target) { start = target; clearInterval(timer); }
+      el.textContent = Math.floor(start).toLocaleString() + suffix;
+    }, 16);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Connect-U</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════ */
+:root {
+  --bg:        #080E1C;
+  --surface:   #0F1829;
+  --surface2:  #162035;
+  --surface3:  #1C2A42;
+  --border:    rgba(255,255,255,0.07);
+  --border2:   rgba(255,255,255,0.12);
+  --gold:      #F0A500;
+  --gold-dim:  rgba(240,165,0,0.12);
+  --gold-glow: rgba(240,165,0,0.25);
+  --teal:      #00BFA6;
+  --teal-dim:  rgba(0,191,166,0.1);
+  --red:       #FF4D6A;
+  --text:      #F0F4FF;
+  --text2:     #8A97B0;
+  --text3:     #4A5568;
+  --radius:    16px;
+  --radius-sm: 10px;
+  --nav-h:     64px;
+  --safe-b:    env(safe-area-inset-bottom, 0px);
+}
+
+/* ── RESET ── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { height:100%; }
+body {
+  font-family: 'Sora', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100%;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+button { font-family: inherit; cursor: pointer; }
+a { text-decoration: none; color: inherit; }
+img { display: block; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 0; height: 0; }
+
+/* ═══════════════════════════════════════════
+   AUTH SCREEN
+═══════════════════════════════════════════ */
+/* authScreen miniapp-v2 dan o'chirildi — login.html alohida sahifa */
+
+.auth-logo {
+  font-size: 13px; font-weight: 600; letter-spacing: 3px;
+  color: var(--gold); margin-bottom: 48px;
+  display: flex; align-items: center; gap: 10px;
+}
+.auth-logo-dot { width: 8px; height: 8px; background: var(--gold); border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+
+.auth-title { font-size: 32px; font-weight: 800; line-height: 1.15; text-align: center; margin-bottom: 12px; }
+.auth-title em { font-style: italic; color: var(--gold); }
+.auth-sub { font-size: 15px; color: var(--text2); text-align: center; line-height: 1.6; margin-bottom: 48px; max-width: 300px; }
+
+.auth-methods { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 360px; }
+
+.auth-btn {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border2);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 15px; font-weight: 600;
+  transition: all 0.2s;
+  width: 100%;
+}
+.auth-btn:hover, .auth-btn:active { background: var(--surface2); border-color: var(--border2); transform: translateY(-1px); }
+.auth-btn.primary { background: var(--gold); border-color: var(--gold); color: #080E1C; }
+.auth-btn.primary:hover { background: #FFB830; }
+.auth-btn-icon { width: 40px; height: 40px; border-radius: 10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.auth-btn.primary .auth-btn-icon { background: rgba(0,0,0,0.15); }
+.auth-btn:not(.primary) .auth-btn-icon { background: var(--surface3); }
+.auth-btn-text { display: flex; flex-direction: column; text-align: left; }
+.auth-btn-text span:first-child { font-size: 15px; font-weight: 600; }
+.auth-btn-text span:last-child { font-size: 12px; font-weight: 400; opacity: 0.65; margin-top: 1px; }
+
+.auth-divider { display: flex; align-items: center; gap: 12px; color: var(--text3); font-size: 13px; }
+.auth-divider::before, .auth-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* Phone auth form */
+.phone-form { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 360px; }
+.phone-form.hidden { display: none; }
+.input-wrap { position: relative; }
+.input-field {
+  width: 100%; padding: 16px 18px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text); font-family: inherit; font-size: 15px;
+  outline: none; transition: border-color 0.2s;
+}
+.input-field:focus { border-color: var(--gold); }
+.input-field::placeholder { color: var(--text3); }
+.otp-hint { font-size: 12px; color: var(--text2); text-align: center; }
+.back-link { font-size: 13px; color: var(--text2); text-align: center; cursor: pointer; }
+.back-link:hover { color: var(--gold); }
+
+/* ═══════════════════════════════════════════
+   APP SHELL
+═══════════════════════════════════════════ */
+#appShell { display: none; flex-direction: column; min-height: 100vh; }
+#appShell.visible { display: flex; }
+
+/* ── TOP HEADER ── */
+.header {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(8,14,28,0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border);
+  /* Fixed height, no overflow */
+  height: var(--nav-h);
+  min-height: var(--nav-h);
+  max-height: var(--nav-h);
+  padding: 0 16px;
+  display: flex; align-items: center;
+  gap: 10px;
+  overflow: hidden; /* prevent avatar bleed */
+}
+.header-logo {
+  font-size: 17px; font-weight: 800; letter-spacing: 0.5px;
+  white-space: nowrap; flex-shrink: 0;
+}
+.header-logo span { color: var(--gold); }
+.header-search {
+  flex: 1; min-width: 0; /* allow shrink */
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 8px 12px; cursor: pointer;
+  transition: border-color 0.2s; overflow: hidden;
+}
+.header-search:hover { border-color: var(--border2); }
+.header-search input {
+  flex: 1; min-width: 0; background: none; border: none; outline: none;
+  font-family: inherit; font-size: 13px; color: var(--text);
+}
+.header-search input::placeholder { color: var(--text3); }
+.header-user {
+  cursor: pointer; flex-shrink: 0;
+  /* prevent any growth */
+  width: 36px; height: 36px;
+}
+.user-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--teal));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: #080E1C;
+  overflow: hidden; flex-shrink: 0;
+  position: relative;
+}
+.user-avatar img { width:100%; height:100%; object-fit:cover; position:absolute; inset:0; }
+
+/* ── CONTENT AREA ── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: calc(var(--nav-h) + 16px + var(--safe-b));
+}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  background: rgba(8,14,28,0.96);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  padding-bottom: var(--safe-b);
+  height: calc(var(--nav-h) + var(--safe-b));
+}
+.nav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 4px; border: none; background: none;
+  color: var(--text3); transition: color 0.2s;
+  padding: 8px 4px 6px;
+  position: relative;
+}
+.nav-item.active { color: var(--gold); }
+.nav-item .nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.3px; }
+.nav-item .nav-dot {
+  position: absolute; top: 8px; right: calc(50% - 14px);
+  width: 6px; height: 6px; background: var(--red);
+  border-radius: 50%; display: none;
+}
+.nav-item .nav-dot.show { display: block; }
+
+/* ── PAGES ── */
+.page { display: none; animation: slideUp 0.25s cubic-bezier(0.23,1,0.32,1); }
+.page.active { display: block; }
+@keyframes slideUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+/* ═══════════════════════════════════════════
+   TYPOGRAPHY & COMMON
+═══════════════════════════════════════════ */
+.page-header { padding: 24px 20px 16px; }
+.page-title { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+.page-sub { font-size: 14px; color: var(--text2); }
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 500; letter-spacing: 2px;
+  color: var(--gold); text-transform: uppercase;
+  margin-bottom: 6px; display: block;
+}
+
+/* ── CARD BASE ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.card-body { padding: 16px; }
+
+/* ── BUTTON ── */
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 20px; border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 14px; font-weight: 600;
+  border: none; transition: all 0.18s; width: 100%;
+}
+.btn-gold { background: var(--gold); color: #080E1C; }
+.btn-gold:hover { background: #FFB830; transform: translateY(-1px); box-shadow: 0 8px 24px var(--gold-glow); }
+.btn-gold:active { transform: translateY(0); }
+.btn-surface { background: var(--surface2); color: var(--text); border: 1px solid var(--border2); }
+.btn-surface:hover { background: var(--surface3); }
+.btn-teal { background: var(--teal); color: #080E1C; }
+.btn-ghost { background: transparent; border: 1.5px solid var(--border2); color: var(--text2); }
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+.btn-sm { padding: 9px 16px; font-size: 13px; border-radius: 8px; width: auto; display: inline-flex; }
+
+/* ── CHIPS ── */
+.chips { display: flex; gap: 8px; overflow-x: auto; padding: 0 20px 2px; scrollbar-width:none; }
+.chips::-webkit-scrollbar { display:none; }
+.chip {
+  flex-shrink: 0; padding: 8px 16px; border-radius: 20px;
+  font-family: inherit; font-size: 13px; font-weight: 500;
+  background: var(--surface); border: 1.5px solid var(--border);
+  color: var(--text2); transition: all 0.18s; white-space: nowrap;
+}
+.chip.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+
+/* ── BADGE ── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+}
+.badge-gold { background: var(--gold-dim); color: var(--gold); border: 1px solid rgba(240,165,0,0.2); }
+.badge-teal { background: var(--teal-dim); color: var(--teal); }
+.badge-red { background: rgba(255,77,106,0.12); color: var(--red); }
+.badge-gray { background: rgba(255,255,255,0.06); color: var(--text2); }
+
+/* ── DIVIDER ── */
+.divider { height: 1px; background: var(--border); margin: 0 20px; }
+.section-gap { height: 24px; }
+.px-20 { padding-left: 20px; padding-right: 20px; }
+
+/* ═══════════════════════════════════════════
+   HOME PAGE
+═══════════════════════════════════════════ */
+.home-hero {
+  margin: 16px 20px;
+  background: linear-gradient(135deg, #0F1F3D, #162035);
+  border: 1px solid rgba(240,165,0,0.2);
+  border-radius: 20px;
+  padding: 24px 20px;
+  position: relative; overflow: hidden;
+}
+.home-hero::before {
+  content: ''; position: absolute;
+  top: -60px; right: -60px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(240,165,0,0.15), transparent 70%);
+  pointer-events: none;
+}
+.home-hero-tag { margin-bottom: 10px; }
+.home-hero h2 { font-size: 22px; font-weight: 800; line-height: 1.2; margin-bottom: 8px; }
+.home-hero h2 em { font-style: italic; color: var(--gold); }
+.home-hero p { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 20px; }
+.home-hero-btns { display: flex; gap: 10px; }
+.home-hero-btns .btn { flex: 1; }
+
+.kpi-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin: 0 20px 20px; }
+.kpi-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px 12px;
+  text-align: center;
+}
+.kpi-val { font-size: 22px; font-weight: 800; color: var(--gold); line-height: 1; margin-bottom: 4px; }
+.kpi-label { font-size: 10px; color: var(--text2); font-weight: 500; line-height: 1.3; }
+
+.section-row { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; margin-bottom: 14px; }
+.section-row-title { font-size: 17px; font-weight: 700; }
+.see-all { font-size: 13px; color: var(--gold); font-weight: 500; cursor: pointer; }
+
+/* Horizontal mentor scroll */
+.mentors-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 0 20px 4px; scrollbar-width: none; }
+.mentors-scroll::-webkit-scrollbar { display: none; }
+.mentor-card-h {
+  flex-shrink: 0; width: 180px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px; cursor: pointer;
+  transition: all 0.2s;
+}
+.mentor-card-h:active { transform: scale(0.97); background: var(--surface2); }
+.mentor-card-h .m-avatar {
+  width: 52px; height: 52px; border-radius: 50%;
+  margin-bottom: 12px; overflow: hidden; position: relative;
+}
+.mentor-card-h .m-avatar img { width:100%; height:100%; object-fit:cover; }
+.mentor-card-h .m-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+.mentor-card-h .m-uni { font-size: 11px; color: var(--gold); font-weight: 500; margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; }
+.mentor-card-h .m-rating { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; }
+
+/* Uni card horizontal */
+.uni-cards-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 0 20px 4px; scrollbar-width: none; }
+.uni-cards-scroll::-webkit-scrollbar { display: none; }
+.uni-card-h {
+  flex-shrink: 0; width: 200px; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+  transition: all 0.2s;
+}
+.uni-card-h:active { transform: scale(0.97); }
+.uni-card-img { width: 100%; height: 110px; object-fit: cover; background: var(--surface3); }
+.uni-card-body { padding: 12px; }
+.uni-card-short { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gold); margin-bottom: 4px; }
+.uni-card-name { font-size: 13px; font-weight: 700; line-height: 1.3; margin-bottom: 8px; }
+.uni-card-stat { display: flex; gap: 12px; }
+.uni-card-stat span { font-size: 11px; color: var(--text2); }
+.uni-card-stat strong { color: var(--text); font-weight: 600; }
+
+/* ═══════════════════════════════════════════
+   MENTORS PAGE
+═══════════════════════════════════════════ */
+.mentor-card-v {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 16px 20px; cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.mentor-card-v:hover { background: var(--surface); }
+.mentor-card-v:last-child { border-bottom: none; }
+.mentor-card-v .m-avatar {
+  width: 52px; height: 52px; border-radius: 50%;
+  flex-shrink: 0; overflow: hidden; position: relative;
+}
+.mentor-card-v .m-avatar img { width:100%; height:100%; object-fit:cover; }
+.mentor-card-v .m-avatar-fallback {
+  width:100%; height:100%; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:20px; font-weight:800; color:#080E1C;
+}
+.mentor-info-v { flex: 1; min-width: 0; }
+.mentor-info-v .m-name { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+.mentor-info-v .m-meta { font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+.mentor-info-v .m-bio { font-size: 13px; color: var(--text2); line-height: 1.5; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+.mentor-info-v .m-tags { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.mentor-rating-badge {
+  display: flex; align-items: center; gap: 3px;
+  font-size: 13px; font-weight: 700; color: #F9C74F;
+}
+
+/* ═══════════════════════════════════════════
+   MENTOR DETAIL PAGE
+═══════════════════════════════════════════ */
+.detail-hero { position: relative; }
+.detail-cover {
+  width: 100%; height: 160px; object-fit: cover;
+  background: var(--surface3);
+}
+.detail-cover-gradient {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 100px;
+  background: linear-gradient(transparent, var(--bg));
+}
+.detail-profile-row {
+  display: flex; align-items: flex-end; gap: 16px;
+  padding: 0 20px; margin-top: -32px; position: relative; z-index: 1;
+  margin-bottom: 16px;
+}
+.detail-avatar {
+  width: 72px; height: 72px; border-radius: 50%;
+  border: 3px solid var(--bg); overflow: hidden;
+  flex-shrink: 0; background: var(--surface3);
+}
+.detail-avatar img { width:100%; height:100%; object-fit:cover; }
+.detail-avatar-fallback {
+  width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:28px; font-weight:800; color:#080E1C;
+}
+.detail-name-block { flex:1; padding-bottom: 4px; }
+.detail-name { font-size: 20px; font-weight: 800; margin-bottom: 2px; }
+.detail-sub { font-size: 13px; color: var(--gold); font-family: 'JetBrains Mono', monospace; }
+
+.stats-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); margin: 0 20px; border-radius: var(--radius-sm); overflow: hidden; }
+.stat-cell { background: var(--surface); padding: 14px 12px; text-align: center; }
+.stat-cell-val { font-size: 20px; font-weight: 800; color: var(--gold); }
+.stat-cell-label { font-size: 10px; color: var(--text2); margin-top: 2px; }
+
+.info-list { margin: 16px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.info-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.info-row:last-child { border-bottom: none; }
+.info-row-label { font-size: 13px; color: var(--text2); }
+.info-row-val { font-size: 13px; font-weight: 600; }
+
+.price-list { margin: 0 20px 16px; display: flex; flex-direction: column; gap: 8px; }
+.price-row {
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px 16px;
+}
+.price-row.featured { border-color: var(--gold); background: var(--gold-dim); }
+.price-row-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.price-row-info p { font-size: 12px; color: var(--text2); }
+.price-amount { font-size: 16px; font-weight: 800; color: var(--gold); white-space: nowrap; }
+
+/* ═══════════════════════════════════════════
+   UNIVERSITIES PAGE
+═══════════════════════════════════════════ */
+.uni-list-card {
+  margin: 0 20px 12px; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+  transition: all 0.2s;
+}
+.uni-list-card:active { transform: scale(0.99); }
+.uni-list-img { width: 100%; height: 140px; object-fit: cover; background: var(--surface3); }
+.uni-list-body { padding: 14px 16px; }
+.uni-list-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 10px; }
+.uni-list-name { font-size: 15px; font-weight: 700; line-height: 1.3; flex: 1; }
+.competition-badge {
+  flex-shrink: 0; font-size: 11px; font-weight: 700;
+  padding: 4px 8px; border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.comp-low { background: rgba(0,191,166,0.12); color: var(--teal); }
+.comp-mid { background: rgba(250,200,80,0.12); color: #FAC850; }
+.comp-high { background: rgba(255,77,106,0.12); color: var(--red); }
+.uni-list-stats { display: flex; gap: 16px; }
+.uni-stat-item { display: flex; flex-direction: column; }
+.uni-stat-val { font-size: 16px; font-weight: 700; }
+.uni-stat-label { font-size: 10px; color: var(--text2); font-weight: 500; }
+
+/* ── University Detail ── */
+.uni-detail-cover { width: 100%; height: 200px; object-fit: cover; background: var(--surface3); }
+.uni-detail-header { padding: 20px 20px 16px; }
+.uni-detail-short { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--gold); margin-bottom: 6px; letter-spacing: 1px; }
+.uni-detail-title { font-size: 22px; font-weight: 800; line-height: 1.2; margin-bottom: 12px; }
+
+.social-links { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.social-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 20px;
+  background: var(--surface); border: 1.5px solid var(--border);
+  font-size: 13px; font-weight: 500; color: var(--text2);
+  transition: all 0.18s;
+}
+.social-btn:hover, .social-btn:active { border-color: var(--border2); color: var(--text); }
+.social-btn.tg { border-color: rgba(0,136,204,0.3); color: #29B6F6; }
+.social-btn.ig { border-color: rgba(225,48,108,0.3); color: #E1306C; }
+.social-btn.web { border-color: rgba(240,165,0,0.3); color: var(--gold); }
+
+/* Faculty tabs */
+.faculty-tabs { display: flex; gap: 0; overflow-x: auto; padding: 0 20px; scrollbar-width: none; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.faculty-tabs::-webkit-scrollbar { display: none; }
+.faculty-tab {
+  flex-shrink: 0; padding: 12px 16px;
+  font-size: 13px; font-weight: 600; color: var(--text3);
+  background: none; border: none; border-bottom: 2px solid transparent;
+  transition: all 0.18s; white-space: nowrap;
+  margin-bottom: -1px;
+}
+.faculty-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+.faculty-detail { padding: 0 20px; }
+.faculty-detail .fd-header { margin-bottom: 20px; }
+.faculty-detail .fd-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.faculty-detail .fd-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+.faculty-img { width: 100%; height: 160px; object-fit: cover; border-radius: var(--radius); margin-bottom: 16px; background: var(--surface3); }
+
+.stats-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.stat-card-sm {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px;
+}
+.stat-card-sm .val { font-size: 24px; font-weight: 800; color: var(--gold); margin-bottom: 4px; }
+.stat-card-sm .lbl { font-size: 11px; color: var(--text2); line-height: 1.3; }
+
+.progress-item { margin-bottom: 14px; }
+.progress-header { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
+.progress-label { color: var(--text2); }
+.progress-val { font-weight: 600; }
+.progress-bar { height: 6px; background: var(--surface3); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--gold), var(--teal)); transition: width 0.8s ease; }
+
+.year-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; margin-bottom: 16px; }
+.year-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+.year-bar { width: 100%; background: var(--gold-dim); border-radius: 4px 4px 0 0; border: 1px solid rgba(240,165,0,0.2); transition: height 0.6s ease; min-height: 4px; }
+.year-bar.current { background: var(--gold); border-color: var(--gold); }
+.year-label { font-size: 10px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
+.year-score { font-size: 10px; font-weight: 600; color: var(--text2); }
+
+/* ═══════════════════════════════════════════
+   PRICING PAGE
+═══════════════════════════════════════════ */
+.tier-card {
+  margin: 0 20px 12px;
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: 20px; padding: 20px;
+  position: relative; overflow: hidden;
+  transition: border-color 0.2s;
+}
+.tier-card.popular { border-color: var(--gold); }
+.tier-card.popular::before {
+  content: 'ENG MASHHUR';
+  position: absolute; top: 14px; right: 14px;
+  background: var(--gold); color: #080E1C;
+  font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+  padding: 4px 10px; border-radius: 20px;
+}
+.tier-badge-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text2); letter-spacing: 2px; margin-bottom: 8px; }
+.tier-price-wrap { display: flex; align-items: baseline; gap: 4px; margin-bottom: 4px; }
+.tier-price { font-size: 30px; font-weight: 800; }
+.tier-price-unit { font-size: 13px; color: var(--text2); }
+.tier-desc { font-size: 13px; color: var(--text2); margin-bottom: 16px; }
+.tier-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.tier-features li { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text2); }
+.tier-features li .check { color: var(--teal); flex-shrink: 0; }
+.tier-features.popular-features li { color: var(--text); }
+
+/* ═══════════════════════════════════════════
+   SESSIONS PAGE
+═══════════════════════════════════════════ */
+.session-card {
+  margin: 0 20px 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px;
+}
+.session-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.session-title { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+.session-meta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.session-meta-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text2); }
+
+/* ═══════════════════════════════════════════
+   PROFILE PAGE
+═══════════════════════════════════════════ */
+.profile-hero {
+  padding: 24px 20px 20px;
+  display: flex; align-items: center; gap: 16px;
+}
+.profile-big-avatar {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--teal));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 800; color: #080E1C;
+  overflow: hidden; position: relative; flex-shrink: 0;
+}
+.profile-big-avatar img { width:100%; height:100%; object-fit:cover; position:absolute; inset:0; }
+.avatar-upload-overlay {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.2s; cursor: pointer;
+}
+.profile-big-avatar:hover .avatar-upload-overlay { opacity: 1; }
+#avatarInput { display: none; }
+.profile-info h2 { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+.profile-info p { font-size: 13px; color: var(--text2); }
+
+.settings-group {
+  margin: 0 20px 16px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+}
+.settings-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: background 0.15s;
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-row:hover { background: var(--surface2); }
+.settings-icon {
+  width: 36px; height: 36px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.settings-row-text { flex: 1; }
+.settings-row-text h4 { font-size: 14px; font-weight: 600; }
+.settings-row-text p { font-size: 12px; color: var(--text2); margin-top: 1px; }
+.settings-row-arrow { color: var(--text3); }
+
+/* ═══════════════════════════════════════════
+   BACK BUTTON
+═══════════════════════════════════════════ */
+.page-back {
+  display: flex; align-items: center; gap: 8px;
+  padding: 16px 20px 8px;
+  font-size: 15px; font-weight: 600; color: var(--gold);
+  cursor: pointer; background: none; border: none;
+}
+.page-back:hover { opacity: 0.8; }
+
+/* ═══════════════════════════════════════════
+   EMPTY STATE
+═══════════════════════════════════════════ */
+.empty-state { text-align: center; padding: 60px 32px; }
+.empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.4; }
+.empty-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+.empty-sub { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 24px; }
+
+/* ═══════════════════════════════════════════
+   PAYMENT MODAL
+═══════════════════════════════════════════ */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 500;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+  align-items: flex-end;
+}
+.modal-overlay.open { display: flex; }
+.modal-sheet {
+  width: 100%; background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  border-top: 1px solid var(--border);
+  padding: 0 20px calc(32px + var(--safe-b));
+  animation: sheetUp 0.3s cubic-bezier(0.23,1,0.32,1);
+}
+@keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 14px auto 20px; }
+.modal-title { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+.modal-sub { font-size: 14px; color: var(--text2); margin-bottom: 24px; }
+.modal-buttons { display: flex; flex-direction: column; gap: 10px; }
+
+/* ═══════════════════════════════════════════
+   DESKTOP LAYOUT (≥768px)
+═══════════════════════════════════════════ */
+@media (min-width: 768px) {
+  body { background: #050911; }
+
+  /* Shell becomes row layout */
+  #appShell {
+    max-width: 1200px; margin: 0 auto;
+    flex-direction: row; min-height: 100vh;
+    position: relative;
+  }
+
+  /* Mobile header hidden on desktop */
+  .header { display: none !important; }
+
+  /* Bottom nav becomes left sidebar */
+  .bottom-nav {
+    position: fixed; left: 0; top: 0; bottom: 0;
+    width: 240px; height: 100vh;
+    flex-direction: column; justify-content: flex-start;
+    border-right: 1px solid var(--border); border-top: none;
+    padding: 0; background: var(--bg);
+    overflow-y: auto;
+  }
+
+  /* Sidebar logo via pseudo */
+  .bottom-nav::before {
+    content: '';
+    display: flex; align-items: center;
+    height: 64px; min-height: 64px;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--border);
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3C/svg%3E") no-repeat;
+  }
+
+  /* Desktop logo element — shown only on desktop */
+  .desktop-sidebar-logo {
+    display: flex !important;
+    align-items: center;
+    height: 64px; padding: 0 24px;
+    font-size: 18px; font-weight: 800;
+    color: #F0F4FF; border-bottom: 1px solid rgba(255,255,255,0.07);
+    letter-spacing: 0.5px; flex-shrink: 0;
+  }
+  .desktop-sidebar-logo span { color: #F0A500; }
+
+  /* Remove pseudo since we use real element */
+  .bottom-nav::before { display: none; }
+
+  /* Nav items as sidebar links */
+  .nav-item {
+    flex: none; flex-direction: row; justify-content: flex-start;
+    gap: 14px; padding: 13px 24px;
+    border-radius: 0; width: 100%;
+  }
+  .nav-item .nav-label { font-size: 14px; font-weight: 600; }
+  .nav-item.active { background: var(--gold-dim); color: var(--gold); }
+  .nav-item:hover:not(.active) { background: rgba(255,255,255,0.04); }
+
+  /* Content area pushes right of sidebar */
+  .content {
+    margin-left: 240px;
+    flex: 1;
+    min-width: 0;
+    max-width: calc(1200px - 240px);
+    padding-bottom: 32px; /* no bottom nav on desktop */
+  }
+
+  /* Home grid adjustments */
+  .kpi-row { grid-template-columns: repeat(6, 1fr); }
+  .mentor-cards-h-wrap { overflow-x: visible; }
+  .uni-list-card { margin: 0 24px 12px; }
+  .tier-card { margin: 0 24px 12px; }
+  .page-header { padding: 28px 24px 18px; }
+}
+
+/* ═══════════════════════════════════════════
+   SEARCH OVERLAY
+═══════════════════════════════════════════ */
+.search-overlay {
+  display: none; position: fixed; inset: 0; z-index: 400;
+  background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+  padding: 80px 20px 20px;
+  flex-direction: column; gap: 12px;
+}
+.search-overlay.open { display: flex; }
+.search-input-wrap {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface); border: 1.5px solid var(--border2);
+  border-radius: var(--radius); padding: 12px 16px;
+}
+.search-input-wrap input {
+  flex: 1; background: none; border: none; outline: none;
+  font-family: inherit; font-size: 16px; color: var(--text);
+}
+.search-cancel { color: var(--gold); font-size: 14px; font-weight: 600; cursor: pointer; background: none; border: none; font-family: inherit; white-space: nowrap; }
+.search-results { flex: 1; overflow-y: auto; }
+.search-result-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; cursor: pointer;
+  background: var(--surface); border-radius: var(--radius-sm);
+  margin-bottom: 8px; transition: background 0.15s;
+}
+.search-result-item:hover { background: var(--surface2); }
+.sr-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--surface3); display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; }
+.sr-icon img { width:100%; height:100%; object-fit:cover; }
+.sr-text h4 { font-size: 14px; font-weight: 600; }
+.sr-text p { font-size: 12px; color: var(--text2); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     AUTH SCREEN
+═══════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════
+     APP SHELL
+═══════════════════════════════════════════ -->
+<div id="appShell">
+
+  <!-- HEADER (mobile) -->
+  <div class="header">
+    <div class="header-logo">Connect<span>-U</span></div>
+    <div class="header-search" onclick="openSearch()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input readonly placeholder="Mentor, universitet qidirish..." style="cursor:pointer; pointer-events:none;">
+    </div>
+    <div class="header-user" onclick="showPage('profile')">
+      <div class="user-avatar" id="headerAvatar"><span id="headerAvatarText">?</span></div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ══ HOME PAGE ══ -->
+    <div class="page active" id="page-home">
+      <div class="home-hero">
+        <div class="home-hero-tag">
+          <span class="badge badge-gold">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg>
+            O'zbekiston №1 mentorlik platformasi
+          </span>
+        </div>
+        <h2 class="home-hero">To'g'ri <em>qaror</em> —<br>bugun boshlanadi.</h2>
+        <p>Verifikatsiyalangan talabalar bilan to'g'ri universitetni tanlang.</p>
+        <div class="home-hero-btns">
+          <button class="btn btn-gold btn-sm" onclick="showPage('mentors')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2a5 5 0 100 10A5 5 0 0012 2zm0 12c-5.33 0-8 2.67-8 4v2h16v-2c0-1.33-2.67-4-8-4z" fill="currentColor"/></svg>
+            Mentor topish
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="showPage('unis')">Universitetlar</button>
+        </div>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi-card"><div class="kpi-val">200K+</div><div class="kpi-label">Abituriyent</div></div>
+        <div class="kpi-card"><div class="kpi-val">30+</div><div class="kpi-label">Mentor</div></div>
+        <div class="kpi-card"><div class="kpi-val">4.8★</div><div class="kpi-label">Reyting</div></div>
+      </div>
+
+      <div class="section-row">
+        <div class="section-row-title">Top Mentorlar</div>
+        <span class="see-all" onclick="showPage('mentors')">Hammasi</span>
+      </div>
+      <div class="mentors-scroll" id="homeTopMentors"></div>
+
+      <div class="section-gap"></div>
+
+      <div class="section-row">
+        <div class="section-row-title">Universitetlar</div>
+        <span class="see-all" onclick="showPage('unis')">Hammasi</span>
+      </div>
+      <div class="uni-cards-scroll" id="homeTopUnis"></div>
+      <div class="section-gap"></div>
+    </div>
+
+    <!-- ══ MENTORS PAGE ══ -->
+    <div class="page" id="page-mentors">
+      <div class="page-header">
+        <div class="section-label">MENTORLAR</div>
+        <div class="page-title">Yo'nalish bo'yicha toping</div>
+        <div class="page-sub">30+ verifikatsiyalangan talaba-mentor</div>
+      </div>
+      <div class="chips" id="mentorChips" style="margin-bottom:12px;">
+        <button class="chip active" onclick="filterMentors('all',this)">Hammasi</button>
+        <button class="chip" onclick="filterMentors('TDYU',this)">TDYU</button>
+        <button class="chip" onclick="filterMentors('ODI',this)">ODI</button>
+        <button class="chip" onclick="filterMentors('TATU',this)">TATU</button>
+        <button class="chip" onclick="filterMentors('UDJTAU',this)">UDJTAU</button>
+        <button class="chip" onclick="filterMentors('TDTU',this)">TDTU</button>
+      </div>
+      <div id="mentorListContainer"></div>
+    </div>
+
+    <!-- ══ MENTOR DETAIL PAGE ══ -->
+    <div class="page" id="page-mentor-detail">
+      <button class="page-back" onclick="showPage('mentors')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Orqaga
+      </button>
+      <div id="mentorDetailContent"></div>
+    </div>
+
+    <!-- ══ UNIS PAGE ══ -->
+    <div class="page" id="page-unis">
+      <div class="page-header">
+        <div class="section-label">UNIVERSITETLAR</div>
+        <div class="page-title">2024 Qabul statistikasi</div>
+        <div class="page-sub">Real ma'lumotlar asosida tahlil</div>
+      </div>
+      <div id="uniListContainer"></div>
+    </div>
+
+    <!-- ══ UNIVERSITY DETAIL PAGE ══ -->
+    <div class="page" id="page-uni-detail">
+      <button class="page-back" onclick="showPage('unis')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Orqaga
+      </button>
+      <div id="uniDetailContent"></div>
+    </div>
+
+    <!-- ══ PRICING PAGE ══ -->
+    <div class="page" id="page-pricing">
+      <div class="page-header">
+        <div class="section-label">NARXLAR</div>
+        <div class="page-title">Hamma uchun imkoniyat</div>
+        <div class="page-sub">Bepuldan elitgacha — o'z paketingizni tanlang</div>
+      </div>
+
+      <div class="tier-card">
+        <div class="tier-badge-label">FREE</div>
+        <div class="tier-price-wrap"><span class="tier-price">Bepul</span></div>
+        <div class="tier-desc">Hamisha bepul · Cheklovsiz foydalanish</div>
+        <ul class="tier-features">
+          <li><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>Universitet statistikasi</li>
+          <li><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>Yo'nalish overview</li>
+          <li><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>Ochiq Q&A</li>
+          <li><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>Oylik webinar</li>
+        </ul>
+        <button class="btn btn-surface">Hozir foydalanmoqdasiz ✓</button>
+      </div>
+
+      <div class="tier-card">
+        <div class="tier-badge-label">GROUP PRO</div>
+        <div class="tier-price-wrap"><span class="tier-price">79,000</span><span class="tier-price-unit">so'm/oy</span></div>
+        <div class="tier-desc">Kichik guruh — katta natija</div>
+        <ul class="tier-features">
+          <li><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>Strukturali roadmap</li>
+          <li><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>Haftalik checklist</li>
+          <li><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>Oyiga 2x guruh sessiya</li>
+          <li><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>Yopiq community</li>
+        </ul>
+        <button class="btn btn-teal" onclick="openPayment('group',79000)">
+          To'lash va mentor tanlash →
+        </button>
+      </div>
+
+      <div class="tier-card popular">
+        <div class="tier-badge-label">1-ON-1 BASIC</div>
+        <div class="tier-price-wrap"><span class="tier-price" style="color:var(--gold)">249,000</span><span class="tier-price-unit">so'm/oy</span></div>
+        <div class="tier-desc">Shaxsiy strategiya va individual sessiya</div>
+        <ul class="tier-features popular-features">
+          <li><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#F0A500" stroke-width="2.5" stroke-linecap="round"/></svg>Oyiga 2 individual sessiya</li>
+          <li><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#F0A500" stroke-width="2.5" stroke-linecap="round"/></svg>Shaxsiy yo'nalish strategiyasi</li>
+          <li><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#F0A500" stroke-width="2.5" stroke-linecap="round"/></svg>Mentor feedback va baholash</li>
+          <li><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#F0A500" stroke-width="2.5" stroke-linecap="round"/></svg>Chat support + guruh imkoniyatlari</li>
+        </ul>
+        <button class="btn btn-gold" onclick="openPayment('individual',249000)">
+          To'lash va mentor tanlash →
+        </button>
+      </div>
+
+      <div class="tier-card">
+        <div class="tier-badge-label">ELITE</div>
+        <div class="tier-price-wrap"><span class="tier-price">499,000+</span><span class="tier-price-unit">so'm/oy</span></div>
+        <div class="tier-desc">Limitli · Maksimal natija</div>
+        <ul class="tier-features">
+          <li><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>Oyiga 4 individual sessiya</li>
+          <li><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>Ota-ona session kiritilgan</li>
+          <li><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>Motivatsion monitoring</li>
+          <li><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>Universitetga tayyorlash</li>
+        </ul>
+        <button class="btn btn-ghost" onclick="openPayment('elite',499000)">So'rash →</button>
+      </div>
+      <div class="section-gap"></div>
+    </div>
+
+    <!-- ══ SESSIONS PAGE ══ -->
+    <div class="page" id="page-sessions">
+      <div class="page-header">
+        <div class="section-label">SESSIYALAR</div>
+        <div class="page-title">Mening sessiyalarim</div>
+      </div>
+      <div id="sessionsContent">
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" opacity="0.3"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div class="empty-title">Sessiyalar yo'q</div>
+          <div class="empty-sub">Mentor tanlang va birinchi sessiyangizni buyurtma qiling.</div>
+          <button class="btn btn-gold" style="max-width:240px;margin:0 auto;" onclick="showPage('mentors')">Mentor topish →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PROFILE PAGE ══ -->
+    <div class="page" id="page-profile">
+      <div class="page-header" style="padding-bottom:8px;">
+        <div class="section-label">PROFIL</div>
+      </div>
+      <div class="profile-hero">
+        <div class="profile-big-avatar" id="profileBigAvatar">
+          <span id="profileAvatarText">?</span>
+          <div class="avatar-upload-overlay" onclick="document.getElementById('avatarInput').click()">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+          </div>
+          <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatarUpload(this)">
+        </div>
+        <div class="profile-info">
+          <h2 id="profileName">Yuklanmoqda...</h2>
+          <p id="profileSub" style="color:var(--text2)">@username</p>
+          <div style="margin-top:8px;"><span class="badge badge-gold">🎓 Abituriyent</span></div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-row" onclick="showPage('sessions')">
+          <div class="settings-icon" style="background:rgba(240,165,0,0.12);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#F0A500" stroke-width="1.8"/><path d="M16 2v4M8 2v4M3 10h18" stroke="#F0A500" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <div class="settings-row-text">
+            <h4>Sessiyalarim</h4>
+            <p>Buyurtmalar tarixi va jadvali</p>
+          </div>
+          <svg class="settings-row-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="settings-row" onclick="showPage('pricing')">
+          <div class="settings-icon" style="background:rgba(0,191,166,0.1);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="#00BFA6" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="settings-row-text">
+            <h4>Obuna rejasi</h4>
+            <p>Hozir: FREE · Yaxshilash</p>
+          </div>
+          <svg class="settings-row-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="settings-row">
+          <div class="settings-icon" style="background:rgba(255,255,255,0.05);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="var(--text2)" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <div class="settings-row-text">
+            <h4>Bildirishnomalar</h4>
+            <p>Sessiya va yangiliklar</p>
+          </div>
+          <svg class="settings-row-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-row">
+          <div class="settings-icon" style="background:rgba(255,255,255,0.05);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="var(--text2)" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="settings-row-text">
+            <h4>Maxfiylik siyosati</h4>
+            <p>Ma'lumotlaringiz xavfsiz</p>
+          </div>
+          <svg class="settings-row-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="settings-row" onclick="authLogout()">
+          <div class="settings-icon" style="background:rgba(255,77,106,0.1);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="#FF4D6A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="settings-row-text">
+            <h4 style="color:var(--red)">Chiqish</h4>
+            <p>Hisobdan chiqish</p>
+          </div>
+        </div>
+      </div>
+      <div class="section-gap"></div>
+    </div>
+
+  </div><!-- /content -->
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <!-- Desktop only logo (hidden on mobile via CSS) -->
+    <div class="desktop-sidebar-logo" style="display:none;">Connect<span>-U</span></div>
+    <button class="nav-item active" id="nav-home" onclick="showPage('home')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <polyline points="9,22 9,12 15,12 15,22" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+      <span class="nav-label">Asosiy</span>
+    </button>
+    <button class="nav-item" id="nav-mentors" onclick="showPage('mentors')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+        <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span class="nav-label">Mentorlar</span>
+    </button>
+    <button class="nav-item" id="nav-unis" onclick="showPage('unis')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M3 9l9-7 9 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M9 22V12h6v10M2 22h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M12 2L2 9h20L12 2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+      <span class="nav-label">Universitetlar</span>
+    </button>
+    <button class="nav-item" id="nav-pricing" onclick="showPage('pricing')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <rect x="1" y="4" width="22" height="16" rx="2" stroke="currentColor" stroke-width="2"/>
+        <path d="M1 10h22" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      <span class="nav-label">Narxlar</span>
+    </button>
+    <button class="nav-item" id="nav-profile" onclick="showPage('profile')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      <span class="nav-label">Profil</span>
+    </button>
+  </nav>
+
+</div><!-- /appShell -->
+
+<!-- SEARCH OVERLAY -->
+<div class="search-overlay" id="searchOverlay">
+  <div class="search-input-wrap">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <input id="searchInput" placeholder="Mentor yoki universitet qidirish..." autofocus oninput="doSearch(this.value)">
+    <button class="search-cancel" onclick="closeSearch()">Bekor</button>
+  </div>
+  <div class="search-results" id="searchResults"></div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="modal-overlay" id="paymentModal" onclick="if(event.target===this)closePayment()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">To'lov usuli</div>
+    <div class="modal-sub" id="payModalSub">Summa: —</div>
+    <div class="modal-buttons">
+      <button class="btn btn-gold" onclick="doPayment('payme')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="1" y="4" width="22" height="16" rx="2" stroke="currentColor" stroke-width="2"/><path d="M1 10h22" stroke="currentColor" stroke-width="2"/></svg>
+        Payme orqali to'lash
+      </button>
+      <button class="btn btn-surface" onclick="doPayment('click')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="1" y="4" width="22" height="16" rx="2" stroke="currentColor" stroke-width="2"/><path d="M1 10h22" stroke="currentColor" stroke-width="2"/></svg>
+        Click orqali to'lash
+      </button>
+      <button class="btn btn-ghost" onclick="closePayment()">Bekor qilish</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     DATA & LOGIC
+═══════════════════════════════════════════ -->
+<script>
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+
+/* ═══ STATE ═══ */
+let currentUser = null;
+let mentors = [];
+let universities = [];
+let currentPaymentData = {};
+let activeUniId = null;
+let activeFacultyIdx = 0;
+
+/* ═══ INIT ═══ */
+window.addEventListener('load', async () => {
+  try {
+    // Joriy foydalanuvchini tekshirish
+    const meRes = await fetch('/api/me', { credentials: 'include' });
+    const meData = await meRes.json();
+    
+    if (meData.success) {
+      currentUser = meData.user;
+      
+      // Role tekshirish
+      if (currentUser.role === 'mentor') {
+        window.location.href = 'mentor.html';
+        return;
+      }
+      if (currentUser.role === 'admin' || currentUser.role === 'superadmin') {
+        window.location.href = 'admin.html';
+        return;
+      }
+      
+      // Ma'lumotlarni yuklash
+      await loadData();
+      launchApp();
+    } else {
+      // 2. localStorage da session bormi?
+      const session = loadSession();
+      if (session) {
+        currentUser = session;
+        if (currentUser.role === 'mentor') {
+          window.location.href = 'mentor.html';
+          return;
+        }
+        if (currentUser.role === 'admin' || currentUser.role === 'superadmin') {
+          window.location.href = 'admin.html';
+          return;
+        }
+        await loadData();
+        launchApp();
+      } else {
+        // 3. Ikkalasi ham yo'q → login.html ga
+        window.location.href = 'login.html';
+      }
+    }
+  } catch (error) {
+    console.error('Yuklashda xato:', error);
+    window.location.href = 'login.html';
+  }
+});
+
+async function loadData() {
+  try {
+    // Mentorlarni yuklash
+    const mentorsRes = await fetch('/api/mentors', { credentials: 'include' });
+    const mentorsData = await mentorsRes.json();
+    if (mentorsData.success) {
+      mentors = mentorsData.mentors;
+    } else {
+      mentors = [];
+    }
+    
+    // Universitetlarni yuklash
+    const unisRes = await fetch('/api/universities', { credentials: 'include' });
+    const unisData = await unisRes.json();
+    if (unisData.success) {
+      universities = unisData.universities;
+    } else {
+      universities = [];
+    }
+  } catch (error) {
+    console.error('Ma\'lumotlarni yuklashda xato:', error);
+    mentors = [];
+    universities = [];
+  }
+}
+
+/* Session localStorage dan o'qish (backup) */
+function loadSession() {
+  try {
+    const raw = localStorage.getItem('cu_session');
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    if (Date.now() - s.savedAt > 30 * 24 * 3600 * 1000) {
+      localStorage.removeItem('cu_session');
+      return null;
+    }
+    return s;
+  } catch { return null; }
+}
+
+/* Chiqish */
+async function authLogout() {
+  try {
+    await fetch('/api/logout', { 
+      method: 'POST', 
+      credentials: 'include' 
+    });
+  } catch (e) {}
+  localStorage.removeItem('cu_session');
+  window.location.href = 'login.html';
+}
+
+/* App ni ishga tushirish */
+function launchApp() {
+  const shell = document.getElementById('appShell');
+  shell.classList.add('visible');
+  initUserUI();
+  renderHome();
+  renderMentorList(mentors);
+  renderUniList();
+  showPage('home');
+}
+
+/* ═══ USER UI ═══ */
+function initUserUI() {
+  if (!currentUser) return;
+  
+  const name = currentUser.full_name || 'Foydalanuvchi';
+  const initials = name[0].toUpperCase();
+  
+  document.getElementById('headerAvatarText').textContent = initials;
+  document.getElementById('profileAvatarText').textContent = initials;
+  document.getElementById('profileName').textContent = name;
+  document.getElementById('profileSub').textContent = currentUser.username ? '@'+currentUser.username : (currentUser.phone || 'ID: '+currentUser.id);
+  
+  if (currentUser.avatar_url) {
+    const img1 = document.createElement('img'); 
+    img1.src = currentUser.avatar_url;
+    img1.style.position = 'absolute';
+    img1.style.inset = 0;
+    img1.style.objectFit = 'cover';
+    document.getElementById('headerAvatar').innerHTML = '';
+    document.getElementById('headerAvatar').appendChild(img1);
+    
+    const img2 = document.createElement('img'); 
+    img2.src = currentUser.avatar_url;
+    img2.style.position = 'absolute';
+    img2.style.inset = 0;
+    img2.style.objectFit = 'cover';
+    document.getElementById('profileBigAvatar').innerHTML = '';
+    document.getElementById('profileBigAvatar').appendChild(img2);
+  }
+}
+
+async function handleAvatarUpload(input) {
+  const file = input.files[0]; 
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const base64 = e.target.result;
+    
+    try {
+      const res = await fetch('/api/profile/avatar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ avatar_url: base64 }),
+        credentials: 'include'
+      });
+      
+      const data = await res.json();
+      if (data.success) {
+        currentUser.avatar_url = base64;
+        
+        ['profileBigAvatar', 'headerAvatar'].forEach(id => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.innerHTML = '';
+          const img = document.createElement('img');
+          img.src = base64;
+          img.style.position = 'absolute';
+          img.style.inset = 0;
+          img.style.objectFit = 'cover';
+          el.appendChild(img);
+        });
+        showToastMsg('Rasm yuklandi ✓');
+      }
+    } catch (error) {
+      showToastMsg('Rasm yuklashda xato', 'err');
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ═══ NAVIGATION ═══ */
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  
+  const page = document.getElementById('page-' + name);
+  if (page) page.classList.add('active');
+  
+  const parentNav = {
+    'mentor-detail': 'mentors',
+    'uni-detail': 'unis'
+  }[name] || name;
+  
+  const navEl = document.getElementById('nav-' + parentNav);
+  if (navEl) navEl.classList.add('active');
+  
+  document.querySelector('.content')?.scrollTo(0, 0);
+}
+
+/* ═══ SEARCH ═══ */
+function openSearch() {
+  document.getElementById('searchOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('searchInput').focus(), 100);
+}
+
+function closeSearch() {
+  document.getElementById('searchOverlay').classList.remove('open');
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchResults').innerHTML = '';
+}
+
+function doSearch(q) {
+  const el = document.getElementById('searchResults');
+  if (!q.trim()) { 
+    el.innerHTML = ''; 
+    return; 
+  }
+  
+  const ql = q.toLowerCase();
+  const results = [];
+  
+  mentors.filter(m => 
+    (m.full_name || '').toLowerCase().includes(ql) || 
+    (m.university || '').toLowerCase().includes(ql)
+  ).forEach(m => results.push({ type: 'mentor', item: m }));
+  
+  universities.filter(u => 
+    u.full_name.toLowerCase().includes(ql) || 
+    u.short_name.toLowerCase().includes(ql)
+  ).forEach(u => results.push({ type: 'uni', item: u }));
+  
+  if (!results.length) { 
+    el.innerHTML = '<p style="color:var(--text2);padding:20px;text-align:center">Hech narsa topilmadi</p>'; 
+    return; 
+  }
+  
+  el.innerHTML = results.map(r => {
+    if (r.type === 'mentor') {
+      const m = r.item;
+      return `
+        <div class="search-result-item" onclick="closeSearch();showMentorDetail('${m.mentor_profile_id || m.id}')">
+          <div class="sr-icon" style="background:${getMentorColor(m.full_name)}"><span style="font-size:18px;font-weight:800;color:#fff">${(m.full_name || 'U')[0]}</span></div>
+          <div class="sr-text"><h4>${m.full_name || 'Mentor'}</h4><p>${m.university || '—'} · ${m.faculty || '—'}</p></div>
+        </div>`;
+    } else {
+      const u = r.item;
+      return `
+        <div class="search-result-item" onclick="closeSearch();showUniDetail('${u.id}')">
+          <div class="sr-icon"><img src="${u.cover_url || 'https://images.unsplash.com/photo-1562774053-701939374585?w=600&q=80'}" alt="" style="width:100%;height:100%;object-fit:cover;"></div>
+          <div class="sr-text"><h4>${u.short_name}</h4><p>${u.full_name}</p></div>
+        </div>`;
+    }
+  }).join('');
+}
+
+function getMentorColor(name) {
+  const colors = [
+    'linear-gradient(135deg,#1e3a6e,#00BFA6)',
+    'linear-gradient(135deg,#5B21B6,#F0A500)',
+    'linear-gradient(135deg,#991B1B,#F0A500)',
+    'linear-gradient(135deg,#0E7490,#6D28D9)',
+    'linear-gradient(135deg,#065F46,#1e3a6e)'
+  ];
+  let hash = 0;
+  for (let i = 0; i < (name || '').length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
+}
+
+/* ═══ HOME ═══ */
+function renderHome() {
+  // Top mentors horizontal
+  const topMentors = mentors.slice(0, 4);
+  document.getElementById('homeTopMentors').innerHTML = topMentors.length ?
+    topMentors.map(m => `
+      <div class="mentor-card-h" onclick="showMentorDetail('${m.mentor_profile_id || m.id}')">
+        <div class="m-avatar">
+          <div class="m-avatar-fallback" style="background:${getMentorColor(m.full_name)};border-radius:50%;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;">${(m.full_name || 'U')[0]}</div>
+        </div>
+        <div class="m-name">${m.full_name || 'Mentor'}</div>
+        <div class="m-uni">${m.university || '—'}</div>
+        <div class="m-rating">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="#F9C74F"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          ${m.rating || 5.0}
+        </div>
+      </div>
+    `).join('') :
+    '<div style="padding:20px;text-align:center;color:var(--text2)">Mentorlar mavjud emas</div>';
+
+  // Top unis horizontal
+  const topUnis = universities.slice(0, 4);
+  document.getElementById('homeTopUnis').innerHTML = topUnis.length ?
+    topUnis.map(u => `
+      <div class="uni-card-h" onclick="showUniDetail('${u.id}')">
+        <img class="uni-card-img" src="${u.cover_url || 'https://images.unsplash.com/photo-1562774053-701939374585?w=600&q=80'}" alt="${u.full_name}" loading="lazy">
+        <div class="uni-card-body">
+          <div class="uni-card-short">${u.short_name}</div>
+          <div class="uni-card-name">${u.full_name.length > 30 ? u.full_name.slice(0,30)+'...' : u.full_name}</div>
+          <div class="uni-card-stat">
+            <span><strong>—</strong> ball</span>
+            <span><strong>—</strong> raqobat</span>
+          </div>
+        </div>
+      </div>
+    `).join('') :
+    '<div style="padding:20px;text-align:center;color:var(--text2)">Universitetlar mavjud emas</div>';
+}
+
+/* ═══ MENTORS ═══ */
+let mentorFilter = 'all';
+
+function filterMentors(uni, btn) {
+  mentorFilter = uni;
+  document.querySelectorAll('#mentorChips .chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  
+  let filtered = mentors;
+  if (uni !== 'all') {
+    filtered = mentors.filter(m => m.university === uni);
+  }
+  renderMentorList(filtered);
+}
+
+function renderMentorList(list) {
+  const el = document.getElementById('mentorListContainer');
+  
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-title">Mentor topilmadi</div><div class="empty-sub">Boshqa filtr sinab ko\'ring</div></div>';
+    return;
+  }
+  
+  el.innerHTML = '<div style="background:var(--surface);border:1px solid var(--border);margin:0 20px;border-radius:var(--radius);overflow:hidden;">' +
+    list.map(m => `
+      <div class="mentor-card-v" onclick="showMentorDetail('${m.mentor_profile_id || m.id}')">
+        <div class="m-avatar">
+          <div class="m-avatar-fallback" style="background:${getMentorColor(m.full_name)};border-radius:50%;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;">${(m.full_name || 'U')[0]}</div>
+        </div>
+        <div class="mentor-info-v">
+          <div class="m-name">${m.full_name || 'Mentor'}</div>
+          <div class="m-meta">${m.university || '—'} · ${m.faculty || '—'} · ${m.year || '—'}-kurs</div>
+          <div class="m-bio">${m.bio || 'Ma\'lumot yo\'q'}</div>
+          <div class="m-tags">
+            <span class="badge badge-gold">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              ${m.rating || 5.0}
+            </span>
+            <span class="badge badge-gray">${m.total_sessions || 0} sessiya</span>
+          </div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="color:var(--text3);flex-shrink:0;margin-top:4px;"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>`).join('') + '</div>';
+}
+
+async function showMentorDetail(id) {
+  try {
+    const res = await fetch(`/api/mentors/${id}`, { credentials: 'include' });
+    const data = await res.json();
+    
+    if (!data.success) {
+      showToastMsg('Mentor topilmadi', 'err');
+      return;
+    }
+    
+    const m = data.mentor;
+    
+    document.getElementById('mentorDetailContent').innerHTML = `
+      <div class="detail-hero">
+        <div style="height:120px;background:${getMentorColor(m.full_name)}; position:relative;">
+          <div class="detail-cover-gradient"></div>
+        </div>
+      </div>
+      <div class="detail-profile-row">
+        <div class="detail-avatar">
+          <div class="detail-avatar-fallback" style="background:${getMentorColor(m.full_name)};">${(m.full_name || 'U')[0]}</div>
+        </div>
+        <div class="detail-name-block">
+          <div class="detail-name">${m.full_name}</div>
+          <div class="detail-sub">${m.university || '—'} · ${m.faculty || '—'}</div>
+        </div>
+      </div>
+
+      <div class="stats-grid-3" style="margin-bottom:20px;">
+        <div class="stat-cell">
+          <div class="stat-cell-val" style="color:#F9C74F;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display:inline;margin-right:2px;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>${m.rating || 5.0}
+          </div>
+          <div class="stat-cell-label">Reyting</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-cell-val">${m.total_sessions || 0}</div>
+          <div class="stat-cell-label">Sessiya</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-cell-val">${m.total_reviews || 0}</div>
+          <div class="stat-cell-label">Sharh</div>
+        </div>
+      </div>
+
+      <div style="padding:0 20px; margin-bottom:20px;">
+        <div class="section-label">BIO</div>
+        <p style="font-size:14px;color:var(--text2);line-height:1.7;">${m.bio || 'Ma\'lumot yo\'q'}</p>
+      </div>
+
+      <div style="padding:0 20px; margin-bottom:16px;">
+        <div class="section-label">TO'LIQ MA'LUMOT</div>
+      </div>
+      <div class="info-list">
+        <div class="info-row"><span class="info-row-label">Universitet</span><span class="info-row-val">${m.university || '—'}</span></div>
+        <div class="info-row"><span class="info-row-label">Yo'nalish</span><span class="info-row-val">${m.faculty || '—'}</span></div>
+        <div class="info-row"><span class="info-row-label">Kurs</span><span class="info-row-val">${m.year || '—'}-kurs</span></div>
+        <div class="info-row"><span class="info-row-label">Status</span><span class="info-row-val" style="color:var(--teal);">${m.is_verified ? '✓ Tasdiqlangan' : '⏳ Kutilmoqda'}</span></div>
+      </div>
+
+      <div style="padding:0 20px; margin:16px 0 10px;">
+        <div class="section-label">SESSIYA NARXLARI</div>
+      </div>
+      <div class="price-list">
+        <div class="price-row"><div class="price-row-info"><h4>Guruh sessiyasi</h4><p>5–8 kishilik guruh</p></div><div class="price-amount">79,000 so'm</div></div>
+        <div class="price-row featured"><div class="price-row-info"><h4>1-on-1 Basic</h4><p>Individual, oyiga 2x</p></div><div class="price-amount">249,000 so'm</div></div>
+        <div class="price-row"><div class="price-row-info"><h4>Video call</h4><p>Zoom / Meet orqali</p></div><div class="price-amount">249,000 so'm</div></div>
+      </div>
+
+      <!-- Pricing info banner -->
+      <div style="margin:0 20px 16px;background:rgba(240,165,0,0.08);border:1px solid rgba(240,165,0,0.2);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:flex-start;gap:10px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="color:var(--gold);flex-shrink:0;margin-top:1px"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--gold);margin-bottom:3px;">Sessiya oldin obuna talab qiladi</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5;">Mentor bilan ishlash uchun avval Group Pro, 1-on-1 yoki Elite tarifni tanlang. Keyin shu mentor bilan sessiya belgilaysiz.</div>
+        </div>
+      </div>
+
+      <div style="padding:0 20px 20px; display:flex; flex-direction:column; gap:10px;">
+        <button class="btn btn-gold" onclick="showPage('pricing')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="1" y="4" width="22" height="16" rx="2" stroke="currentColor" stroke-width="2"/><path d="M1 10h22" stroke="currentColor" stroke-width="2"/></svg>
+          Tarif tanlash → Sessiya boshlash
+        </button>
+        <button class="btn btn-ghost" onclick="openGroupChat()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          Bepul savol berish (Telegram)
+        </button>
+      </div>`;
+    
+    showPage('mentor-detail');
+  } catch (error) {
+    console.error('Mentor detallarini yuklashda xato:', error);
+    showToastMsg('Mentor ma\'lumotlarini yuklashda xato', 'err');
+  }
+}
+
+/* ═══ UNIVERSITIES ═══ */
+function compClass(r) { 
+  if (!r) return 'comp-low';
+  return r > 7 ? 'comp-high' : r > 4 ? 'comp-mid' : 'comp-low'; 
+}
+
+function compLabel(r) { 
+  if (!r) return 'Qulay';
+  return r > 7 ? 'Juda yuqori' : r > 4 ? 'O\'rtacha' : 'Qulay'; 
+}
+
+function renderUniList() {
+  const el = document.getElementById('uniListContainer');
+  
+  if (!universities.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-title">Universitetlar mavjud emas</div></div>';
+    return;
+  }
+  
+  el.innerHTML = universities.map(u => {
+    const ratio = 4.2; // Default value
+    return `
+      <div class="uni-list-card" onclick="showUniDetail('${u.id}')">
+        <img class="uni-list-img" src="${u.cover_url || 'https://images.unsplash.com/photo-1562774053-701939374585?w=600&q=80'}" alt="${u.full_name}" loading="lazy">
+        <div class="uni-list-body">
+          <div class="uni-list-header">
+            <div class="uni-list-name">${u.full_name}</div>
+            <span class="competition-badge ${compClass(ratio)}">${ratio}x</span>
+          </div>
+          <div class="uni-list-stats">
+            <div class="uni-stat-item"><div class="uni-stat-val">—</div><div class="uni-stat-label">Ball</div></div>
+            <div class="uni-stat-item"><div class="uni-stat-val">—</div><div class="uni-stat-label">Kvota</div></div>
+            <div class="uni-stat-item"><div class="uni-stat-val" style="color:${ratio > 7 ? 'var(--red)' : ratio > 4 ? '#FAC850' : 'var(--teal)'}">${compLabel(ratio)}</div><div class="uni-stat-label">Raqobat</div></div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function showUniDetail(id) {
+  try {
+    const res = await fetch(`/api/universities/${id}`, { credentials: 'include' });
+    const data = await res.json();
+    
+    if (!data.success) {
+      showToastMsg('Universitet topilmadi', 'err');
+      return;
+    }
+    
+    const u = data.university;
+    activeUniId = id;
+    activeFacultyIdx = 0;
+    
+    const uniMentors = mentors.filter(m => m.university === u.short_name);
+
+    document.getElementById('uniDetailContent').innerHTML = `
+      <img class="uni-detail-cover" src="${u.cover_url || 'https://images.unsplash.com/photo-1562774053-701939374585?w=600&q=80'}" alt="${u.full_name}" loading="lazy">
+      <div class="uni-detail-header">
+        <div class="uni-detail-short">${u.short_name}</div>
+        <div class="uni-detail-title">${u.full_name}</div>
+        <div class="social-links">
+          <a href="${u.website || '#'}" target="_blank" class="social-btn web">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20" stroke="currentColor" stroke-width="1.8"/></svg>
+            Rasmiy sayt
+          </a>
+          <a href="${u.telegram || '#'}" target="_blank" class="social-btn tg">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8l-1.7 8c-.12.54-.44.68-.9.42l-2.5-1.84-1.2 1.16c-.13.13-.25.25-.51.25l.18-2.53 4.6-4.15c.2-.18-.04-.28-.31-.1L7.7 15.1l-2.46-.77c-.53-.17-.55-.53.12-.79l9.63-3.71c.44-.16.83.11.65.97z"/></svg>
+            Telegram
+          </a>
+          <a href="${u.instagram || '#'}" target="_blank" class="social-btn ig">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.8"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+            Instagram
+          </a>
+          ${uniMentors.length ? `<button class="social-btn" onclick="filterMentors('${u.short_name}', document.querySelector('#mentorChips .chip:nth-child(2)'));showPage('mentors');" style="cursor:pointer;border-color:rgba(0,191,166,0.3);color:var(--teal);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/></svg>
+            ${uniMentors.length} mentor
+          </button>` : ''}
+        </div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.6;">${u.description || 'Ma\'lumot yo\'q'}</p>
+      </div>
+
+      <div class="divider"></div>
+      <div style="padding:16px 20px 0;">
+        <div class="section-label">FAKULTETLAR BO'YICHA STATISTIKA</div>
+      </div>
+      <div class="faculty-tabs" id="facultyTabsBar">
+        ${u.faculties && u.faculties.length ? u.faculties.map((f,i) => 
+          `<button class="faculty-tab${i===0?' active':''}" onclick="switchFaculty(${i})">${f.name}</button>`
+        ).join('') : '<div style="padding:20px;text-align:center">Fakultetlar mavjud emas</div>'}
+      </div>
+      <div id="facultyDetailArea"></div>`;
+
+    if (u.faculties && u.faculties.length) {
+      renderFacultyDetail(u, 0);
+    }
+    
+    showPage('uni-detail');
+  } catch (error) {
+    console.error('Universitet detallarini yuklashda xato:', error);
+    showToastMsg('Universitet ma\'lumotlarini yuklashda xato', 'err');
+  }
+}
+
+function switchFaculty(idx) {
+  activeFacultyIdx = idx;
+  document.querySelectorAll('.faculty-tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+  
+  fetch(`/api/universities/${activeUniId}`, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        renderFacultyDetail(data.university, idx);
+      }
+    });
+}
+
+function renderFacultyDetail(u, idx) {
+  if (!u.faculties || !u.faculties[idx]) return;
+  
+  const f = u.faculties[idx];
+  const years = f.stats && f.stats.length ? f.stats.map(s => `${s.year}:${s.max_score || 0}`) : ['2022:0', '2023:0', '2024:0'];
+  
+  const maxScore = Math.max(...years.map(y => parseInt(y.split(':')[1]) || 0));
+  const barsHtml = years.map((y, i) => {
+    const [yr, sc] = y.split(':');
+    const h = maxScore ? Math.round((parseInt(sc) / maxScore) * 100) : 10;
+    return `<div class="year-bar-wrap">
+      <div class="year-score">${sc}</div>
+      <div class="year-bar${i === years.length - 1 ? ' current' : ''}" style="height:${h}%"></div>
+      <div class="year-label">${yr}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('facultyDetailArea').innerHTML = `
+    <div class="faculty-detail">
+      <img class="faculty-img" src="${f.cover_url || 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&q=80'}" alt="${f.name}" loading="lazy">
+      <div class="fd-header">
+        <div class="fd-title">${f.name}</div>
+        <div class="fd-desc">${f.description || 'Ma\'lumot yo\'q'}</div>
+      </div>
+
+      <div class="stats-2col">
+        <div class="stat-card-sm"><div class="val">${f.quota || '—'}</div><div class="lbl">Kvota (o'rin soni)</div></div>
+        <div class="stat-card-sm"><div class="val">—</div><div class="lbl">2024 ariza berganlar</div></div>
+        <div class="stat-card-sm"><div class="val">—</div><div class="lbl">Ball diapazoni</div></div>
+        <div class="stat-card-sm"><div class="val" style="color:var(--teal)">—</div><div class="lbl">Raqobat darajasi</div></div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <div class="section-label" style="padding:0;">BALL DINAMIKASI (3 YIL)</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-top:8px;">
+          <div class="year-chart">${barsHtml}</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:20px;">
+        <div class="section-label" style="padding:0;">BITIRUVCHI KO'RSATKICHLARI</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-top:8px;">
+          <div class="progress-item">
+            <div class="progress-header"><span class="progress-label">Ish bilan bandlik</span><span class="progress-val">${f.employment_pct || 0}%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${f.employment_pct || 0}%"></div></div>
+          </div>
+          <div class="progress-item">
+            <div class="progress-header"><span class="progress-label">O'rtacha maosh</span><span class="progress-val">${f.avg_salary_mln || 0}M+ so'm</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${Math.min((f.avg_salary_mln || 0) * 4, 100)}%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-gold" style="margin-bottom:20px;" onclick="showPage('mentors')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+        Bu yo'nalish mentori topish
+      </button>
+    </div>`;
+}
+
+/* ═══ PAYMENT ═══ */
+let selectedTier = null;
+
+async function openPayment(type, amount) {
+  currentPaymentData = { type, amount };
+  
+  const tierNames = { group: 'Group Pro', individual: '1-on-1 Basic', elite: 'Elite' };
+  document.getElementById('payModalSub').innerHTML =
+    `<strong style="color:var(--gold)">${tierNames[type] || type}</strong> — ${amount.toLocaleString()} so'm/oy<br>
+    <span style="font-size:12px;opacity:0.7">To'lovdan keyin mentor tanlash sahifasiga o'tasiz</span>`;
+  
+  document.getElementById('paymentModal').classList.add('open');
+}
+
+function closePayment() { 
+  document.getElementById('paymentModal').classList.remove('open'); 
+}
+
+async function doPayment(method) {
+  closePayment();
+  
+  try {
+    // To'lov yaratish
+    const res = await fetch('/api/payments/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: currentPaymentData.amount,
+        method: method,
+        meta: { type: currentPaymentData.type }
+      }),
+      credentials: 'include'
+    });
+    
+    const data = await res.json();
+    
+    if (data.success && data.payment.urls && data.payment.urls.url) {
+      // To'lov sahifasiga o'tish
+      if (tg?.openLink) {
+        tg.openLink(data.payment.urls.url);
+      } else {
+        window.open(data.payment.urls.url, '_blank');
+      }
+      
+      tg?.sendData?.(JSON.stringify({ 
+        action: 'payment', 
+        method, 
+        ...currentPaymentData,
+        payment_id: data.payment.id 
+      }));
+      
+      // Mentor tanlash sahifasiga o'tish
+      setTimeout(() => {
+        showPage('mentors');
+        showToastMsg('To\'lov amalga oshirildi! Endi mentor tanlang 👇');
+      }, 800);
+    } else {
+      showToastMsg('To\'lov yaratishda xato', 'err');
+    }
+  } catch (error) {
+    console.error('To\'lov xatosi:', error);
+    showToastMsg('To\'lov yaratishda xato', 'err');
+  }
+}
+
+function showToastMsg(msg, type = 'ok') {
+  let el = document.getElementById('app-toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'app-toast';
+    el.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#162035;color:#F0F4FF;padding:12px 20px;border-radius:12px;font-size:13px;font-weight:600;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,0.5);transition:opacity .25s;border-left:3px solid var(--gold);max-width:calc(100vw - 40px);white-space:normal;text-align:center;';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.borderLeft = type === 'err' ? '3px solid var(--red)' : '3px solid var(--gold)';
+  el.style.opacity = '1';
+  setTimeout(() => el.style.opacity = '0', 3500);
+}
+
+function openGroupChat() {
+  if (tg?.openTelegramLink) {
+    tg.openTelegramLink('https://t.me/connectu_admin');
+  } else {
+    window.open('https://t.me/connectu_admin', '_blank');
+  }
+}
+</script>
+</body>
+</html>
