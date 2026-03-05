@@ -6,3 +6,4 @@ requests==2.31.0
 psycopg2-binary==2.9.9
 Flask-Admin
 gunicorn==21.2.0
+user-agents==2.2.0
