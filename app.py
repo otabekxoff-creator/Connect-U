@@ -287,7 +287,7 @@ def send_new_login_notification(user, old_session, device_info):
 
 @app.route('/api/telegram-login', methods=['POST'])
 def telegram_login():
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
 
     # ── 1. initData orqali kelgan bo'lsa (Telegram Mini App) ──
     init_data_raw = data.get('initData') or data.get('init_data')
@@ -469,7 +469,7 @@ def check_auth_token():
 @app.route('/api/send-otp', methods=['POST'])
 def send_otp():
     try:
-        data = request.json
+        data = request.get_json(force=True, silent=True) or {}
         phone = data.get('phone')
         
         if not phone:
@@ -534,7 +534,7 @@ def send_otp():
         
 @app.route('/api/verify-otp', methods=['POST'])
 def verify_otp():
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
     phone = data.get('phone')
     code = data.get('code')
     
@@ -585,7 +585,7 @@ def sync_session():
                     'user': user.to_full_dict()
                 })
         
-        data = request.json
+        data = request.get_json(force=True, silent=True) or {}
         user_id = data.get('user_id')
         phone = data.get('phone')
         
@@ -622,7 +622,7 @@ def sync_session():
 
 @app.route('/api/login-telegram', methods=['POST'])
 def login_telegram():
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
 
     # initData yoki telegram_id qabul qilish
     init_data_raw = data.get('initData') or data.get('init_data')
@@ -684,7 +684,7 @@ def confirm_role():
     if not user:
         return jsonify({'success': False, 'error': 'Kirilmagan'}), 401
     
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
     role = data.get('role')
     phone = data.get('phone')
     
@@ -710,7 +710,7 @@ def confirm_role():
 
 @app.route('/api/admin/login', methods=['POST'])
 def admin_login():
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
     username = data.get('username', '').strip()
     password = data.get('password', '').strip()
     
@@ -759,7 +759,7 @@ def admin_change_password():
     if not user or user.role not in ['admin', 'superadmin']:
         return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
     
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
     old_password = data.get('old_password', '')
     new_password = data.get('new_password', '')
     
@@ -832,7 +832,7 @@ def logout():
 @app.route('/api/bot/verify-login', methods=['POST'])
 def bot_verify_login():
     try:
-        data = request.json
+        data = request.get_json(force=True, silent=True) or {}
         token = data.get('token')
         telegram_id = data.get('telegram_id')
         first_name = data.get('first_name', '')
@@ -885,7 +885,7 @@ def bot_verify_login():
 @app.route('/api/bot/register', methods=['POST'])
 def bot_register():
     try:
-        data = request.json
+        data = request.get_json(force=True, silent=True) or {}
         
         telegram_id = data.get('telegram_id')
         phone = data.get('phone')
@@ -953,7 +953,7 @@ def bot_get_user(telegram_id):
 
 @app.route('/api/bot/update-user', methods=['POST'])
 def bot_update_user():
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
     telegram_id = data.get('telegram_id')
     
     user = User.query.filter_by(telegram_id=telegram_id).first()
@@ -997,7 +997,7 @@ def bot_mark_otp_sent():
     if api_key != os.getenv('BOT_API_KEY', 'secret-key-123'):
         return jsonify({'success': False}), 403
     
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
     otp_id = data.get('otp_id')
     
     otp = db.session.get(OTPCode, otp_id)
@@ -1107,7 +1107,7 @@ def update_profile():
     if not user:
         return jsonify({'success': False, 'error': 'Kirilmagan'}), 401
     
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
     
     if 'full_name' in data:
         user.full_name = data['full_name']
@@ -1137,7 +1137,7 @@ def upload_avatar():
     if not user:
         return jsonify({'success': False, 'error': 'Kirilmagan'}), 401
     
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
     avatar_url = data.get('avatar_url')
     
     if not avatar_url:
@@ -1236,7 +1236,7 @@ def create_subscription():
     if not user:
         return jsonify({'success': False, 'error': 'Kirilmagan'}), 401
     
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
     tier = data.get('tier')
     price = data.get('price', 0)
     
@@ -1328,7 +1328,7 @@ def create_session():
     if not user:
         return jsonify({'success': False, 'error': 'Kirilmagan'}), 401
     
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
     mentor_id = data.get('mentor_id')
     session_type = data.get('session_type', 'individual')
     scheduled_at = data.get('scheduled_at')
@@ -1367,7 +1367,7 @@ def create_payment():
     if not user:
         return jsonify({'success': False, 'error': 'Kirilmagan'}), 401
     
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
     amount = data.get('amount')
     method = data.get('method')
     meta = data.get('meta', {})
@@ -1407,7 +1407,7 @@ def payment_callback(payment_id):
     if not payment:
         abort(404)
     
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
     status = data.get('status')
     provider_tx = data.get('transaction')
     
@@ -1600,7 +1600,7 @@ def admin_reject_withdrawal(wd_id):
     if not admin or admin.role not in ['admin', 'superadmin']:
         return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
     
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
     reason = data.get('reason', '')
     
     wd = db.session.get(Withdrawal, wd_id)
@@ -1785,7 +1785,7 @@ def admin_broadcast():
     if not admin or admin.role not in ['admin', 'superadmin']:
         return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
     
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
     title = data.get('title')
     text = data.get('text')
     targets = data.get('targets', ['all'])
@@ -1917,7 +1917,7 @@ def add_mentor_certificate():
     if not mentor:
         return jsonify({'success': False, 'error': 'Mentor profil topilmadi'}), 404
 
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
     title = data.get('title', '').strip()
     if not title:
         return jsonify({'success': False, 'error': 'Sertifikat nomi kerak'}), 400
@@ -1978,7 +1978,7 @@ def save_mentor_card():
     if not mentor:
         return jsonify({'success': False, 'error': 'Mentor profil topilmadi'}), 404
 
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
     card_last4 = data.get('card_last4', '').strip()
     card_holder = data.get('card_holder', '').strip().upper()
     card_number = data.get('card_number', '').strip()
@@ -2006,7 +2006,7 @@ def mentor_withdraw():
     if not mentor:
         return jsonify({'success': False, 'error': 'Mentor profil topilmadi'}), 404
 
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
     amount = int(data.get('amount', 0))
 
     if amount < 50000:
@@ -2150,7 +2150,7 @@ def handle_universities():
         if not user or user.role not in ['admin', 'superadmin']:
             return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
         
-        data = request.json
+        data = request.get_json(force=True, silent=True) or {}
         try:
             uni = University(
                 short_name=data.get('short_name'),
@@ -2205,7 +2205,7 @@ def handle_university(uni_id):
         if not user or user.role not in ['admin', 'superadmin']:
             return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
         
-        data = request.json
+        data = request.get_json(force=True, silent=True) or {}
         uni.short_name = data.get('short_name', uni.short_name)
         uni.full_name = data.get('full_name', uni.full_name)
         uni.description = data.get('description', uni.description)
@@ -2249,7 +2249,7 @@ def handle_faculties(uni_id):
         if not user or user.role not in ['admin', 'superadmin']:
             return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
         
-        data = request.json
+        data = request.get_json(force=True, silent=True) or {}
         faculty = Faculty(
             university_id=uni_id,
             name=data.get('name'),
@@ -2293,7 +2293,7 @@ def handle_faculty(faculty_id):
         if not user or user.role not in ['admin', 'superadmin']:
             return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
         
-        data = request.json
+        data = request.get_json(force=True, silent=True) or {}
         faculty.name = data.get('name', faculty.name)
         faculty.description = data.get('description', faculty.description)
         faculty.cover_url = data.get('cover_url', faculty.cover_url)
@@ -2324,7 +2324,7 @@ def handle_faculty_stats(faculty_id):
     if not user or user.role not in ['admin', 'superadmin']:
         return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
     
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
     year = data.get('year')
     
     if not year:
@@ -2408,7 +2408,7 @@ def add_news():
     if not admin or admin.role not in ['admin', 'superadmin']:
         return jsonify({'success': False, 'error': 'Ruxsat yoq'}), 403
     
-    data = request.json
+    data = request.get_json(force=True, silent=True) or {}
     if not data.get('title') or not data.get('content'):
         return jsonify({'success': False, 'error': 'Sarlavha va matn kerak'}), 400
         
@@ -2487,9 +2487,14 @@ def delete_material(mat_id):
 #     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 10000)))
 
 if __name__ == '__main__':
-    # To'g'ridan-to'g'ri `python app.py` bilan ishga tushirilganda
-    # Produksiyada gunicorn ishlatiladi: gunicorn app:app
-    port = int(os.environ.get('PORT', 10000))
-    debug = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
-    print(f"🚀 Server ishga tushmoqda — host=0.0.0.0, port={port}, debug={debug}")
-    app.run(host='0.0.0.0', port=port, debug=debug)
+    # # Webhook o'rnatish
+    # webhook_url = "https://connect-u-2.onrender.com/webhook"
+    # bot.remove_webhook()
+    # bot.set_webhook(url=webhook_url)
+    
+    # # Flask serverni ishga tushirish
+    # app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 10000)))
+    print("🚀 Lokal server ishga tushmoqda...")
+    print(f"📊 Admin panel: http://localhost:5000/admin")
+    print(f"🔐 Login: http://localhost:5000/login.html")
+    app.run(host='127.0.0.1', port=5000, debug=True)
