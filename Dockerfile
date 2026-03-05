@@ -10,8 +10,3 @@ COPY . .
 EXPOSE 10000
 
 CMD ["gunicorn", "--bind", "0.0.0.0:10000", "app:app"]
-```
-
-**3. Render.com Start Command:**
-```
-gunicorn --bind 0.0.0.0:10000 app:app
