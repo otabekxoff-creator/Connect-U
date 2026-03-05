@@ -101,12 +101,10 @@ def serve_admin_login_page():
             return redirect('/admin.html')
     return send_from_directory('static', 'admin_login.html')
 
+
 @app.route('/<path:filename>.html')
 def serve_html(filename):
-    try:
-        return send_from_directory('static', filename + '.html')
-    except:
-        abort(404)
+    return send_from_directory('static', filename + '.html')
 
 @app.route('/static/<path:filename>')
 def serve_static(filename):
