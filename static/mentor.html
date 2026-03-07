@@ -1536,10 +1536,24 @@ function filterSessions(filter,btn) {
   if(btn)btn.classList.add('active');
   renderSessions(filter);
 }
+// function renderSessions(filter) {
+//   const list=filter==='all'?sessions:sessions.filter(s=>s.status===filter);
+//   document.getElementById('sessionsListMentor').innerHTML=list.length?list.map(s=>sessionItemHTML(s)).join(''):emptyState('Sessiya yo\'q');
+// }
+/*---------------------- Test -------------------------------*/
 function renderSessions(filter) {
-  const list=filter==='all'?sessions:sessions.filter(s=>s.status===filter);
-  document.getElementById('sessionsListMentor').innerHTML=list.length?list.map(s=>sessionItemHTML(s)).join(''):emptyState('Sessiya yo\'q');
+  const list = filter === 'all' ? sessions : sessions.filter(s => s.status === filter);
+  const container = document.getElementById('sessionsListMentor');
+  
+  if (!list || list.length === 0) {
+    container.innerHTML = emptyState('Sessiya yo\'q');
+    return;
+  }
+  
+  container.innerHTML = list.map(s => sessionItemHTML(s)).join('');
 }
+/*-----------------------------------------------------*/
+   
 async function confirmSession(id) {
   try {
     const res=await fetch(`/api/sessions/${id}/confirm`,{method:'POST',credentials:'include'});
@@ -1845,6 +1859,134 @@ function _mTimeAgo(str){
   if(sec<86400)return Math.floor(sec/3600)+' soat oldin';
   if(sec<7*86400)return Math.floor(sec/86400)+' kun oldin';
   return d.toLocaleDateString('uz-UZ');
+}
+
+/*---------Test-------------*/
+   
+// Test sessiyalarni qo'shish
+function addTestSessions() {
+  // Agar sessions bo'sh bo'lsa yoki test sessiyalar yo'q bo'lsa
+  if (!sessions || sessions.length === 0) {
+    sessions = [];
+  }
+  
+  // Test sessiyalar ro'yxati
+  const testSessions = [
+    {
+      id: 'test_1_' + Date.now(),
+      student_name: 'Aziza Karimova',
+      session_type: 'individual',
+      status: 'pending',
+      scheduled_at: new Date(Date.now() + 86400000).toISOString(), // 1 kundan keyin
+      duration_min: 60,
+      student_id: 'test_student_1',
+      mentor_id: currentUser?.id || 'test_mentor',
+      created_at: new Date().toISOString(),
+      notes: 'DTM matematika fanidan yordam kerak'
+    },
+    {
+      id: 'test_2_' + Date.now(),
+      student_name: 'Bobur Aliyev',
+      session_type: 'group',
+      status: 'confirmed',
+      scheduled_at: new Date(Date.now() + 172800000).toISOString(), // 2 kundan keyin
+      duration_min: 90,
+      student_id: 'test_student_2',
+      mentor_id: currentUser?.id || 'test_mentor',
+      created_at: new Date().toISOString(),
+      notes: 'Guruh bilan ingliz tili grammatikasi',
+      meet_link: 'https://meet.google.com/test-session'
+    },
+    {
+      id: 'test_3_' + Date.now(),
+      student_name: 'Gulnoza Rahimova',
+      session_type: 'individual',
+      status: 'completed',
+      scheduled_at: new Date(Date.now() - 172800000).toISOString(), // 2 kun oldin
+      duration_min: 60,
+      student_id: 'test_student_3',
+      mentor_id: currentUser?.id || 'test_mentor',
+      created_at: new Date(Date.now() - 86400000).toISOString(),
+      notes: 'Fizika masalalari yechish',
+      points_earned: 8000
+    },
+    {
+      id: 'test_4_' + Date.now(),
+      student_name: 'Dilshod Tursunov',
+      session_type: 'individual',
+      status: 'cancelled',
+      scheduled_at: new Date(Date.now() - 86400000).toISOString(), // 1 kun oldin
+      duration_min: 60,
+      student_id: 'test_student_4',
+      mentor_id: currentUser?.id || 'test_mentor',
+      created_at: new Date(Date.now() - 172800000).toISOString(),
+      notes: 'Bekor qilingan sessiya'
+    },
+    {
+      id: 'test_5_' + Date.now(),
+      student_name: 'Madina Abdurahmonova',
+      session_type: 'group',
+      status: 'pending',
+      scheduled_at: new Date(Date.now() + 259200000).toISOString(), // 3 kundan keyin
+      duration_min: 120,
+      student_id: 'test_student_5',
+      mentor_id: currentUser?.id || 'test_mentor',
+      created_at: new Date().toISOString(),
+      notes: 'IELTS tayyorlov guruhi (5 kishi)'
+    },
+    {
+      id: 'test_6_' + Date.now(),
+      student_name: 'Jasur Hamidov',
+      session_type: 'individual',
+      status: 'confirmed',
+      scheduled_at: new Date(Date.now() + 43200000).toISOString(), // 12 soatdan keyin
+      duration_min: 60,
+      student_id: 'test_student_6',
+      mentor_id: currentUser?.id || 'test_mentor',
+      created_at: new Date().toISOString(),
+      notes: 'Web dasturlash asoslari'
+    },
+    {
+      id: 'test_7_' + Date.now(),
+      student_name: 'Nodira Yusupova',
+      session_type: 'individual',
+      status: 'completed',
+      scheduled_at: new Date(Date.now() - 259200000).toISOString(), // 3 kun oldin
+      duration_min: 60,
+      student_id: 'test_student_7',
+      mentor_id: currentUser?.id || 'test_mentor',
+      created_at: new Date(Date.now() - 345600000).toISOString(),
+      notes: 'Kimyo fanidan test tahlili',
+      points_earned: 8000
+    }
+  ];
+  
+  // Mavjud sessiyalarga testlarni qo'shish (takrorlanmasligi uchun id tekshirish)
+  testSessions.forEach(testSession => {
+    const exists = sessions.some(s => s.id === testSession.id);
+    if (!exists) {
+      sessions.push(testSession);
+    }
+  });
+  
+  // Points history ga tugallangan sessiyalarni qo'shish
+  testSessions.forEach(session => {
+    if (session.status === 'completed' && session.points_earned) {
+      const pointExists = pointsHistory.some(p => 
+        p.reason === 'session_completed' && p.reason_text?.includes(session.student_name)
+      );
+      
+      if (!pointExists) {
+        pointsHistory.push({
+          id: 'point_' + session.id,
+          points: session.points_earned,
+          reason: 'session_completed',
+          reason_text: `Sessiya: ${session.student_name}`,
+          created_at: session.scheduled_at || new Date().toISOString()
+        });
+      }
+    }
+  });
 }
 
 /* ─── START ─── */
