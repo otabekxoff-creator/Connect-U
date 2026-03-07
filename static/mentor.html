@@ -154,32 +154,22 @@ img{display:block;object-fit:cover}
 .si-time{font-size:12px;color:var(--text2);margin-bottom:4px}
 .si-points{font-size:13px;font-weight:700;color:var(--teal)}
 
-/* ── PROFILE REFACTOR ── */
+/* ── PROFILE ── */
 .profile-cover{width:100%;height:140px;position:relative;background:linear-gradient(135deg,#0D1F3C,#1A3060);cursor:pointer}
 .profile-cover-edit{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);padding:7px 13px;border-radius:20px;font-size:12px;font-weight:600;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:5px;cursor:pointer}
-
-.profile-header { padding: 0 18px; margin-top: -40px; position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 24px; }
-.p-avatar{width:90px;height:90px;border-radius:50%;border:4px solid var(--bg);overflow:hidden;background:linear-gradient(135deg,var(--gold),var(--teal));display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:800;color:#070D1A;position:relative;cursor:pointer;flex-shrink:0; margin-bottom: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);}
+.profile-avatar-wrap{padding:0 18px;margin-top:-40px;position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
+.p-avatar{width:80px;height:80px;border-radius:50%;border:3px solid var(--bg);overflow:hidden;background:linear-gradient(135deg,var(--gold),var(--teal));display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:#070D1A;position:relative;cursor:pointer;flex-shrink:0}
 .p-avatar img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
 .p-avatar-overlay{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
 .p-avatar:active .p-avatar-overlay{opacity:1}
-.p-name{font-size:22px;font-weight:800;margin-bottom:2px}
-.p-sub{font-size:14px;color:var(--gold);font-family:'JetBrains Mono',monospace;margin-bottom:12px}
-
-/* Profile Menu List */
-.menu-list { margin: 0 18px 16px; background: var(--s1); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
-.menu-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .2s; }
-.menu-item:active { background: var(--s2); }
-.menu-item:last-child { border-bottom: none; }
-.mi-icon { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;}
-.mi-text { flex: 1; font-size: 14px; font-weight: 600; }
-.mi-arrow { color: var(--text3); display: flex; align-items: center; justify-content: center;}
+.p-name{font-size:20px;font-weight:800;margin-bottom:3px}
+.p-sub{font-size:13px;color:var(--gold);font-family:'JetBrains Mono',monospace;margin-bottom:8px}
 
 /* Verification banners */
-.verify-banner{width:100%; border-radius:var(--r);padding:12px 16px;display:flex;align-items:center;gap:12px; margin-top: 12px;}
+.verify-banner{margin:0 18px 16px;border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px}
 .vb-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.vb-text h4{font-size:14px;font-weight:600;margin-bottom:2px; text-align: left;}
-.vb-text p{font-size:12px;color:var(--text2); text-align: left;}
+.vb-text h4{font-size:14px;font-weight:600;margin-bottom:2px}
+.vb-text p{font-size:12px;color:var(--text2)}
 .vb-action{margin-left:auto;font-size:12px;font-weight:600;color:var(--purple);white-space:nowrap;cursor:pointer;background:none;border:none;font-family:inherit}
 
 /* Info list */
@@ -189,6 +179,7 @@ img{display:block;object-fit:cover}
 .il-label{font-size:13px;color:var(--text2)}
 .il-val{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
 .il-edit{color:var(--gold);font-size:12px;cursor:pointer;background:none;border:none;padding:2px 6px;border-radius:6px}
+.il-row-hover:hover, .il-row-hover:active { background: var(--s2); transition: background 0.2s; }
 
 /* Edit form */
 .edit-form{margin:0 18px 16px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px}
@@ -198,6 +189,14 @@ img{display:block;object-fit:cover}
 .ef-input:focus{border-color:var(--gold)}
 .ef-textarea{min-height:90px;resize:vertical}
 .ef-btns{display:flex;gap:10px}
+
+/* Card display */
+.card-display{background:linear-gradient(135deg,#1A2A4A,#0D1A30);border:1px solid var(--border2);border-radius:16px;padding:20px;position:relative;overflow:hidden;margin:0 18px 16px}
+.cd-chip{width:36px;height:26px;border-radius:5px;background:linear-gradient(135deg,#F0A500,#FFD166);margin-bottom:16px}
+.cd-number{font-family:'JetBrains Mono',monospace;font-size:17px;letter-spacing:3px;margin-bottom:10px}
+.cd-bottom{display:flex;justify-content:space-between;align-items:flex-end}
+.cd-holder{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px}
+.cd-logo{font-size:11px;color:var(--text2);font-family:'JetBrains Mono',monospace}
 
 /* ── CERTIFICATES ── */
 .cert-card{margin:0 18px 10px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:15px;display:flex;gap:12px;align-items:flex-start}
@@ -340,7 +339,7 @@ img{display:block;object-fit:cover}
 
   <div class="page active" id="pg-home">
 
-    <div id="homeVerifyBanner" style="display:none;margin:12px 18px 0;border-radius:var(--r);padding:12px 16px;display:none;align-items:center;gap:12px;cursor:pointer" onclick="showPage('certs')">
+    <div id="homeVerifyBanner" style="display:none;margin:12px 18px 0;border-radius:var(--r);padding:12px 16px;align-items:center;gap:12px;cursor:pointer" onclick="showPage('certs')">
       <div style="flex:1">
         <div style="font-size:13px;font-weight:700" id="hvbTitle">⚠️ Verifikatsiya talab qilinadi</div>
         <div style="font-size:12px;margin-top:2px" id="hvbMsg">Guvohnomangizni yuklang</div>
@@ -396,7 +395,7 @@ img{display:block;object-fit:cover}
 
   <div class="page" id="pg-profile">
 
-    <div class="profile-cover" id="profileCover" onclick="document.getElementById('coverInput').click()">
+    <div class="profile-cover" id="profileCover" onclick="document.getElementById('coverInput').click()" style="cursor:pointer">
       <div class="profile-cover-edit">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
         Cover
@@ -404,67 +403,61 @@ img{display:block;object-fit:cover}
     </div>
     <input type="file" id="coverInput" accept="image/*" onchange="handleCover(this)" style="display:none">
 
-    <div class="profile-header">
+    <div class="profile-avatar-wrap">
       <div class="p-avatar" id="pAvatar" onclick="document.getElementById('avatarInput').click()">
         <span id="pAvatarText">M</span>
         <div class="p-avatar-overlay">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="white" stroke-width="1.8"/><circle cx="12" cy="13" r="4" stroke="white" stroke-width="1.8"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="white" stroke-width="1.8"/><circle cx="12" cy="13" r="4" stroke="white" stroke-width="1.8"/></svg>
         </div>
       </div>
       <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatar(this)" style="display:none">
-      
-      <div class="p-name" id="pName">Mentor</div>
-      <div class="p-sub" id="pSub">@username</div>
-      <div id="pVerifyBadge" style="margin-bottom: 8px;"></div>
-      
-      <button class="btn btn-ghost btn-sm" onclick="openModal('profileEditModal')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        Profilni tahrirlash
-      </button>
-
-      <div id="bannerPending" class="verify-banner" style="background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.3);display:none">
-        <div class="vb-icon" style="background:rgba(240,165,0,.15)">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/></svg>
-        </div>
-        <div class="vb-text">
-          <h4 id="bannerTitle">Verifikatsiya talab qilinadi</h4>
-          <p id="bannerMsg">3 kun ichida guvohnomangizni yuklang</p>
-        </div>
-        <button class="vb-action" onclick="showPage('certs')">Yuklash →</button>
+      <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <div class="p-name" id="pName">Mentor</div>
+        <div class="p-sub" id="pSub">@username</div>
+        <div id="pVerifyBadge"></div>
+        <button class="btn btn-gold btn-sm" onclick="openModal('profileEditModal')" style="margin-top:4px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Profilni tahrirlash
+        </button>
       </div>
+    </div>
 
-      <div id="bannerVerified" class="verify-banner" style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);display:none">
-        <div class="vb-icon" style="background:rgba(34,197,94,.15)">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="12" r="10" stroke="var(--green)" stroke-width="1.8"/></svg>
-        </div>
-        <div class="vb-text">
-          <h4 style="color:var(--green)">✓ Profil tasdiqlangan</h4>
-          <p>Siz platformada faolsiz</p>
-        </div>
+    <div id="bannerPending" class="verify-banner" style="background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.3);display:none">
+      <div class="vb-icon" style="background:rgba(240,165,0,.15)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/></svg>
+      </div>
+      <div class="vb-text">
+        <h4 id="bannerTitle">Verifikatsiya talab qilinadi</h4>
+        <p id="bannerMsg">3 kun ichida guvohnomangizni yuklang</p>
+      </div>
+      <button class="vb-action" onclick="showPage('certs')">Yuklash →</button>
+    </div>
+
+    <div id="bannerVerified" class="verify-banner" style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);display:none">
+      <div class="vb-icon" style="background:rgba(34,197,94,.15)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="12" r="10" stroke="var(--green)" stroke-width="1.8"/></svg>
+      </div>
+      <div class="vb-text">
+        <h4 style="color:var(--green)">✓ Profil tasdiqlangan</h4>
+        <p>Mentorlar ro'yxatida ko'rinasiz</p>
       </div>
     </div>
 
     <div style="padding:0 18px;margin-bottom:8px"><span class="label">PLATFORMA</span></div>
-    <div class="menu-list">
-      <div class="menu-item" onclick="showPage('news')">
-        <div class="mi-icon" style="background:rgba(240,165,0,0.15); color:var(--gold);">📰</div>
-        <div class="mi-text">Yangiliklar</div>
-        <div class="mi-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+    <div class="info-list" style="margin-bottom:16px;">
+      <div class="il-row il-row-hover" onclick="showPage('notif')" style="cursor:pointer;">
+        <span class="il-val" style="color:var(--text); font-size:14px;"><span style="font-size:16px;margin-right:4px;">🔔</span> Bildirishnomalar</span>
+        <span class="il-label" style="display:flex;align-items:center;gap:6px">
+           <span id="pNotifBadge" style="display:none;background:var(--red);color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">Yangi</span>
+           →
+        </span>
       </div>
-      <div class="menu-item" onclick="showPage('notif')">
-        <div class="mi-icon" style="background:rgba(0,191,166,0.15); color:var(--teal);">🔔</div>
-        <div class="mi-text">Bildirishnomalar</div>
-        <div class="mi-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
-      </div>
-      <div class="menu-item" onclick="openModal('cardModal')">
-        <div class="mi-icon" style="background:rgba(124,92,252,0.15); color:var(--purple);">💳</div>
-        <div class="mi-text">To'lov kartasi</div>
-        <div class="mi-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
-      </div>
-      <div class="menu-item" onclick="showPage('certs')">
-        <div class="mi-icon" style="background:rgba(255,255,255,0.08); color:var(--text);">🎓</div>
-        <div class="mi-text">Hujjatlar va Sertifikatlar</div>
-        <div class="mi-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="il-row il-row-hover" onclick="showPage('news')" style="cursor:pointer;">
+        <span class="il-val" style="color:var(--text); font-size:14px;"><span style="font-size:16px;margin-right:4px;">📰</span> Yangiliklar</span>
+        <span class="il-label" style="display:flex;align-items:center;gap:6px">
+           <span id="pNewsBadge" style="display:none;background:var(--gold);color:#070D1A;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">Yangi</span>
+           →
+        </span>
       </div>
     </div>
 
@@ -492,16 +485,48 @@ img{display:block;object-fit:cover}
       </div>
     </div>
 
-    <div style="padding:0 18px;margin-bottom:24px">
+    <div style="padding:0 18px;margin-bottom:16px">
       <span class="label">BIO</span>
       <p id="bioDisplay" style="font-size:13px;color:var(--text2);line-height:1.7;margin-top:4px">—</p>
     </div>
 
-    <div style="padding:0 18px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
-      <span class="label" style="margin-bottom:0">REELS / VIDEOLAR</span>
-      <button class="btn btn-ghost btn-sm" onclick="showPage('videos')">Barchasi →</button>
+    <div style="padding:0 18px;margin-bottom:8px"><span class="label">TO'LOV KARTASI</span></div>
+    <div class="card-display">
+      <div class="cd-chip"></div>
+      <div class="cd-number" id="cdNumber">•••• •••• •••• ••••</div>
+      <div class="cd-bottom">
+        <div class="cd-holder" id="cdHolder">KARTA EGASI</div>
+        <div class="cd-logo">VISA / MC</div>
+      </div>
     </div>
-    <div id="profileVideosMini" style="padding:0 18px;margin-bottom:24px;display:grid;grid-template-columns:repeat(3, 1fr);gap:6px"></div>
+    <div style="padding:0 18px;margin-bottom:16px">
+      <button class="btn btn-ghost" onclick="openModal('cardModal')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="1" y="4" width="22" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M1 10h22" stroke="currentColor" stroke-width="1.8"/></svg>
+        Karta ma'lumotlarini o'zgartirish
+      </button>
+    </div>
+
+    <div style="padding:0 18px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+      <span class="label" style="margin-bottom:0">SERTIFIKATLAR & HUJJATLAR</span>
+      <button class="btn btn-ghost btn-sm" onclick="showPage('certs')">Ko'rish →</button>
+    </div>
+    <div style="padding:0 18px;margin-bottom:8px">
+      <div id="profileStudentIdStatus" style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px">
+        <div id="profileStudentIdIcon" style="font-size:18px">📋</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600" id="profileStudentIdTitle">Talaba guvohnomasi</div>
+          <div style="font-size:11px;color:var(--text2)" id="profileStudentIdSub">Yuklanmagan</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('certs')">→</button>
+      </div>
+    </div>
+    <div id="profileCertsMini" style="padding:0 18px;margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+
+    <div style="padding:0 18px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+      <span class="label" style="margin-bottom:0">VIDEOLARIM</span>
+      <button class="btn btn-ghost btn-sm" onclick="showPage('videos')">Ko'rish →</button>
+    </div>
+    <div id="profileVideosMini" style="padding:0 18px;margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px"></div>
 
     <div style="padding:0 18px;margin-bottom:8px;display:flex;gap:10px">
       <button class="btn btn-ghost" onclick="toggleTheme()" style="flex:1">
@@ -512,7 +537,7 @@ img{display:block;object-fit:cover}
     <div style="padding:0 18px;margin-bottom:24px">
       <button class="btn btn-red" onclick="logout()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        Tizimdan chiqish
+        Chiqish
       </button>
     </div>
     <div class="gap"></div>
@@ -580,7 +605,7 @@ img{display:block;object-fit:cover}
       </div>
       <button class="btn btn-teal btn-sm" onclick="openWithdrawModal()" style="width:100%">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 7l-5-5-5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-        Pul yechish so'rovi
+        Pul yechish so'rovini yuborish
       </button>
     </div>
     <div class="sr"><div class="sr-t">Tranzaksiyalar tarixi</div></div>
@@ -606,6 +631,7 @@ img{display:block;object-fit:cover}
 
   <div class="page" id="pg-news">
     <div style="padding:20px 18px 8px">
+      <button onclick="showPage('profile')" style="background:none;border:none;color:var(--text2);font-size:14px;display:flex;align-items:center;gap:4px;margin-bottom:12px;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Orqaga</button>
       <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text2);margin-bottom:4px">YANGILIKLAR</div>
       <div style="font-size:22px;font-weight:800">Platforma yangiliklari</div>
     </div>
@@ -640,6 +666,7 @@ img{display:block;object-fit:cover}
 
   <div class="page" id="pg-notif">
     <div style="padding:20px 18px 8px">
+      <button onclick="showPage('profile')" style="background:none;border:none;color:var(--text2);font-size:14px;display:flex;align-items:center;gap:4px;margin-bottom:12px;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Orqaga</button>
       <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text2);margin-bottom:4px">BILDIRISHNOMALAR</div>
       <div style="font-size:22px;font-weight:800">Xabarlar</div>
     </div>
@@ -678,47 +705,174 @@ img{display:block;object-fit:cover}
     <div style="margin:12px 0 16px">
       <div style="font-size:12px;color:var(--text2);margin-bottom:8px;font-weight:500">Ko'rish huquqi</div>
       <div style="display:flex;gap:8px">
-        <div class="target-chip active" id="mvAccFree" onclick="setMvAccess('free',this)" style="flex:1;justify-content:center; padding:10px; border-radius:10px; border:1px solid var(--border); text-align:center; cursor:pointer;">
+        <div class="target-chip active" id="mvAccFree" onclick="setMvAccess('free',this)" style="flex:1;justify-content:center">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
           ✓ Bepul (hammaga)
         </div>
-        <div class="target-chip" id="mvAccPrem" onclick="setMvAccess('premium',this)" style="flex:1;justify-content:center; padding:10px; border-radius:10px; border:1px solid var(--border); text-align:center; cursor:pointer;">
-          ⭐ Premium (obuna)
+        <div class="target-chip" id="mvAccPrem" onclick="setMvAccess('premium',this)" style="flex:1;justify-content:center">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          ⭐ Premium (obuna kerak)
         </div>
       </div>
     </div>
-    <div class="ef-field"><label class="ef-label">Video sarlavhasi *</label><input class="ef-input" id="mvTitle" placeholder="DTM matematika: eng muhim formulalar"></div>
-    <div class="ef-field"><label class="ef-label">Video URL *</label><input class="ef-input" id="mvUrl" placeholder="https://youtube.com/watch?v=..." oninput="mvAutoThumb(this.value)"></div>
-    <div class="ef-field"><label class="ef-label">Thumbnail (avtomatik YouTube'dan)</label><input class="ef-input" id="mvThumb" placeholder="https://..."><div id="mvThumbPreview" style="display:none;margin-top:8px;border-radius:10px;overflow:hidden"><img id="mvThumbImg" style="width:100%;max-height:130px;object-fit:cover"></div></div>
-    <div class="ef-field"><label class="ef-label">Qisqa tavsif</label><textarea class="ef-input" id="mvDesc" placeholder="Bu video nima haqida..." style="min-height:60px;resize:vertical"></textarea></div>
+    <div class="ef-field">
+      <label class="ef-label">Video sarlavhasi *</label>
+      <input class="ef-input" id="mvTitle" placeholder="DTM matematika: eng muhim formulalar">
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Video URL *</label>
+      <input class="ef-input" id="mvUrl" placeholder="https://youtube.com/watch?v=..." oninput="mvAutoThumb(this.value)">
+      <div style="font-size:11px;color:var(--text2);margin-top:3px">YouTube, Telegram yoki boshqa platformalar</div>
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Thumbnail (avtomatik YouTube'dan)</label>
+      <input class="ef-input" id="mvThumb" placeholder="https://...">
+      <div id="mvThumbPreview" style="display:none;margin-top:8px;border-radius:10px;overflow:hidden"><img id="mvThumbImg" style="width:100%;max-height:130px;object-fit:cover"></div>
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Qisqa tavsif</label>
+      <textarea class="ef-input" id="mvDesc" placeholder="Bu video nima haqida..." style="min-height:60px;resize:vertical"></textarea>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
       <button class="btn-ghost" onclick="closeModal('videoModal')" style="padding:12px;border-radius:10px;background:var(--s2);border:1px solid var(--border);color:var(--text2);cursor:pointer;font-family:inherit;font-size:14px;font-weight:600">Bekor</button>
-      <button class="btn-act" onclick="saveMentorVideo()" style="padding:12px;justify-content:center">Saqlash</button>
+      <button class="btn-act" onclick="saveMentorVideo()" style="padding:12px;justify-content:center">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v13a2 2 0 01-2 2z" stroke="currentColor" stroke-width="2"/></svg>
+        Saqlash
+      </button>
     </div>
   </div>
 </div>
 
 <div class="modal" id="withdrawModal" onclick="if(event.target===this)closeModal('withdrawModal')">
-  <div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">Pul yechish</div><div class="modal-sub" id="withdrawSub">Mavjud balans: 0 so'm</div><div class="card-display" style="margin:0 0 16px"><div class="cd-chip"></div><div class="cd-number" id="wdCardNum">•••• •••• •••• ••••</div><div class="cd-bottom"><div class="cd-holder" id="wdCardHolder">KARTA EGASI</div><div class="cd-logo">VISA / MC</div></div></div><div class="ef-field"><label class="ef-label">Summa (so'm)</label><input class="ef-input" id="withdrawAmount" type="number" placeholder="50000" min="50000"><div style="font-size:11px;color:var(--text2);margin-top:4px">Minimal: 50,000 so'm</div></div><div class="modal-btns"><button class="btn btn-gold" onclick="submitWithdraw()">So'rov yuborish</button><button class="btn btn-ghost" onclick="closeModal('withdrawModal')">Bekor qilish</button></div></div>
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Pul yechish</div>
+    <div class="modal-sub" id="withdrawSub">Mavjud balans: 0 so'm</div>
+    <div class="card-display" style="margin:0 0 16px">
+      <div class="cd-chip"></div>
+      <div class="cd-number" id="wdCardNum">•••• •••• •••• ••••</div>
+      <div class="cd-bottom">
+        <div class="cd-holder" id="wdCardHolder">KARTA EGASI</div>
+        <div class="cd-logo">VISA / MC</div>
+      </div>
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Summa (so'm)</label>
+      <input class="ef-input" id="withdrawAmount" type="number" placeholder="50000" min="50000">
+      <div style="font-size:11px;color:var(--text2);margin-top:4px">Minimal: 50,000 so'm</div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" onclick="submitWithdraw()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 7l-5-5-5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        So'rov yuborish
+      </button>
+      <button class="btn btn-ghost" onclick="closeModal('withdrawModal')">Bekor qilish</button>
+    </div>
+  </div>
 </div>
 
 <div class="modal" id="certModal" onclick="if(event.target===this)closeModal('certModal')">
-  <div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">Sertifikat qo'shish</div><div class="ef-field" style="margin-top:4px"><label class="ef-label">Sertifikat nomi *</label><input class="ef-input" id="certTitle" placeholder="IELTS 7.0, AWS Certified..."></div><div class="ef-field"><label class="ef-label">Berilgan tashkilot</label><input class="ef-input" id="certIssuer" placeholder="British Council, Amazon..."></div><div class="ef-field"><label class="ef-label">Sana</label><input class="ef-input" id="certDate" type="date"></div><div class="modal-btns"><button class="btn btn-gold" onclick="addCert()">✓ Qo'shish</button><button class="btn btn-ghost" onclick="closeModal('certModal')">Bekor qilish</button></div></div>
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Sertifikat qo'shish</div>
+    <div class="ef-field" style="margin-top:4px">
+      <label class="ef-label">Sertifikat nomi *</label>
+      <input class="ef-input" id="certTitle" placeholder="IELTS 7.0, AWS Certified...">
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Berilgan tashkilot</label>
+      <input class="ef-input" id="certIssuer" placeholder="British Council, Amazon...">
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Sana</label>
+      <input class="ef-input" id="certDate" type="date">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" onclick="addCert()">✓ Qo'shish</button>
+      <button class="btn btn-ghost" onclick="closeModal('certModal')">Bekor qilish</button>
+    </div>
+  </div>
 </div>
 
 <div class="modal" id="cardModal" onclick="if(event.target===this)closeModal('cardModal')">
-  <div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title">Karta ma'lumotlari</div><div class="modal-sub">Pul yechish uchun karta raqamingizni kiriting</div><div class="ef-field"><label class="ef-label">Karta raqami</label><input class="ef-input mono" id="cardNumber" type="text" placeholder="8600 0000 0000 0000" maxlength="19" oninput="formatCard(this)"></div><div class="ef-field"><label class="ef-label">Karta egasi (lotincha)</label><input class="ef-input" id="cardHolder" type="text" placeholder="AZIZ KARIMOV" style="text-transform:uppercase"></div><div class="modal-btns"><button class="btn btn-gold" onclick="saveCard()">Saqlash</button><button class="btn btn-ghost" onclick="closeModal('cardModal')">Bekor qilish</button></div></div>
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Karta ma'lumotlari</div>
+    <div class="modal-sub">Pul yechish uchun karta raqamingizni kiriting</div>
+    <div class="ef-field">
+      <label class="ef-label">Karta raqami</label>
+      <input class="ef-input mono" id="cardNumber" type="text" placeholder="8600 0000 0000 0000" maxlength="19" oninput="formatCard(this)">
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Karta egasi (lotincha)</label>
+      <input class="ef-input" id="cardHolder" type="text" placeholder="AZIZ KARIMOV" style="text-transform:uppercase">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" onclick="saveCard()">Saqlash</button>
+      <button class="btn btn-ghost" onclick="closeModal('cardModal')">Bekor qilish</button>
+    </div>
+  </div>
 </div>
 
 <div class="modal" id="editModal" onclick="if(event.target===this)closeModal('editModal')">
-  <div class="modal-sheet"><div class="modal-handle"></div><div class="modal-title" id="editModalTitle">Tahrirlash</div><div class="ef-field" style="margin-top:8px"><label class="ef-label" id="editModalLabel">Qiymat</label><input class="ef-input" id="editModalInput" type="text" placeholder=""></div><div class="modal-btns"><button class="btn btn-gold" onclick="saveEditField()">Saqlash</button><button class="btn btn-ghost" onclick="closeModal('editModal')">Bekor qilish</button></div></div>
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="editModalTitle">Tahrirlash</div>
+    <div class="ef-field" style="margin-top:8px">
+      <label class="ef-label" id="editModalLabel">Qiymat</label>
+      <input class="ef-input" id="editModalInput" type="text" placeholder="">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" onclick="saveEditField()">Saqlash</button>
+      <button class="btn btn-ghost" onclick="closeModal('editModal')">Bekor qilish</button>
+    </div>
+  </div>
 </div>
 
 <div class="modal" id="sessionDetailModal" onclick="if(event.target===this)closeModal('sessionDetailModal')">
-  <div class="modal-sheet"><div class="modal-handle"></div><div id="sessionDetailContent"></div></div>
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div id="sessionDetailContent"></div>
+  </div>
 </div>
 
 <div class="modal" id="profileEditModal" onclick="if(event.target===this)closeModal('profileEditModal')">
-  <div class="modal-sheet" style="max-height:90vh;overflow-y:auto"><div class="modal-handle"></div><div class="modal-title">Profilni tahrirlash</div><div class="modal-sub">Ma'lumotlarni o'zgartiring va saqlang</div><div class="ef-field"><label class="ef-label">To'liq ism</label><input class="ef-input" id="peFullName" type="text" placeholder="Ism Familiya"></div><div class="ef-field"><label class="ef-label">Universitet</label><input class="ef-input" id="peUniversity" type="text" placeholder="TDYU, TATU..."></div><div class="ef-field"><label class="ef-label">Yo'nalish (Fakultet)</label><input class="ef-input" id="peFaculty" type="text" placeholder="Huquqshunoslik..."></div><div class="ef-field"><label class="ef-label">Kurs (1-6)</label><input class="ef-input" id="peYear" type="number" min="1" max="6" placeholder="2"></div><div class="ef-field"><label class="ef-label">GPA</label><input class="ef-input" id="peGpa" type="number" step="0.01" min="0" max="5" placeholder="3.85"></div><div class="ef-field"><label class="ef-label">Bio</label><textarea class="ef-input ef-textarea" id="peBio" placeholder="O'zingiz haqingizda yozing..."></textarea></div><div class="modal-btns"><button class="btn btn-gold" onclick="saveProfileEdit()">Saqlash</button><button class="btn btn-ghost" onclick="closeModal('profileEditModal')">Bekor qilish</button></div></div>
+  <div class="modal-sheet" style="max-height:90vh;overflow-y:auto">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Profilni tahrirlash</div>
+    <div class="modal-sub">Ma'lumotlarni o'zgartiring va saqlang</div>
+    <div class="ef-field">
+      <label class="ef-label">To'liq ism</label>
+      <input class="ef-input" id="peFullName" type="text" placeholder="Ism Familiya">
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Universitet</label>
+      <input class="ef-input" id="peUniversity" type="text" placeholder="TDYU, TATU...">
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Yo'nalish (Fakultet)</label>
+      <input class="ef-input" id="peFaculty" type="text" placeholder="Huquqshunoslik...">
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Kurs (1-6)</label>
+      <input class="ef-input" id="peYear" type="number" min="1" max="6" placeholder="2">
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">GPA</label>
+      <input class="ef-input" id="peGpa" type="number" step="0.01" min="0" max="5" placeholder="3.85">
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Bio</label>
+      <textarea class="ef-input ef-textarea" id="peBio" placeholder="O'zingiz haqingizda yozing..."></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" onclick="saveProfileEdit()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v13a2 2 0 01-2 2z" stroke="currentColor" stroke-width="2"/><polyline points="17,21 17,13 7,13 7,21" stroke="currentColor" stroke-width="2"/></svg>
+        Saqlash
+      </button>
+      <button class="btn btn-ghost" onclick="closeModal('profileEditModal')">Bekor qilish</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -736,7 +890,7 @@ let currentEditField = null;
 /* ─── INIT ─── */
 async function init() {
   try {
-    // Auth tekshirish (Ushbu joy server ishlamagach mock sifatida tashlab ketilishi ham mumkin)
+    // Auth tekshirish
     const meRes = await fetch('/api/me', {credentials:'include'});
     if(!meRes.ok) { window.location.href='login.html'; return; }
     
@@ -749,10 +903,12 @@ async function init() {
       return;
     }
 
+    // Mentor profili
     if(currentUser.mentor_profile) {
       mentorData = currentUser.mentor_profile;
     }
 
+    // Parallel so'rovlar
     await Promise.allSettled([
       loadSessions(),
       loadPoints(),
@@ -760,13 +916,20 @@ async function init() {
       loadVerificationStatus()
     ]);
 
+    // UI render
     renderAll();
+    
+    // Yengilliklar va bildirishnomalarni oldindan yuklash
+    loadMentorNews();
+    loadMentorNotifs();
+
+    // Loading yashirish
     document.getElementById('loadingScreen').style.display = 'none';
     document.getElementById('appShell').style.display = 'flex';
 
   } catch(e) {
     console.error('Init xatosi:', e);
-    // window.location.href = 'login.html'; // Tizim tekshirish uchun o'chirib qo'yish mumkin
+    window.location.href = 'login.html';
   }
 }
 
@@ -826,17 +989,20 @@ function renderHome() {
   document.getElementById('kpiStudents').textContent = mentorData?.total_reviews || 0;
   document.getElementById('withdrawSub').textContent = 'Mavjud balans: ' + fmt(balance) + ' so\'m';
 
+  // Sparkline
   const vals = [20,35,28,55,40,70,50,80,65,100];
   const max = Math.max(...vals);
   document.getElementById('sparkline').innerHTML = vals.map((v,i) =>
     `<div class="sp-bar${i===vals.length-1?' active':''}" style="height:${Math.round(v/max*100)}%"></div>`
   ).join('');
 
+  // Upcoming
   const upcoming = sessions.filter(s => s.status === 'confirmed' && s.scheduled_at).slice(0,3);
   document.getElementById('upcomingSessions').innerHTML = upcoming.length
     ? upcoming.map(s => sessionItemHTML(s)).join('')
     : emptyState('Tasdiqlangan sessiya yo\'q');
 
+  // Pending requests
   const pending = sessions.filter(s => s.status === 'pending');
   document.getElementById('reqBadge').textContent = pending.length ? pending.length + ' yangi' : '';
   
@@ -849,7 +1015,9 @@ function renderHome() {
     : emptyState('Yangi so\'rov yo\'q');
 }
 
-function emptyState(msg) { return `<div class="empty-state">${msg}</div>`; }
+function emptyState(msg) {
+  return `<div class="empty-state">${msg}</div>`;
+}
 
 function sessionItemHTML(s) {
   const statusBadge = {
@@ -892,12 +1060,12 @@ function pendingItemHTML(s) {
   </div>`;
 }
 
-/* ─── PROFILE (YANGILANGAN MANTIQ) ─── */
+/* ─── PROFILE ─── */
 function renderProfile() {
-  const name = currentUser?.full_name || 'Mentor';
+  const name = currentUser.full_name || 'Mentor';
   document.getElementById('pAvatarText').textContent = name[0].toUpperCase();
   document.getElementById('pName').textContent = name;
-  document.getElementById('pSub').textContent = currentUser?.username ? '@'+currentUser.username : '@mentor';
+  document.getElementById('pSub').textContent = currentUser.username ? '@'+currentUser.username : '@mentor';
   
   document.getElementById('ilName').textContent = name;
   
@@ -909,14 +1077,22 @@ function renderProfile() {
     const bioDisp = document.getElementById('bioDisplay');
     if (bioDisp) bioDisp.textContent = mentorData.bio || '—';
     
+    if(mentorData.card_last4) {
+      const num = '•••• •••• •••• ' + mentorData.card_last4;
+      document.getElementById('cdNumber').textContent = num;
+      document.getElementById('cdHolder').textContent = mentorData.card_holder || '—';
+      document.getElementById('wdCardNum').textContent = num;
+      document.getElementById('wdCardHolder').textContent = mentorData.card_holder || '—';
+    }
+    
     // Verify badge
     if(mentorData.is_verified) {
-      document.getElementById('pVerifyBadge').innerHTML = '<span class="badge b-green">✓ Tasdiqlangan mentor</span>';
+      document.getElementById('pVerifyBadge').innerHTML = '<span class="badge b-green" style="margin-top:4px">✓ Tasdiqlangan</span>';
     }
   }
   
   // Avatar
-  if(currentUser?.avatar_url) {
+  if(currentUser.avatar_url) {
     const av = document.getElementById('pAvatar');
     let img = av.querySelector('img');
     if(!img) { img = document.createElement('img'); av.appendChild(img); }
@@ -933,21 +1109,117 @@ function renderProfile() {
     }
   }
 
-  // Render mini sections (Videos as Reels)
+  // Render mini sections
   renderProfileMiniSections();
+  
+  // Update profile edit modal open handler
+  const editBtn = document.querySelector('[onclick="openModal(\'profileEditModal\')"]');
+  if (editBtn) editBtn.onclick = openProfileEditModal;
+}
+
+/* ─── EDIT FIELD MODAL ─── */
+let editFieldKey = null;
+
+function openEditModal(field, label, type='text') {
+  editFieldKey = field;
+  document.getElementById('editModalTitle').textContent = label + ' ni tahrirlash';
+  document.getElementById('editModalLabel').textContent = label;
+  const inp = document.getElementById('editModalInput');
+  inp.type = type;
+  
+  // Mavjud qiymatni to'ldirish
+  const vals = {
+    name: currentUser.full_name,
+    university: mentorData?.university,
+    faculty: mentorData?.faculty,
+    year: mentorData?.year,
+    gpa: mentorData?.gpa
+  };
+  inp.value = vals[field] || '';
+  
+  openModal('editModal');
+  setTimeout(() => inp.focus(), 300);
+}
+
+async function saveEditField() {
+  const val = document.getElementById('editModalInput').value.trim();
+  if(!val) { showToast('Qiymat kiriting', 'err'); return; }
+  
+  try {
+    let body = {};
+    if(editFieldKey === 'name') {
+      body = {full_name: val};
+    } else {
+      body = {[editFieldKey]: val};
+    }
+    
+    const res = await fetch('/api/profile', {
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body),
+      credentials:'include'
+    });
+    const data = await res.json();
+    
+    if(data.success) {
+      // Local state yangilash
+      if(editFieldKey === 'name') {
+        currentUser.full_name = val;
+        document.getElementById('pName').textContent = val;
+        document.getElementById('pAvatarText').textContent = val[0].toUpperCase();
+        document.getElementById('ilName').textContent = val;
+      } else {
+        if(!mentorData) mentorData = {};
+        mentorData[editFieldKey] = val;
+        const elMap = {university:'ilUni',faculty:'ilFaculty',year:'ilYear',gpa:'ilGpa'};
+        const el = document.getElementById(elMap[editFieldKey]);
+        if(el) el.textContent = editFieldKey === 'year' ? val+'-kurs' : val;
+      }
+      closeModal('editModal');
+      showToast('Saqlandi ✓');
+    } else {
+      showToast(data.error || 'Xatolik', 'err');
+    }
+  } catch(e) {
+    showToast('Server xatosi', 'err');
+  }
+}
+
+async function saveBio() {
+  const bio = document.getElementById('bioText').value;
+  try {
+    const res = await fetch('/api/profile', {
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({bio}),
+      credentials:'include'
+    });
+    const data = await res.json();
+    if(data.success) {
+      if(mentorData) mentorData.bio = bio;
+      showToast('Bio saqlandi ✓');
+    } else {
+      showToast(data.error || 'Xatolik', 'err');
+    }
+  } catch(e) {
+    showToast('Server xatosi', 'err');
+  }
 }
 
 /* ─── AVATAR / COVER ─── */
 async function handleAvatar(input) {
   const file = input.files[0];
   if(!file) return;
+  
   const reader = new FileReader();
   reader.onload = async (e) => {
     const base64 = e.target.result;
     try {
       const res = await fetch('/api/profile/avatar', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({avatar_url: base64}), credentials:'include'
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({avatar_url: base64}),
+        credentials:'include'
       });
       const data = await res.json();
       if(data.success) {
@@ -959,7 +1231,9 @@ async function handleAvatar(input) {
       } else {
         showToast(data.error || 'Xatolik', 'err');
       }
-    } catch(e) { showToast('Yuklashda xato', 'err'); }
+    } catch(e) {
+      showToast('Yuklashda xato', 'err');
+    }
   };
   reader.readAsDataURL(file);
 }
@@ -978,41 +1252,217 @@ function handleCover(input) {
   reader.readAsDataURL(file);
 }
 
-/* ─── VERIFICATION UI (BANNERS IN PROFILE) ─── */
+/* ─── CARD ─── */
+function formatCard(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,16);
+  el.value = v.replace(/(\d{4})/g,'$1 ').trim();
+}
+
+async function saveCard() {
+  const rawNum = document.getElementById('cardNumber').value.replace(/\s/g,'');
+  const holder = document.getElementById('cardHolder').value.toUpperCase().trim();
+  if(rawNum.length < 16 || !holder) { showToast('Ma\'lumotlarni to\'liq kiriting', 'err'); return; }
+  
+  try {
+    const res = await fetch('/api/mentor/card', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        card_number: rawNum,         // full number for admin
+        card_last4: rawNum.slice(-4),
+        card_holder: holder
+      }),
+      credentials:'include'
+    });
+    const data = await res.json();
+    if(data.success) {
+      if(!mentorData) mentorData = {};
+      mentorData.card_last4 = rawNum.slice(-4);
+      mentorData.card_holder = holder;
+      const masked = '•••• •••• •••• ' + rawNum.slice(-4);
+      document.getElementById('cdNumber').textContent = masked;
+      document.getElementById('cdHolder').textContent = holder;
+      document.getElementById('wdCardNum').textContent = masked;
+      document.getElementById('wdCardHolder').textContent = holder;
+      closeModal('cardModal');
+      showToast('Karta saqlandi ✓');
+    } else {
+      showToast(data.error || 'Xatolik', 'err');
+    }
+  } catch(e) {
+    showToast('Server xatosi', 'err');
+  }
+}
+
+/* ─── CERTS ─── */
+function renderCerts() {
+  document.getElementById('certsList').innerHTML = certificates.length
+    ? certificates.map(c => `
+      <div class="cert-card">
+        <div class="cert-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 15l-2 5-1-5-5-1 5-2 1-5 2 5 5 1-5 2z" stroke="var(--gold)" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-4" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="cert-info">
+          <div class="cert-title">${escHtml(c.title)}</div>
+          <div class="cert-issuer">${escHtml(c.issuer||'—')} · ${c.issued_date||c.date||'—'}</div>
+          <div class="cert-actions">
+            ${c.file_url ? `<button class="btn btn-surface btn-sm" onclick="window.open('${c.file_url}','_blank')">Ko'rish</button>` : ''}
+            <button class="btn btn-red btn-sm" onclick="deleteCert('${c.id}')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><polyline points="3,6 5,6 21,6" stroke="currentColor" stroke-width="2"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2" stroke="currentColor" stroke-width="2"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>`).join('')
+    : '<div class="empty-state">Sertifikat yo\'q</div>';
+}
+
+async function addCert() {
+  const title = document.getElementById('certTitle').value.trim();
+  const issuer = document.getElementById('certIssuer').value.trim();
+  const date = document.getElementById('certDate').value;
+  
+  if(!title) { showToast('Nom kiriting', 'err'); return; }
+  
+  try {
+    const res = await fetch('/api/mentor/certificates', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({title, issuer: issuer||null, date: date||null}),
+      credentials:'include'
+    });
+    const data = await res.json();
+    if(data.success) {
+      certificates.push(data.certificate);
+      renderCerts();
+      closeModal('certModal');
+      document.getElementById('certTitle').value='';
+      document.getElementById('certIssuer').value='';
+      document.getElementById('certDate').value='';
+      showToast('Sertifikat qo\'shildi ✓');
+    } else {
+      showToast(data.error||'Xatolik','err');
+    }
+  } catch(e) {
+    showToast('Server xatosi','err');
+  }
+}
+
+async function deleteCert(id) {
+  if(!confirm('Sertifikatni o\'chirasizmi?')) return;
+  try {
+    const res = await fetch(`/api/mentor/certificates/${id}`, {
+      method:'DELETE', credentials:'include'
+    });
+    const data = await res.json();
+    if(data.success) {
+      certificates = certificates.filter(c=>c.id!==id);
+      renderCerts();
+      showToast('O\'chirildi');
+    }
+  } catch(e) {
+    showToast('O\'chirishda xato','err');
+  }
+}
+
+/* ─── STUDENT ID UPLOAD ─── */
+async function uploadStudentId(input) {
+  if(!input.files[0]) return;
+  const file = input.files[0];
+  const formData = new FormData();
+  formData.append('student_id', file);
+  
+  const zone = document.getElementById('studentIdZone');
+  zone.innerHTML = '<div style="padding:24px;text-align:center"><div class="spinner"></div><p style="margin-top:12px;font-size:13px;color:var(--text2)">Yuklanmoqda...</p></div>';
+  
+  try {
+    const res = await fetch('/api/mentor/upload-student-id', {
+      method:'POST', body:formData, credentials:'include'
+    });
+    const data = await res.json();
+    if(data.success) {
+      showToast('✅ Guvohnoma yuklandi!');
+      await loadVerificationStatus();
+    } else {
+      restoreStudentIdZone();
+      showToast('❌ ' + (data.error||'Yuklashda xato'), 'err');
+    }
+  } catch(e) {
+    restoreStudentIdZone();
+    showToast('❌ Server bilan bog\'lanib bo\'lmadi','err');
+  }
+}
+
+function restoreStudentIdZone() {
+  document.getElementById('studentIdZone').innerHTML = `
+    <div class="uz-icon" id="studentIdIcon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="var(--gold)" stroke-width="1.8"/><path d="M7 9h5M7 13h8M7 17h4" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </div>
+    <div class="uz-title" id="studentIdTitle">Talaba guvohnomasi</div>
+    <div class="uz-sub" id="studentIdSub">JPG, PNG yoki PDF · 5 MB gacha</div>
+    <div id="studentIdStatus" style="margin-top:8px;font-size:12px;font-weight:600"></div>`;
+}
+
+async function uploadCV(input) {
+  if(!input.files[0]) return;
+  const file = input.files[0];
+  const formData = new FormData();
+  formData.append('document', file);
+  formData.append('type', 'cv');
+  
+  try {
+    const res = await fetch('/api/mentor/documents', {
+      method:'POST', body:formData, credentials:'include'
+    });
+    const data = await res.json();
+    if(data.success) showToast('CV yuklandi ✓');
+    else showToast(data.error||'Xatolik','err');
+  } catch(e) {
+    showToast('Yuklashda xato','err');
+  }
+}
+
+/* ─── VERIFICATION UI ─── */
 function updateVerificationUI(data) {
   const bannerPending = document.getElementById('bannerPending');
   const bannerVerified = document.getElementById('bannerVerified');
   const homeBanner = document.getElementById('homeVerifyBanner');
 
   if(data.is_verified) {
+    // Profile page
     bannerPending.style.display = 'none';
-    bannerVerified.style.display = 'flex'; // Optional: yashil bannerni hammasi zo'r degani uchuni chiqarish mumkin
+    bannerVerified.style.display = 'flex';
+    // Home page - yashir
     if(homeBanner) homeBanner.style.display = 'none';
+    // Certs page
     updateStudentIdZone('verified');
 
   } else if(data.student_id_url) {
+    // Yuklagan, kutilmoqda
     bannerPending.style.display = 'flex';
     bannerVerified.style.display = 'none';
     document.getElementById('bannerTitle').textContent = '⏳ Tekshiruv kutilmoqda';
     document.getElementById('bannerMsg').textContent = 'Guvohnoma yuklandi, admin tekshirishi kutilmoqda';
-    
+    // Home banner - yashil emas, sariq
     if(homeBanner) {
       homeBanner.style.display = 'flex';
       homeBanner.style.background = 'rgba(240,165,0,0.1)';
       homeBanner.style.border = '1px solid rgba(240,165,0,0.25)';
       homeBanner.style.color = 'var(--gold)';
       document.getElementById('hvbTitle').textContent = '⏳ Tekshiruv kutilmoqda';
-      const daysText = data.days_left !== undefined ? (data.days_left > 0 ? `${data.days_left} kun qoldi` : data.days_left===0 ? 'Bugun so\'nggi kun!' : 'Muddati o\'tgan!') : 'Admin tekshirishi kutilmoqda';
+      const daysText = data.days_left !== undefined
+        ? (data.days_left > 0 ? `${data.days_left} kun qoldi` : data.days_left===0 ? 'Bugun so\'nggi kun!' : 'Muddati o\'tgan!')
+        : 'Admin tekshirishi kutilmoqda';
       document.getElementById('hvbMsg').textContent = daysText;
     }
     updateStudentIdZone('pending', data.days_left);
 
   } else {
+    // Yuklamagan
     bannerPending.style.display = 'flex';
     bannerVerified.style.display = 'none';
     document.getElementById('bannerTitle').textContent = '⚠️ Verifikatsiya talab qilinadi';
-    document.getElementById('bannerMsg').textContent = 'Guvohnomangizni yuklamasangiz profil o\'chiriladi';
-    
+    document.getElementById('bannerMsg').textContent = '3 kun ichida guvohnomangizni yuklamasangiz, profil o\'chiriladi';
+    // Home banner - qizil ogohlantirish
     if(homeBanner) {
       homeBanner.style.display = 'flex';
       const urgent = (data.days_left !== undefined && data.days_left <= 1);
@@ -1020,11 +1470,14 @@ function updateVerificationUI(data) {
       homeBanner.style.border = `1px solid ${urgent ? 'rgba(255,77,106,0.3)' : 'rgba(240,165,0,0.25)'}`;
       homeBanner.style.color = urgent ? 'var(--red)' : 'var(--gold)';
       if(data.days_left !== undefined) {
-        document.getElementById('hvbTitle').textContent = data.days_left <= 0 ? '🚨 Muddati o\'tdi!' : data.days_left === 1 ? '⚠️ Bugun so\'nggi kun!' : `⚠️ ${data.days_left} kun qoldi`;
+        document.getElementById('hvbTitle').textContent =
+          data.days_left <= 0 ? '🚨 Muddati o\'tdi! Profil o\'chiriladi'
+          : data.days_left === 1 ? '⚠️ Bugun so\'nggi kun!'
+          : `⚠️ ${data.days_left} kun qoldi`;
       } else {
         document.getElementById('hvbTitle').textContent = '⚠️ Verifikatsiya talab qilinadi';
       }
-      document.getElementById('hvbMsg').textContent = '3 kun ichida yuklang';
+      document.getElementById('hvbMsg').textContent = '3 kun ichida guvohnomangizni yuklang';
     }
     updateStudentIdZone('none');
   }
@@ -1033,6 +1486,7 @@ function updateVerificationUI(data) {
 function updateStudentIdZone(status, daysLeft) {
   const zone = document.getElementById('studentIdZone');
   if(!zone) return;
+  
   const icons = {
     verified: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round"/></svg>`,
     pending: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="var(--gold)" stroke-width="1.8"/><path d="M12 7v5l3 3" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round"/></svg>`,
@@ -1044,31 +1498,170 @@ function updateStudentIdZone(status, daysLeft) {
     none: {border:'var(--border2)',bg:'var(--s1)',title:'Talaba guvohnomasi',sub:'JPG, PNG yoki PDF · 5 MB gacha',status:'<span style="color:var(--red)">✕ Yuklanmagan</span>',clickable:true}
   };
   const c = configs[status] || configs.none;
+  
   zone.style.borderColor = c.border;
   zone.style.background = c.bg;
   zone.style.cursor = c.clickable ? 'pointer' : 'default';
   zone.onclick = c.clickable ? () => document.getElementById('studentIdInput').click() : null;
-  zone.innerHTML = `<div class="uz-icon">${icons[status]}</div><div class="uz-title">${c.title}</div><div class="uz-sub">${c.sub}</div><div style="margin-top:8px;font-size:12px;font-weight:600">${c.status}</div>`;
+  
+  zone.innerHTML = `
+    <div class="uz-icon">${icons[status]}</div>
+    <div class="uz-title">${c.title}</div>
+    <div class="uz-sub">${c.sub}</div>
+    <div style="margin-top:8px;font-size:12px;font-weight:600">${c.status}</div>`;
 }
 
-/* ─── EARNINGS, SESSIONS, MODALS (O'ZGARISHSZ) ─── */
+/* ─── EARNINGS ─── */
 function renderEarnings() {
   const totalEarned = pointsHistory.filter(p=>p.points>0).reduce((s,p)=>s+p.points,0);
   const paidOut = pointsHistory.filter(p=>p.points<0&&p.reason==='withdrawal').reduce((s,p)=>s+Math.abs(p.points),0);
+  
   document.getElementById('totalEarned').textContent = fmt(totalEarned);
   document.getElementById('pendingPayout').textContent = fmt(mentorData?.balance||0);
   document.getElementById('paidOut').textContent = fmt(paidOut);
   document.getElementById('sessCount').textContent = mentorData?.total_sessions||0;
-  document.getElementById('pointsHistory').innerHTML = pointsHistory.length ? pointsHistory.map(p => `<div class="point-item"><div class="pi-left"><h4>${escHtml(p.reason_text || p.reason || 'Tranzaksiya')}</h4><p>${fmtDateShort(p.created_at)}</p></div><div class="pi-amount ${p.points>0?'pi-plus':'pi-minus'}">${p.points>0?'+':''}${fmt(p.points)} so'm</div></div>`).join('') : '<div class="empty-state">Tranzaksiya tarixi yo\'q</div>';
+  
+  const reasonText = {
+    session_completed:'Sessiya yakunlandi',
+    bonus:'Bonus',
+    withdrawal:'Pul yechildi',
+    penalty:'Jarima',
+    refund:'Qaytarildi'
+  };
+  
+  document.getElementById('pointsHistory').innerHTML = pointsHistory.length
+    ? pointsHistory.map(p => `
+      <div class="point-item">
+        <div class="pi-left">
+          <h4>${escHtml(p.reason_text || reasonText[p.reason] || p.reason || 'Tranzaksiya')}</h4>
+          <p>${fmtDateShort(p.created_at)}</p>
+        </div>
+        <div class="pi-amount ${p.points>0?'pi-plus':'pi-minus'}">
+          ${p.points>0?'+':''}${fmt(p.points)} so'm
+        </div>
+      </div>`).join('')
+    : '<div class="empty-state">Tranzaksiya tarixi yo\'q</div>';
 }
 
+/* ─── SESSIONS ─── */
 function filterSessions(filter, btn) {
   document.querySelectorAll('.sf-chip').forEach(c=>c.classList.remove('active'));
   if(btn) btn.classList.add('active');
-  const list = filter==='all' ? sessions : sessions.filter(s=>s.status===filter);
-  document.getElementById('sessionsListMentor').innerHTML = list.length ? list.map(s=>sessionItemHTML(s)).join('') : emptyState('Sessiya yo\'q');
+  renderSessions(filter);
 }
 
+function renderSessions(filter) {
+  const list = filter==='all' ? sessions : sessions.filter(s=>s.status===filter);
+  document.getElementById('sessionsListMentor').innerHTML = list.length
+    ? list.map(s=>sessionItemHTML(s)).join('')
+    : emptyState('Sessiya yo\'q');
+}
+
+async function confirmSession(id) {
+  try {
+    const res = await fetch(`/api/sessions/${id}/confirm`, {method:'POST', credentials:'include'});
+    const data = await res.json();
+    if(data.success) {
+      const s = sessions.find(x=>x.id===id);
+      if(s) s.status = 'confirmed';
+      renderHome();
+      renderSessions('all');
+      showToast('Sessiya tasdiqlandi ✓');
+    } else {
+      showToast(data.error||'Xatolik','err');
+    }
+  } catch(e) {
+    showToast('Server xatosi','err');
+  }
+}
+
+async function rejectSession(id) {
+  try {
+    const res = await fetch(`/api/sessions/${id}/reject`, {method:'POST', credentials:'include'});
+    const data = await res.json();
+    if(data.success) {
+      const s = sessions.find(x=>x.id===id);
+      if(s) s.status = 'cancelled';
+      renderHome();
+      renderSessions('all');
+      showToast('Rad etildi');
+    } else {
+      showToast(data.error||'Xatolik','err');
+    }
+  } catch(e) {
+    showToast('Server xatosi','err');
+  }
+}
+
+function openSessionDetail(id) {
+  const s = sessions.find(x=>x.id===id);
+  if(!s) return;
+  
+  const pts = s.session_type==='individual' ? 8000 : s.session_type==='group' ? 2000 : 0;
+  const statusBadge = {
+    pending:'<span class="badge b-gold">Kutilmoqda</span>',
+    confirmed:'<span class="badge b-teal">Tasdiqlangan</span>',
+    completed:'<span class="badge b-green">Tugallandi</span>',
+    cancelled:'<span class="badge b-red">Bekor qilindi</span>'
+  };
+  
+  document.getElementById('sessionDetailContent').innerHTML = `
+    <div style="padding:0 0 16px">
+      <div class="modal-title">${escHtml(s.student_name||'Foydalanuvchi')}</div>
+      <div style="margin-top:4px">${statusBadge[s.status]||''}</div>
+    </div>
+    <div class="info-list" style="margin:0 0 16px">
+      <div class="il-row"><span class="il-label">Tur</span><span class="il-val">${s.session_type==='individual'?'Individual':s.session_type==='group'?'Guruh':s.session_type||'—'}</span></div>
+      <div class="il-row"><span class="il-label">Vaqt</span><span class="il-val">${fmtDate(s.scheduled_at)}</span></div>
+      <div class="il-row"><span class="il-label">Davomiyligi</span><span class="il-val">${s.duration_min||60} daqiqa</span></div>
+      <div class="il-row"><span class="il-label">To'lov</span><span class="il-val" style="color:var(--teal)">${fmt(pts)} so'm</span></div>
+      ${s.notes?`<div class="il-row"><span class="il-label">Izoh</span><span class="il-val" style="font-size:12px">${escHtml(s.notes)}</span></div>`:''}
+    </div>
+    ${s.status==='pending'?`
+    <div class="modal-btns">
+      <button class="btn btn-teal" onclick="confirmSession('${s.id}');closeModal('sessionDetailModal')">✓ Tasdiqlash</button>
+      <button class="btn btn-red" onclick="rejectSession('${s.id}');closeModal('sessionDetailModal')">✕ Rad etish</button>
+    </div>`:''}
+    ${s.meet_link?`<a href="${s.meet_link}" target="_blank" class="btn btn-purple" style="margin-top:10px">🎥 Meeting ga kirish</a>`:''}`;
+  
+  openModal('sessionDetailModal');
+}
+
+/* ─── WITHDRAW ─── */
+function openWithdrawModal() {
+  document.getElementById('withdrawSub').textContent = 'Mavjud balans: ' + fmt(mentorData?.balance||0) + ' so\'m';
+  document.getElementById('withdrawAmount').value = '';
+  openModal('withdrawModal');
+}
+
+async function submitWithdraw() {
+  const amt = parseInt(document.getElementById('withdrawAmount').value);
+  const balance = mentorData?.balance || 0;
+  
+  if(!amt || amt < 50000) { showToast('Minimal 50,000 so\'m', 'err'); return; }
+  if(amt > balance) { showToast('Balans yetarli emas', 'err'); return; }
+  if(!(mentorData?.card_last4)) { showToast('Avval karta raqamini kiriting', 'err'); closeModal('withdrawModal'); openModal('cardModal'); return; }
+  
+  try {
+    const res = await fetch('/api/mentor/withdraw', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({amount:amt}),
+      credentials:'include'
+    });
+    const data = await res.json();
+    if(data.success) {
+      closeModal('withdrawModal');
+      showToast('So\'rov yuborildi ✓ Admin tasdiqlashi kutilmoqda');
+    } else {
+      showToast(data.error||'Xatolik','err');
+    }
+  } catch(e) {
+    showToast('Server xatosi','err');
+  }
+}
+
+/* ─── NAV ─── */
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
@@ -1077,72 +1670,350 @@ function showPage(name) {
   const ni = document.getElementById('ni-'+name);
   if(ni) ni.classList.add('active');
   document.querySelector('.content')?.scrollTo(0,0);
+  // Lazy load new pages
   if (name === 'news') loadMentorNews();
   if (name === 'videos') loadMentorVideos();
   if (name === 'notif') { loadMentorNotifs(); markMentorNotifsRead(); }
 }
 
-function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = ''; }
+/* ─── MODAL ─── */
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
 
-async function logout() { try { await fetch('/api/logout', {method:'POST', credentials:'include'}); } catch(e){} window.location.href = 'login.html'; }
+/* ─── LOGOUT ─── */
+async function logout() {
+  try {
+    await fetch('/api/logout', {method:'POST', credentials:'include'});
+  } catch(e){}
+  window.location.href = 'login.html';
+}
 
-function fmt(n) { if(n===undefined||n===null) return '0'; return Math.abs(n).toLocaleString('uz-UZ'); }
+/* ─── UTILS ─── */
+function fmt(n) {
+  if(n===undefined||n===null) return '0';
+  return Math.abs(n).toLocaleString('uz-UZ');
+}
+
 function fmtDate(dateStr) {
   if(!dateStr) return '—';
-  const d = new Date(dateStr); const now = new Date(); const diff = d - now;
-  if(diff < 0) { const ago = Math.floor(-diff/86400000); return ago===0 ? 'Bugun' : ago===1 ? 'Kecha' : `${ago} kun oldin`; }
-  const days = Math.floor(diff/86400000); const t = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-  if(days===0) return `Bugun ${t}`; if(days===1) return `Ertaga ${t}`; return `${d.getDate()}.${d.getMonth()+1} ${t}`;
+  const d = new Date(dateStr);
+  const now = new Date();
+  const diff = d - now;
+  if(diff < 0) {
+    const ago = Math.floor(-diff/86400000);
+    return ago===0 ? 'Bugun' : ago===1 ? 'Kecha' : `${ago} kun oldin`;
+  }
+  const days = Math.floor(diff/86400000);
+  const t = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  if(days===0) return `Bugun ${t}`;
+  if(days===1) return `Ertaga ${t}`;
+  return `${d.getDate()}.${d.getMonth()+1} ${t}`;
 }
-function fmtDateShort(dateStr) { if(!dateStr) return '—'; const d = new Date(dateStr); return `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`; }
-function strColor(str) { let h=0; for(let i=0;i<str.length;i++) h=str.charCodeAt(i)+((h<<5)-h); const colors=['#1e3a6e','#2d1b69','#1a3a2a','#3a1a2a','#6e1e3a','#1e4040','#2a1a40']; return colors[Math.abs(h)%colors.length]; }
-function escHtml(str) { if(!str) return ''; return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function fmtDateShort(dateStr) {
+  if(!dateStr) return '—';
+  const d = new Date(dateStr);
+  return `${d.getDate()}.${d.getMonth()+1}.${d.getFullYear()}`;
+}
+
+function strColor(str) {
+  let h=0;
+  for(let i=0;i<str.length;i++) h=str.charCodeAt(i)+((h<<5)-h);
+  const colors=['#1e3a6e','#2d1b69','#1a3a2a','#3a1a2a','#6e1e3a','#1e4040','#2a1a40'];
+  return colors[Math.abs(h)%colors.length];
+}
+
+function escHtml(str) {
+  if(!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
 let toastTimer;
 function showToast(msg, type='ok') {
   clearTimeout(toastTimer);
   let el = document.getElementById('_toast');
-  if(!el) { el = document.createElement('div'); el.id = '_toast'; el.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1A2A4A;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.5);white-space:nowrap;transition:opacity .3s;pointer-events:none;max-width:90vw;text-align:center'; document.body.appendChild(el); }
-  el.textContent = msg; el.style.borderLeft = type==='err' ? '3px solid var(--red)' : '3px solid var(--teal)'; el.style.opacity = '1'; toastTimer = setTimeout(() => el.style.opacity='0', 2800);
+  if(!el) {
+    el = document.createElement('div');
+    el.id = '_toast';
+    el.style.cssText = 'position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1A2A4A;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.5);white-space:nowrap;transition:opacity .3s;pointer-events:none;max-width:90vw;text-align:center';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.borderLeft = type==='err' ? '3px solid var(--red)' : '3px solid var(--teal)';
+  el.style.opacity = '1';
+  toastTimer = setTimeout(() => el.style.opacity='0', 2800);
 }
 
 /* ══════════════════════════════════════════
-   YANGILIKLAR, VIDEOLAR, NOTIF
+   YANGILIKLAR — MENTOR SIDE
 ══════════════════════════════════════════ */
 let _mNews = [], _mNewsLoaded = false;
-async function loadMentorNews() {
-  if (_mNewsLoaded) return; const el = document.getElementById('mentorNewsList'); el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">Yuklanmoqda...</div>';
-  try { const res = await fetch('/api/news?target=mentor'); const d = await res.json(); _mNews = d.success ? d.news : _demoMentorNews(); } catch { _mNews = _demoMentorNews(); }
-  _mNewsLoaded = true; _renderMentorNews(_mNews); _checkMentorNewsBadge();
-}
-function _demoMentorNews() { return [{id:'m1',title:'📋 Yangi to\'lov tizimi ishga tushdi',content:'Endi sessiyangizdagi to\'lovlar 24 soat ichida balansga tushadi.',image_url:'',link:'',category:'update',priority:'high',targets:['mentor'],created_at:new Date().toISOString()},{id:'m2',title:'📅 Mentor webinari',content:'Kelasi juma kuni mentor webinari bo\'lib o\'tadi.',image_url:'',link:'https://t.me/connectu_admin',category:'event',priority:'normal',targets:['mentor'],created_at:new Date(Date.now()-86400000*2).toISOString()}]; }
-function _renderMentorNews(list) { const el = document.getElementById('mentorNewsList'); if (!list.length) { el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text2)"><div style="font-size:32px;margin-bottom:8px">📭</div>Yangiliklar yo\'q</div>'; return; } const catIcon = {general:'📢',update:'🔄',event:'📅',urgent:'⚠️'}; const prioClass = {critical:'p-critical',high:'p-high'}; el.innerHTML = list.map(n => `<div class="m-news-card ${prioClass[n.priority]||''}" ${n.link?`onclick="openExtM('${n.link}')"`:''}>${n.image_url?`<img class="mnc-img" src="${n.image_url}">`:''}<div class="mnc-body"><div class="mnc-tags"><span style="background:var(--gold-d);color:var(--gold);padding:2px 9px;border-radius:20px;font-size:10px;font-weight:600">${catIcon[n.category]||'📢'} ${n.category==='update'?'Yangilanish':n.category==='event'?'Tadbir':n.category==='urgent'?'Muhim':'Umumiy'}</span></div><div class="mnc-title">${n.title}</div><div class="mnc-desc">${n.content||''}</div><div class="mnc-foot"><span style="font-size:11px;color:var(--text2)">${_mTimeAgo(n.created_at)}</span>${n.link?`<span class="mnc-link">Batafsil</span>`:''}</div></div></div>`).join(''); }
-function filterMentorNews(f, btn) { document.querySelectorAll('#mentorNewsFilterBar .chip').forEach(c => c.classList.remove('active')); btn.classList.add('active'); const list = f === 'all' ? _mNews : _mNews.filter(n => n.category === f || n.priority === f); _renderMentorNews(list); }
-function _checkMentorNewsBadge() { const lastSeen = parseInt(localStorage.getItem('cu_mentor_news_seen')||'0'); const hasNew = _mNews.some(n => new Date(n.created_at).getTime() > lastSeen); const b = document.getElementById('mNewsBadge'); if (b) b.style.display = hasNew ? 'block' : 'none'; }
 
-let _mVideos = [], _mVideosLoaded = false, _mvAccessVal = 'free';
-function setMvAccess(val, el) { _mvAccessVal = val; document.querySelectorAll('#mvAccFree,#mvAccPrem').forEach(e => e.classList.remove('active')); el.classList.add('active'); }
-function mvAutoThumb(url) { const m = (url||'').match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/); if (m) { const t = `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg`; document.getElementById('mvThumb').value = t; document.getElementById('mvThumbImg').src = t; document.getElementById('mvThumbPreview').style.display = 'block'; } }
-async function loadMentorVideos() {
-  if (_mVideosLoaded) return; const el = document.getElementById('mentorVideoList'); el.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text2)">Yuklanmoqda...</div>';
-  try { const mid = currentUser?.id; const res = await fetch(mid ? `/api/materials?mentor_id=${mid}` : '/api/materials'); const d = await res.json(); _mVideos = d.success ? d.materials.filter(m => !m.mentor_name || m.mentor_name === currentUser?.full_name) : _demoMentorVideos(); } catch { _mVideos = _demoMentorVideos(); }
-  _mVideosLoaded = true; _renderMentorVideos(_mVideos); renderProfileMiniSections(); // Refresh Reels in profile
+async function loadMentorNews() {
+  if (_mNewsLoaded) return;
+  const el = document.getElementById('mentorNewsList');
+  el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">Yuklanmoqda...</div>';
+  try {
+    const res = await fetch('/api/news?target=mentor');
+    const d = await res.json();
+    _mNews = d.success ? d.news : _demoMentorNews();
+  } catch { _mNews = _demoMentorNews(); }
+  _mNewsLoaded = true;
+  _renderMentorNews(_mNews);
+  _checkMentorNewsBadge();
+  _mNews.slice(0, 2).forEach(n => _addMentorNotif({
+    id:'news_'+n.id,type:'news',icon:'📰',iconBg:'rgba(240,165,0,0.12)',
+    title:n.title,desc:(n.content||'').slice(0,80)+'...',time:n.created_at,
+    read:false,onTap:()=>showPage('news')
+  }));
 }
-function _demoMentorVideos() { return [{id:'mv1',title:'Matematika formulalari — DTM 2025',url:'https://www.youtube.com/watch?v=dQw4w9WgXcQ',thumbnail:'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg',access:'free',views:124,likes:18},{id:'mv2',title:'TDYU kirish imtihoniga tayyorlash',url:'',thumbnail:'',access:'premium',views:56,likes:9}]; }
-function _mYtThumb(url) { const m = (url||'').match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/); return m ? `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg` : null; }
+function _demoMentorNews() {
+  return [
+    {id:'m1',title:'📋 Yangi to\'lov tizimi ishga tushdi',content:'Endi sessiyangizdagi to\'lovlar 24 soat ichida balansga tushadi. Karta ulash uchun profil sahifasiga o\'ting.',image_url:'',link:'',category:'update',priority:'high',targets:['mentor'],created_at:new Date().toISOString()},
+    {id:'m2',title:'📅 Mentor webinari: Dars o\'tish texnikasi',content:'Kelasi juma kuni mentor webinari bo\'lib o\'tadi. Yangi dars o\'tish metodologiyasini o\'rganing.',image_url:'',link:'https://t.me/connectu_admin',category:'event',priority:'normal',targets:['mentor'],created_at:new Date(Date.now()-86400000*2).toISOString()},
+    {id:'m3',title:'⚠️ Profil to\'ldirilmagan mentorlar uchun',content:'30% dan kam to\'ldirilgan profil 3 kun ichida archivga o\'tkaziladi. Profilingizni to\'ldiring.',image_url:'',link:'',category:'urgent',priority:'critical',targets:['mentor'],created_at:new Date(Date.now()-86400000*3).toISOString()},
+  ];
+}
+function _renderMentorNews(list) {
+  const el = document.getElementById('mentorNewsList');
+  if (!list.length) { el.innerHTML = '<div style="text-align:center;padding:48px;color:var(--text2)"><div style="font-size:32px;margin-bottom:8px">📭</div>Yangiliklar yo\'q</div>'; return; }
+  const catIcon = {general:'📢',update:'🔄',event:'📅',urgent:'⚠️'};
+  const prioClass = {critical:'p-critical',high:'p-high'};
+  el.innerHTML = list.map(n => `
+    <div class="m-news-card ${prioClass[n.priority]||''}" ${n.link?`onclick="openExtM('${n.link}')"`:''}>
+      ${n.image_url?`<img class="mnc-img" src="${n.image_url}" alt="" loading="lazy">`:''}
+      <div class="mnc-body">
+        <div class="mnc-tags">
+          <span style="background:var(--gold-d);color:var(--gold);padding:2px 9px;border-radius:20px;font-size:10px;font-weight:600">${catIcon[n.category]||'📢'} ${n.category==='update'?'Yangilanish':n.category==='event'?'Tadbir':n.category==='urgent'?'Muhim':'Umumiy'}</span>
+          ${n.priority==='critical'?'<span style="background:rgba(255,77,106,0.15);color:var(--red);padding:2px 9px;border-radius:20px;font-size:10px;font-weight:600">📌 Pinned</span>':''}
+        </div>
+        <div class="mnc-title">${n.title}</div>
+        <div class="mnc-desc">${n.content||''}</div>
+        <div class="mnc-foot">
+          <span style="font-size:11px;color:var(--text2)">${_mTimeAgo(n.created_at)}</span>
+          ${n.link?`<span class="mnc-link"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" stroke="currentColor" stroke-width="2"/><polyline points="15,3 21,3 21,9" stroke="currentColor" stroke-width="2"/><line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" stroke-width="2"/></svg> Batafsil</span>`:''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+function filterMentorNews(f, btn) {
+  document.querySelectorAll('#mentorNewsFilterBar .chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  const list = f === 'all' ? _mNews : _mNews.filter(n => n.category === f || n.priority === f);
+  _renderMentorNews(list);
+}
+function _checkMentorNewsBadge() {
+  const lastSeen = parseInt(localStorage.getItem('cu_mentor_news_seen')||'0');
+  const hasNew = _mNews.some(n => new Date(n.created_at).getTime() > lastSeen);
+  const b = document.getElementById('mNewsBadge');
+  if (b) b.style.display = hasNew ? 'block' : 'none';
+  
+  const pBadge = document.getElementById('pNewsBadge');
+  if (pBadge) pBadge.style.display = hasNew ? 'inline-block' : 'none';
+}
+
+/* ══════════════════════════════════════════
+   VIDEO MATERIALLAR — MENTOR SIDE
+══════════════════════════════════════════ */
+let _mVideos = [], _mVideosLoaded = false, _mvAccessVal = 'free';
+
+function setMvAccess(val, el) {
+  _mvAccessVal = val;
+  document.querySelectorAll('#mvAccFree,#mvAccPrem').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+}
+function mvAutoThumb(url) {
+  const m = (url||'').match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+  if (m) {
+    const t = `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg`;
+    document.getElementById('mvThumb').value = t;
+    const img = document.getElementById('mvThumbImg');
+    img.src = t; document.getElementById('mvThumbPreview').style.display = 'block';
+  }
+}
+async function loadMentorVideos() {
+  if (_mVideosLoaded) return;
+  const el = document.getElementById('mentorVideoList');
+  el.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text2)">Yuklanmoqda...</div>';
+  try {
+    const mid = currentMentor?.id;
+    const res = await fetch(mid ? `/api/materials?mentor_id=${mid}` : '/api/materials');
+    const d = await res.json();
+    _mVideos = d.success ? d.materials.filter(m => !m.mentor_name || m.mentor_name === currentMentor?.name) : _demoMentorVideos();
+  } catch { _mVideos = _demoMentorVideos(); }
+  _mVideosLoaded = true;
+  _renderMentorVideos(_mVideos);
+}
+function _demoMentorVideos() {
+  return [
+    {id:'mv1',title:'Matematika formulalari — DTM 2025',url:'https://www.youtube.com/watch?v=dQw4w9WgXcQ',thumbnail:'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg',access:'free',views:124,likes:18},
+    {id:'mv2',title:'TDYU kirish imtihoniga tayyorlash',url:'',thumbnail:'',access:'premium',views:56,likes:9},
+  ];
+}
+function _mYtThumb(url) {
+  const m = (url||'').match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
+  return m ? `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg` : null;
+}
 function _renderMentorVideos(list) {
   const el = document.getElementById('mentorVideoList');
-  if (!list.length) { el.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--text2)"><div style="font-size:36px;margin-bottom:10px">🎬</div><div style="font-weight:700;margin-bottom:6px">Hali video yo'q</div><button class="btn-act" onclick="openModal('videoModal')" style="margin:0 auto">Video qo'shish</button></div>`; return; }
-  el.innerHTML = list.map(v => { const isPrem = v.access === 'premium'; const thumb = v.thumbnail || _mYtThumb(v.url||'') || ''; return `<div class="mv-card"><div class="mv-thumb">${thumb ? `<img src="${thumb}">` : `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" opacity="0.2"><polygon points="5,3 19,12 5,21" fill="currentColor"/></svg>`}<div class="mv-overlay"><div class="mv-play"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><polygon points="5,3 19,12 5,21" fill="#040810"/></svg></div></div><div style="position:absolute;top:6px;right:6px"><span style="font-size:9px;padding:2px 6px;border-radius:10px;font-weight:700;background:${isPrem?'rgba(240,165,0,.9)':'rgba(0,191,166,.9)'};color:#040810">${isPrem?'⭐ Premium':'✓ Bepul'}</span></div></div><div class="mv-body"><div class="mv-title">${v.title}</div><div class="mv-meta"><span class="mv-stats">${v.views||0} ko'rildi · ${v.likes||0} ♥</span></div></div></div>`; }).join('');
+  if (!list.length) {
+    el.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--text2)">
+      <div style="font-size:36px;margin-bottom:10px">🎬</div>
+      <div style="font-weight:700;margin-bottom:6px">Hali video yo'q</div>
+      <div style="font-size:13px;margin-bottom:16px">Birinchi videongizni qo'shing</div>
+      <button class="btn-act" onclick="openModal('videoModal')" style="margin:0 auto">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+        Video qo'shish
+      </button></div>`;
+    return;
+  }
+  el.innerHTML = list.map(v => {
+    const isPrem = v.access === 'premium';
+    const thumb = v.thumbnail || _mYtThumb(v.url||'') || '';
+    return `<div class="mv-card">
+      <div class="mv-thumb">
+        ${thumb ? `<img src="${thumb}" alt="" loading="lazy">` : `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" opacity="0.2"><polygon points="5,3 19,12 5,21" fill="currentColor"/></svg>`}
+        <div class="mv-overlay"><div class="mv-play"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><polygon points="5,3 19,12 5,21" fill="#040810"/></svg></div></div>
+        <div style="position:absolute;top:6px;right:6px">
+          <span style="font-size:9px;padding:2px 6px;border-radius:10px;font-weight:700;background:${isPrem?'rgba(240,165,0,.9)':'rgba(0,191,166,.9)'};color:#040810">${isPrem?'⭐ Premium':'✓ Bepul'}</span>
+        </div>
+        <div style="position:absolute;bottom:6px;right:6px;display:flex;gap:4px">
+          <button onclick="deleteMentorVideo('${v.id}')" style="width:24px;height:24px;border-radius:6px;background:rgba(255,77,106,.8);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center" title="O'chirish">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><polyline points="3,6 5,6 21,6" stroke="white" stroke-width="2"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6" stroke="white" stroke-width="2"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="mv-body">
+        <div class="mv-title">${v.title}</div>
+        <div class="mv-meta">
+          <span class="mv-stats">${v.views||0} ko'rildi · ${v.likes||0} ♥</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 }
-function filterMentorVideos(f, btn) { document.querySelectorAll('#mentorVideoFilterBar .chip').forEach(c => c.classList.remove('active')); btn.classList.add('active'); const list = f === 'all' ? _mVideos : _mVideos.filter(v => v.access === f); _renderMentorVideos(list); }
+function filterMentorVideos(f, btn) {
+  document.querySelectorAll('#mentorVideoFilterBar .chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  const list = f === 'all' ? _mVideos : _mVideos.filter(v => v.access === f);
+  _renderMentorVideos(list);
+}
+async function saveMentorVideo() {
+  const title = document.getElementById('mvTitle').value.trim();
+  const url = document.getElementById('mvUrl').value.trim();
+  if (!title || !url) { showToast('Sarlavha va URL kiriting'); return; }
+  const payload = {
+    title, url, access: _mvAccessVal,
+    thumbnail: document.getElementById('mvThumb').value || null,
+    description: document.getElementById('mvDesc').value || '',
+    mentor_name: currentMentor?.name || '',
+    mentor_id: currentMentor?.id || null,
+  };
+  try {
+    await fetch('/api/mentor/materials', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload), credentials: 'include' });
+    closeModal('videoModal');
+    ['mvTitle','mvUrl','mvThumb','mvDesc'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('mvThumbPreview').style.display = 'none';
+    _mVideosLoaded = false;
+    loadMentorVideos();
+    showToast('✅ Video saqlandi');
+  } catch { showToast('Xatolik yuz berdi'); }
+}
+async function deleteMentorVideo(id) {
+  if (!confirm("Bu videoni o'chirasizmi?")) return;
+  try {
+    await fetch(`/api/materials/${id}`, { method: 'DELETE', credentials: 'include' });
+    _mVideos = _mVideos.filter(v => v.id !== id);
+    _renderMentorVideos(_mVideos);
+    showToast('O\'chirildi');
+  } catch { showToast('Xatolik'); }
+}
 
+/* ══════════════════════════════════════════
+   BILDIRISHNOMALAR — MENTOR SIDE
+══════════════════════════════════════════ */
 let _mNotifs = [];
-function loadMentorNotifs() { if (!_mNotifs.find(n => n.id === 'sys_welcome')) { _mNotifs.unshift({id:'sys_welcome',type:'system',icon:'🎉',iconBg:'rgba(0,191,166,0.12)',title:'Mentor paneliga xush kelibsiz!',desc:'Profilingizni to\'ldiring va birinchi sessiyani oling.',time:new Date(Date.now()-86400000*2).toISOString(),read:true}); } _renderMentorNotifs(); }
-function _renderMentorNotifs() { const el = document.getElementById('mentorNotifList'); if (!_mNotifs.length) { el.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text2)"><div style="font-size:40px;margin-bottom:12px">🔔</div><div style="font-weight:600;margin-bottom:6px">Bildirishnomalar yo\'q</div></div>'; return; } el.innerHTML = _mNotifs.map(n => `<div class="mnotif-item ${n.read?'read':''}" onclick="showPage('news')"><div class="mni-icon" style="background:${n.iconBg||'rgba(255,255,255,0.06)'}">${n.icon||'🔔'}</div><div class="mni-body"><div class="mni-title">${n.title}</div><div class="mni-desc">${n.desc||''}</div><div class="mni-time">${_mTimeAgo(n.time)}</div></div>${!n.read ? '<div class="mni-dot"></div>' : '<div style="width:8px"></div>'}</div>`).join(''); }
-function markMentorNotifsRead() { localStorage.setItem('cu_mentor_news_seen', Date.now().toString()); setTimeout(() => { _mNotifs.forEach(n => n.read = true); _renderMentorNotifs(); }, 4000); }
-function _mTimeAgo(str) { if (!str) return ''; const d = new Date(str); const sec = Math.floor((Date.now()-d)/1000); if (sec < 60) return 'Hozirgina'; if (sec < 3600) return Math.floor(sec/60) + ' daq. oldin'; if (sec < 86400) return Math.floor(sec/3600) + ' soat oldin'; return d.toLocaleDateString('uz-UZ'); }
+
+function _addMentorNotif(n) {
+  if (_mNotifs.find(x => x.id === n.id)) return;
+  _mNotifs.unshift(n);
+  _updateMentorBadge();
+}
+function _updateMentorBadge() {
+  const unread = _mNotifs.filter(n => !n.read).length;
+  const b = document.getElementById('mNotifBadge');
+  if (b) b.style.display = unread > 0 ? 'block' : 'none';
+  
+  const pBadge = document.getElementById('pNotifBadge');
+  if (pBadge) {
+    pBadge.style.display = unread > 0 ? 'inline-block' : 'none';
+    pBadge.textContent = unread + ' yangi';
+  }
+}
+function loadMentorNotifs() {
+  if (!_mNotifs.find(n => n.id === 'sys_welcome')) {
+    _addMentorNotif({id:'sys_welcome',type:'system',icon:'🎉',iconBg:'rgba(0,191,166,0.12)',title:'Mentor paneliga xush kelibsiz!',desc:'Profilingizni to\'ldiring va birinchi sessiyani oling.',time:new Date(Date.now()-86400000*2).toISOString(),read:true});
+  }
+  _renderMentorNotifs();
+}
+function _renderMentorNotifs() {
+  const el = document.getElementById('mentorNotifList');
+  if (!_mNotifs.length) {
+    el.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text2)"><div style="font-size:40px;margin-bottom:12px">🔔</div><div style="font-weight:600;margin-bottom:6px">Bildirishnomalar yo\'q</div><div style="font-size:13px">Yangiliklar va sessiya xabarlar shu yerda</div></div>';
+    return;
+  }
+  el.innerHTML = _mNotifs.map(n => `
+    <div class="mnotif-item ${n.read?'read':''}" onclick="_tapMentorNotif('${n.id}')">
+      <div class="mni-icon" style="background:${n.iconBg||'rgba(255,255,255,0.06)'}">${n.icon||'🔔'}</div>
+      <div class="mni-body">
+        <div class="mni-title">${n.title}</div>
+        <div class="mni-desc">${n.desc||''}</div>
+        <div class="mni-time">${_mTimeAgo(n.time)}</div>
+      </div>
+      ${!n.read ? '<div class="mni-dot"></div>' : '<div style="width:8px"></div>'}
+    </div>`).join('');
+}
+function _tapMentorNotif(id) {
+  const n = _mNotifs.find(x => x.id === id);
+  if (!n) return;
+  n.read = true;
+  _updateMentorBadge();
+  if (n.type === 'news') { showPage('news'); return; }
+  if (n.onTap) n.onTap();
+  _renderMentorNotifs();
+}
+function markMentorNotifsRead() {
+  localStorage.setItem('cu_mentor_news_seen', Date.now().toString());
+  setTimeout(() => {
+    _mNotifs.forEach(n => n.read = true);
+    _updateMentorBadge();
+    const pb = document.getElementById('pNewsBadge');
+    if(pb) pb.style.display = 'none';
+    _renderMentorNotifs();
+  }, 4000);
+}
+function openExtM(url) {
+  if (window.Telegram?.WebApp?.openLink) Telegram.WebApp.openLink(url);
+  else window.open(url, '_blank');
+}
+function _mTimeAgo(str) {
+  if (!str) return '';
+  const d = new Date(str); const sec = Math.floor((Date.now()-d)/1000);
+  if (sec < 60) return 'Hozirgina';
+  if (sec < 3600) return Math.floor(sec/60) + ' daqiqa oldin';
+  if (sec < 86400) return Math.floor(sec/3600) + ' soat oldin';
+  if (sec < 7*86400) return Math.floor(sec/86400) + ' kun oldin';
+  return d.toLocaleDateString('uz-UZ');
+}
+
+/* ─── START ─── */
+window.addEventListener('load', init);
 
 /* ─── THEME ─── */
 function toggleTheme() {
@@ -1150,14 +2021,19 @@ function toggleTheme() {
   localStorage.setItem('cu_mentor_theme', isLight ? 'light' : 'dark');
   document.getElementById('themeLabel').textContent = isLight ? 'Qora rejim' : 'Oq rejim';
 }
+
 function applyTheme() {
   const t = localStorage.getItem('cu_mentor_theme');
-  if (t === 'light') { document.body.classList.add('light-theme'); const lbl = document.getElementById('themeLabel'); if (lbl) lbl.textContent = 'Qora rejim'; }
+  if (t === 'light') {
+    document.body.classList.add('light-theme');
+    const lbl = document.getElementById('themeLabel');
+    if (lbl) lbl.textContent = 'Qora rejim';
+  }
 }
 
-/* ─── PROFILE EDIT ─── */
+/* ─── PROFILE EDIT MODAL ─── */
 function openProfileEditModal() {
-  document.getElementById('peFullName').value = currentUser?.full_name || '';
+  document.getElementById('peFullName').value = currentUser.full_name || '';
   document.getElementById('peUniversity').value = mentorData?.university || '';
   document.getElementById('peFaculty').value = mentorData?.faculty || '';
   document.getElementById('peYear').value = mentorData?.year || '';
@@ -1165,6 +2041,11 @@ function openProfileEditModal() {
   document.getElementById('peBio').value = mentorData?.bio || '';
   openModal('profileEditModal');
 }
+
+// Also call when clicking the edit button
+document.addEventListener('DOMContentLoaded', () => {
+  applyTheme();
+});
 
 async function saveProfileEdit() {
   const body = {
@@ -1176,47 +2057,82 @@ async function saveProfileEdit() {
     bio: document.getElementById('peBio').value.trim()
   };
   try {
-    const res = await fetch('/api/profile', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body), credentials:'include' });
+    const res = await fetch('/api/profile', {
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body), credentials:'include'
+    });
     const data = await res.json();
     if (data.success) {
-      if (body.full_name) { currentUser.full_name = body.full_name; document.getElementById('pName').textContent = body.full_name; document.getElementById('ilName').textContent = body.full_name; }
+      // Update local state
+      if (body.full_name) {
+        currentUser.full_name = body.full_name;
+        document.getElementById('pName').textContent = body.full_name;
+        document.getElementById('pAvatarText').textContent = body.full_name[0].toUpperCase();
+        document.getElementById('ilName').textContent = body.full_name;
+      }
       if (!mentorData) mentorData = {};
       if (body.university) { mentorData.university = body.university; document.getElementById('ilUni').textContent = body.university; }
       if (body.faculty) { mentorData.faculty = body.faculty; document.getElementById('ilFaculty').textContent = body.faculty; }
       if (body.year) { mentorData.year = body.year; document.getElementById('ilYear').textContent = body.year+'-kurs'; }
       if (body.gpa) { mentorData.gpa = body.gpa; document.getElementById('ilGpa').textContent = body.gpa; }
-      if (body.bio !== undefined) { mentorData.bio = body.bio; const bioDisp = document.getElementById('bioDisplay'); if (bioDisp) bioDisp.textContent = body.bio || '—'; }
-      closeModal('profileEditModal'); showToast('Profil yangilandi ✓');
-    } else { showToast(data.error || 'Xatolik', 'err'); }
-  } catch(e) { showToast('Server xatosi', 'err'); }
+      if (body.bio !== undefined) {
+        mentorData.bio = body.bio;
+        const bioDisp = document.getElementById('bioDisplay');
+        if (bioDisp) bioDisp.textContent = body.bio || '—';
+      }
+      closeModal('profileEditModal');
+      showToast('Profil yangilandi ✓');
+    } else {
+      showToast(data.error || 'Xatolik', 'err');
+    }
+  } catch(e) {
+    showToast('Server xatosi', 'err');
+  }
 }
 
-/* ─── PROFILE MINI SECTIONS (REELS STILI) ─── */
+/* ─── PROFILE MINI SECTIONS ─── */
 function renderProfileMiniSections() {
+  // Bio display
   const bioDisp = document.getElementById('bioDisplay');
-  if (bioDisp) bioDisp.textContent = mentorData?.bio || 'O\'zingiz haqingizda ma\'lumot yo\'q. Profilni tahrirlash orqali to\'ldiring.';
+  if (bioDisp) bioDisp.textContent = mentorData?.bio || '—';
 
+  // Certs mini
+  const certsMini = document.getElementById('profileCertsMini');
+  if (certsMini) {
+    if (certificates.length === 0) {
+      certsMini.innerHTML = '<div style="grid-column:1/-1;font-size:12px;color:var(--text3);padding:8px 0">Sertifikat qo\'shilmagan</div>';
+    } else {
+      certsMini.innerHTML = certificates.slice(0, 4).map(c => `
+        <div style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px">
+          <div style="font-size:18px;margin-bottom:4px">🏆</div>
+          <div style="font-size:11px;font-weight:600;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${escHtml(c.title)}</div>
+          <div style="font-size:10px;color:var(--text2);margin-top:2px">${c.issuer||''}</div>
+        </div>`).join('');
+    }
+  }
+
+  // Videos mini - Instagram 3-col grid
   const vidMini = document.getElementById('profileVideosMini');
   if (vidMini) {
     if (!_mVideos || _mVideos.length === 0) {
-      vidMini.innerHTML = '<div style="grid-column:1/-1;font-size:12px;color:var(--text3);padding:8px 0; text-align:center;">Hali videolar yuklanmagan</div>';
+      vidMini.innerHTML = '<div style="grid-column:1/-1;font-size:12px;color:var(--text3);padding:8px 0">Video qo\'shilmagan</div>';
     } else {
-      // ASPECT RATIO 9/16 for Reels style
       vidMini.innerHTML = _mVideos.slice(0, 6).map(v => {
         const thumb = v.thumbnail || _mYtThumb(v.url||'') || '';
-        return `<div style="aspect-ratio:9/16; background:var(--s2); border-radius:10px; overflow:hidden; position:relative; cursor:pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15);" onclick="showPage('videos')">
-          ${thumb ? `<img src="${thumb}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0" loading="lazy">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px; color:var(--text2)">🎬</div>`}
-          <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 40%);display:flex;align-items:flex-end;justify-content:flex-start; padding: 8px;">
-            <div style="font-size:10px; font-weight: 600; color: #fff; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">▶ ${v.views || 0}</div>
+        return `<div style="aspect-ratio:1;background:var(--s2);border-radius:6px;overflow:hidden;position:relative;cursor:pointer" onclick="showPage('videos')">
+          ${thumb ? `<img src="${thumb}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0" loading="lazy">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:20px">🎬</div>`}
+          <div style="position:absolute;inset:0;background:rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center">
+            <div style="width:24px;height:24px;background:rgba(255,255,255,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center">
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="none"><polygon points="5,3 19,12 5,21" fill="#040810"/></svg>
+            </div>
           </div>
-          ${v.access==='premium' ? `<div style="position:absolute;top:6px;right:6px;font-size:10px;padding:2px 5px;border-radius:6px;background:rgba(240,165,0,.9);color:#040810;font-weight:700">⭐</div>` : ''}
+          ${v.access==='premium' ? `<div style="position:absolute;top:3px;right:3px;font-size:8px;padding:1px 4px;border-radius:4px;background:rgba(240,165,0,.9);color:#040810;font-weight:700">⭐</div>` : ''}
         </div>`;
       }).join('');
     }
   }
 }
 
-window.addEventListener('load', () => { init(); applyTheme(); loadMentorVideos(); });
 </script>
 </body>
 </html>
