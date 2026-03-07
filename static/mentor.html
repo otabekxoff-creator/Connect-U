@@ -340,7 +340,7 @@ img{display:block;object-fit:cover}
 
   <div class="page active" id="pg-home">
 
-    <div id="homeVerifyBanner" style="display:none;margin:12px 18px 0;border-radius:var(--r);padding:12px 16px;display:none;align-items:center;gap:12px;cursor:pointer" onclick="showPage('certs')">
+    <div id="homeVerifyBanner" style="display:none;margin:12px 18px 0;border-radius:var(--r);padding:12px 16px;align-items:center;gap:12px;cursor:pointer" onclick="showPage('certs')">
       <div style="flex:1">
         <div style="font-size:13px;font-weight:700" id="hvbTitle">⚠️ Verifikatsiya talab qilinadi</div>
         <div style="font-size:12px;margin-top:2px" id="hvbMsg">Guvohnomangizni yuklang</div>
@@ -646,7 +646,9 @@ img{display:block;object-fit:cover}
     <div id="mentorNotifList" style="padding:0 18px 90px"></div>
   </div>
 
-</div><nav class="nav">
+</div>
+
+<nav class="nav">
   <button class="ni active" id="ni-home" onclick="showPage('home')">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><polyline points="9,22 9,12 15,12 15,22" stroke="currentColor" stroke-width="2"/></svg>
     <span class="ni-label">Asosiy</span>
@@ -670,7 +672,9 @@ img{display:block;object-fit:cover}
   </button>
 </nav>
 
-</div><div class="modal" id="videoModal" onclick="if(event.target===this)closeModal('videoModal')">
+</div>
+
+<div class="modal" id="videoModal" onclick="if(event.target===this)closeModal('videoModal')">
   <div class="modal-sheet" style="max-height:90vh;overflow-y:auto">
     <div class="modal-handle"></div>
     <div class="modal-title">Video qo'shish</div>
@@ -736,21 +740,50 @@ let currentEditField = null;
 /* ─── INIT ─── */
 async function init() {
   try {
-    // Auth tekshirish (Ushbu joy server ishlamagach mock sifatida tashlab ketilishi ham mumkin)
-    const meRes = await fetch('/api/me', {credentials:'include'});
-    if(!meRes.ok) { window.location.href='login.html'; return; }
-    
-    const meData = await meRes.json();
-    if(!meData.success) { window.location.href='login.html'; return; }
-    
-    currentUser = meData.user;
-    if(currentUser.role !== 'mentor') {
-      window.location.href = 'abuturyent.html';
-      return;
+    let isRealData = false;
+
+    // Haqiqiy serverdan ma'lumot olishga urinamiz
+    try {
+      const meRes = await fetch('/api/me', {credentials:'include'});
+      if(meRes.ok) {
+        const meData = await meRes.json();
+        if(meData.success) {
+          currentUser = meData.user;
+          mentorData = currentUser.mentor_profile || null;
+          isRealData = true;
+        }
+      }
+    } catch(err) {
+      console.warn("Backend server ulanmadi, sinov (mock) ma'lumotlari bilan ishga tushirilmoqda...");
     }
 
-    if(currentUser.mentor_profile) {
-      mentorData = currentUser.mentor_profile;
+    // Server ulanmasa test ma'lumotlar orqali interfeysni ochamiz
+    if (!isRealData) {
+      currentUser = {
+        id: 'm1',
+        full_name: 'Azamat Qodirov',
+        username: 'azamat_mentor',
+        role: 'mentor',
+        avatar_url: ''
+      };
+      mentorData = {
+        university: 'Toshkent Axborot Texnologiyalari Universiteti',
+        faculty: 'Dasturiy injiniring',
+        year: 3,
+        gpa: 4.6,
+        bio: 'Matematika va fizika fanlaridan abituriyentlarni tayyorlayman. 3 yillik tajribaga egaman.',
+        balance: 150000,
+        total_sessions: 24,
+        rating: 4.9,
+        total_reviews: 18,
+        is_verified: true,
+        card_last4: '8600',
+        card_holder: 'AZAMAT QODIROV'
+      };
+    }
+
+    if(currentUser.role !== 'mentor') {
+      console.warn('Haqiqiy tizimda bu user abituriyent sahifasiga yo\'naltiriladi.');
     }
 
     await Promise.allSettled([
@@ -760,13 +793,13 @@ async function init() {
       loadVerificationStatus()
     ]);
 
+  } catch(e) {
+    console.error('Init xatosi:', e);
+  } finally {
+    // Qanday xatolik bo'lishidan qat'iy nazar loading o'chib interfeys ko'rinishi shart!
     renderAll();
     document.getElementById('loadingScreen').style.display = 'none';
     document.getElementById('appShell').style.display = 'flex';
-
-  } catch(e) {
-    console.error('Init xatosi:', e);
-    // window.location.href = 'login.html'; // Tizim tekshirish uchun o'chirib qo'yish mumkin
   }
 }
 
@@ -775,7 +808,12 @@ async function loadSessions() {
     const res = await fetch('/api/sessions', {credentials:'include'});
     const data = await res.json();
     if(data.success) sessions = data.sessions || [];
-  } catch(e) { console.error('Sessions xatosi:', e); }
+  } catch(e) { 
+    sessions = [
+      { id: 's1', student_name: 'Sardor', session_type: 'individual', scheduled_at: new Date(Date.now() + 86400000).toISOString(), status: 'confirmed' },
+      { id: 's2', student_name: 'Malika', session_type: 'group', scheduled_at: new Date(Date.now() + 172800000).toISOString(), status: 'pending' }
+    ];
+  }
 }
 
 async function loadPoints() {
@@ -783,7 +821,11 @@ async function loadPoints() {
     const res = await fetch('/api/mentor/points', {credentials:'include'});
     const data = await res.json();
     if(data.success) pointsHistory = data.points || [];
-  } catch(e) { console.error('Points xatosi:', e); }
+  } catch(e) { 
+    pointsHistory = [
+      { reason: 'session_completed', points: 8000, created_at: new Date().toISOString() }
+    ];
+  }
 }
 
 async function loadCertificates() {
@@ -791,7 +833,9 @@ async function loadCertificates() {
     const res = await fetch('/api/mentor/certificates', {credentials:'include'});
     const data = await res.json();
     if(data.success) certificates = data.certificates || [];
-  } catch(e) { console.error('Certs xatosi:', e); }
+  } catch(e) { 
+    certificates = [{ id: 'c1', title: 'IELTS 7.5', issuer: 'British Council', date: '2023-10-12' }];
+  }
 }
 
 async function loadVerificationStatus() {
@@ -800,7 +844,9 @@ async function loadVerificationStatus() {
     if(!res.ok) return;
     const data = await res.json();
     if(data.success) updateVerificationUI(data);
-  } catch(e) { console.error('Verify xatosi:', e); }
+  } catch(e) { 
+    updateVerificationUI({ is_verified: mentorData?.is_verified || false, student_id_url: null });
+  }
 }
 
 function renderAll() {
@@ -959,7 +1005,14 @@ async function handleAvatar(input) {
       } else {
         showToast(data.error || 'Xatolik', 'err');
       }
-    } catch(e) { showToast('Yuklashda xato', 'err'); }
+    } catch(e) { 
+      // Test uchun Local o'zgartirish
+      const av = document.getElementById('pAvatar');
+      let img = av.querySelector('img');
+      if(!img) { img = document.createElement('img'); av.appendChild(img); }
+      img.src = base64;
+      showToast('Rasm yuklandi (Lokal) ✓');
+    }
   };
   reader.readAsDataURL(file);
 }
@@ -986,7 +1039,7 @@ function updateVerificationUI(data) {
 
   if(data.is_verified) {
     bannerPending.style.display = 'none';
-    bannerVerified.style.display = 'flex'; // Optional: yashil bannerni hammasi zo'r degani uchuni chiqarish mumkin
+    bannerVerified.style.display = 'flex';
     if(homeBanner) homeBanner.style.display = 'none';
     updateStudentIdZone('verified');
 
@@ -1051,7 +1104,6 @@ function updateStudentIdZone(status, daysLeft) {
   zone.innerHTML = `<div class="uz-icon">${icons[status]}</div><div class="uz-title">${c.title}</div><div class="uz-sub">${c.sub}</div><div style="margin-top:8px;font-size:12px;font-weight:600">${c.status}</div>`;
 }
 
-/* ─── EARNINGS, SESSIONS, MODALS (O'ZGARISHSZ) ─── */
 function renderEarnings() {
   const totalEarned = pointsHistory.filter(p=>p.points>0).reduce((s,p)=>s+p.points,0);
   const paidOut = pointsHistory.filter(p=>p.points<0&&p.reason==='withdrawal').reduce((s,p)=>s+Math.abs(p.points),0);
@@ -1127,7 +1179,7 @@ function mvAutoThumb(url) { const m = (url||'').match(/(?:youtube\.com\/watch\?v
 async function loadMentorVideos() {
   if (_mVideosLoaded) return; const el = document.getElementById('mentorVideoList'); el.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text2)">Yuklanmoqda...</div>';
   try { const mid = currentUser?.id; const res = await fetch(mid ? `/api/materials?mentor_id=${mid}` : '/api/materials'); const d = await res.json(); _mVideos = d.success ? d.materials.filter(m => !m.mentor_name || m.mentor_name === currentUser?.full_name) : _demoMentorVideos(); } catch { _mVideos = _demoMentorVideos(); }
-  _mVideosLoaded = true; _renderMentorVideos(_mVideos); renderProfileMiniSections(); // Refresh Reels in profile
+  _mVideosLoaded = true; _renderMentorVideos(_mVideos); renderProfileMiniSections(); 
 }
 function _demoMentorVideos() { return [{id:'mv1',title:'Matematika formulalari — DTM 2025',url:'https://www.youtube.com/watch?v=dQw4w9WgXcQ',thumbnail:'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg',access:'free',views:124,likes:18},{id:'mv2',title:'TDYU kirish imtihoniga tayyorlash',url:'',thumbnail:'',access:'premium',views:56,likes:9}]; }
 function _mYtThumb(url) { const m = (url||'').match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/); return m ? `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg` : null; }
@@ -1188,7 +1240,17 @@ async function saveProfileEdit() {
       if (body.bio !== undefined) { mentorData.bio = body.bio; const bioDisp = document.getElementById('bioDisplay'); if (bioDisp) bioDisp.textContent = body.bio || '—'; }
       closeModal('profileEditModal'); showToast('Profil yangilandi ✓');
     } else { showToast(data.error || 'Xatolik', 'err'); }
-  } catch(e) { showToast('Server xatosi', 'err'); }
+  } catch(e) { 
+    // Test uchun mahalliy yangilash
+    if (body.full_name) { currentUser.full_name = body.full_name; document.getElementById('pName').textContent = body.full_name; document.getElementById('ilName').textContent = body.full_name; }
+    if (!mentorData) mentorData = {};
+    if (body.university) { mentorData.university = body.university; document.getElementById('ilUni').textContent = body.university; }
+    if (body.faculty) { mentorData.faculty = body.faculty; document.getElementById('ilFaculty').textContent = body.faculty; }
+    if (body.year) { mentorData.year = body.year; document.getElementById('ilYear').textContent = body.year+'-kurs'; }
+    if (body.gpa) { mentorData.gpa = body.gpa; document.getElementById('ilGpa').textContent = body.gpa; }
+    if (body.bio !== undefined) { mentorData.bio = body.bio; const bioDisp = document.getElementById('bioDisplay'); if (bioDisp) bioDisp.textContent = body.bio || '—'; }
+    closeModal('profileEditModal'); showToast('Profil yangilandi (Lokal) ✓');
+  }
 }
 
 /* ─── PROFILE MINI SECTIONS (REELS STILI) ─── */
