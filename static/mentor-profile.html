@@ -143,19 +143,23 @@
       <div class="il-row"><span class="il-label">Reyting</span><span class="il-val" id="ilRating">5.0 ★</span></div>
       <div class="il-row"><span class="il-label">Jami sessiyalar</span><span class="il-val" id="ilSess">0</span></div>
     </div>
-
     <!-- Platform settings -->
     <div style="padding:0 18px;margin-bottom:8px"><span class="label">PLATFORMA SOZLAMALARI</span></div>
     <div class="platform-section">
       <div class="ps-row">
         <span class="ps-row-label">🌙 Tema</span>
-        <button class="settings-toggle" id="themeToggleBtn" data-on="false" onclick="CU.toggleTheme();updateThemeToggle()"></button>
+        <button class="settings-toggle" id="themeToggleBtn" data-on="false" onclick="CU.toggleTheme()">
+          <span class="theme-icon">🌙</span>
+          <span class="theme-lbl">Oq rejim</span>
+        </button>
       </div>
-      <div class="settings-row" style="cursor:default">
+      <div class="ps-row" style="cursor:default">
         <span class="ps-row-label" style="flex:1">🔔 Bildirishnomalar</span>
-        <button class="settings-toggle on"></button>
+        <button class="settings-toggle on">
+          <span class="theme-icon">🔔</span>
+        </button>
       </div>
-      <div class="settings-row" style="cursor:default">
+      <div class="ps-row" style="cursor:default">
         <span class="ps-row-label" style="flex:1">👁 Profil ko'rinishi</span>
         <span class="badge b-green">Ochiq</span>
       </div>
@@ -349,6 +353,8 @@ window.addEventListener('load', () => {
 
 function updateThemeToggle() {
   const btn = document.getElementById('themeToggleBtn');
+  if (!btn) return; // xavfsizlik
+  
   const isLight = document.body.classList.contains('light-theme');
   btn.classList.toggle('on', isLight);
 }
