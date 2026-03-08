@@ -17,63 +17,158 @@
 
 /* ─── LIGHT THEME (oq dizayn — rasmga mos) ─── */
 body.light-theme {
-  --bg:#F2F5FB;
+  --bg:#EEF2F9;
   --s1:#FFFFFF;
-  --s2:#F0F3FA;
-  --s3:#E4E9F5;
-  --border:rgba(0,0,0,0.07);
-  --border2:rgba(0,0,0,0.13);
-  --text:#0F172A;
-  --text2:#64748B;
-  --text3:#94A3B8;
+  --s2:#F4F6FB;
+  --s3:#E8EDF7;
+  --border:rgba(0,0,0,0.08);
+  --border2:rgba(0,0,0,0.15);
+  --text:#0D1B2E;
+  --text2:#5A6A85;
+  --text3:#9BAAC0;
 
-  /* Ko'k asosiy rang (rasmda ko'k gradient kartalar) */
+  /* Blue primary (rasmda) */
   --gold:#2563EB;
-  --gold-d:rgba(37,99,235,0.09);
-  --gold-g:rgba(37,99,235,0.20);
+  --gold-d:rgba(37,99,235,0.08);
+  --gold-g:rgba(37,99,235,0.18);
   --teal:#0EA5A0;
   --teal-d:rgba(14,165,160,0.10);
   --purple:#7C3AED;
   --red:#EF4444;
   --green:#22C55E;
   --blue:#2563EB;
-
-  /* Gradient kartalar */
-  --hero-grad: linear-gradient(135deg, #1D4ED8 0%, #2563EB 60%, #60A5FA 100%);
-  --hero-grad2: linear-gradient(135deg, #0D9488 0%, #0EA5A0 100%);
-  --card-dark: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
 }
 
-/* Light theme header & nav — oq */
+/* Header — oq, shadow bilan */
 body.light-theme .hdr {
-  background: rgba(255,255,255,0.96);
-  box-shadow: 0 1px 0 rgba(0,0,0,0.07);
+  background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 body.light-theme .nav {
-  background: rgba(255,255,255,0.97);
-  box-shadow: 0 -1px 0 rgba(0,0,0,0.07);
+  background: rgba(255,255,255,0.98);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 -1px 3px rgba(0,0,0,0.06);
+  border-top: 1px solid rgba(0,0,0,0.06);
 }
 body.light-theme .hdr-logo span { color: #2563EB; }
+body.light-theme .ni { color: #9BAAC0; }
 body.light-theme .ni.active { color: #2563EB; }
 body.light-theme .label { color: #2563EB; }
 body.light-theme .sr-a { color: #2563EB; }
+body.light-theme .hdr-back { color: #5A6A85; }
+body.light-theme .hdr-title { color: #0D1B2E; }
+
+/* Chips */
+body.light-theme .chip {
+  background: #FFFFFF;
+  border-color: rgba(0,0,0,0.10);
+  color: #5A6A85;
+}
 body.light-theme .chip.active {
-  background: rgba(37,99,235,0.09);
+  background: rgba(37,99,235,0.08);
   border-color: #2563EB;
   color: #2563EB;
 }
-body.light-theme .btn-gold { background: #2563EB; color: white; }
-body.light-theme .btn-teal { background: #0EA5A0; color: white; }
-body.light-theme .b-gold { background: rgba(37,99,235,0.09); color: #2563EB; border-color: rgba(37,99,235,0.2); }
+
+/* Buttons */
+body.light-theme .btn-gold { background: #2563EB; color: #fff; }
+body.light-theme .btn-teal { background: #0EA5A0; color: #fff; }
+body.light-theme .btn-act { background: #2563EB; color: #fff; }
+body.light-theme .btn-surface { background: #F4F6FB; color: #0D1B2E; border-color: rgba(0,0,0,0.10); }
+body.light-theme .btn-ghost { border-color: rgba(0,0,0,0.12); color: #5A6A85; }
+body.light-theme .bc-btn-wd { background: rgba(255,255,255,0.25); color: #fff; border: 1px solid rgba(255,255,255,0.35); }
+body.light-theme .bc-btn-hist { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.85); border-color: rgba(255,255,255,0.2); }
+
+/* Badges */
+body.light-theme .b-gold { background: rgba(37,99,235,0.08); color: #2563EB; border-color: rgba(37,99,235,0.18); }
+body.light-theme .b-teal { background: rgba(14,165,160,0.08); color: #0EA5A0; }
+body.light-theme .b-gray { background: rgba(0,0,0,0.05); color: #5A6A85; }
+
+/* Header badge (MENTOR pill) */
 body.light-theme .hdr-badge {
-  background: rgba(37,99,235,0.09);
-  border-color: rgba(37,99,235,0.2);
+  background: rgba(37,99,235,0.08);
+  border-color: rgba(37,99,235,0.18);
   color: #2563EB;
 }
+
+/* Cards */
+body.light-theme .card { background: #fff; border-color: rgba(0,0,0,0.07); }
+body.light-theme .info-list { background: #fff; border-color: rgba(0,0,0,0.07); }
+body.light-theme .quick-card { background: #fff; border-color: rgba(0,0,0,0.07); }
+body.light-theme .req-card { background: #fff; border-color: rgba(0,0,0,0.09); }
+body.light-theme .mv-card { background: #fff; border-color: rgba(0,0,0,0.09); }
+body.light-theme .news-card { background: #fff; border-color: rgba(0,0,0,0.09); }
+body.light-theme .cg-card { background: #fff; border-color: rgba(0,0,0,0.07); }
+body.light-theme .settings-group { background: #fff; border-color: rgba(0,0,0,0.07); }
+body.light-theme .platform-section { background: #fff; border-color: rgba(0,0,0,0.07); }
+body.light-theme .upload-zone { background: #fff; border-color: rgba(0,0,0,0.12); }
+body.light-theme .notif-mini { background: #fff; border-color: rgba(0,0,0,0.07); }
+body.light-theme .news-mini { background: #fff; border-color: rgba(0,0,0,0.07); }
+body.light-theme .modal-sheet { background: #fff; }
+
+/* Stats boxes */
+body.light-theme .stat-box { background: #fff; border-color: rgba(0,0,0,0.07); }
+body.light-theme .sb-val { color: #2563EB; }
+body.light-theme .ss-box { background: #fff; border-color: rgba(0,0,0,0.07); }
+
+/* Session items */
+body.light-theme .sess-item:active { background: #F4F6FB; }
+body.light-theme .si-points { color: #0EA5A0; }
+
+/* Balance card — ko'k gradient (rasmdagi kabi) */
+body.light-theme .balance-card {
+  background: linear-gradient(135deg, #1845C8 0%, #2563EB 55%, #4F86F7 100%);
+  border: none;
+  box-shadow: 0 8px 32px rgba(37,99,235,0.35);
+}
+body.light-theme .balance-card::before { background: radial-gradient(circle, rgba(255,255,255,0.14), transparent 70%); }
+body.light-theme .balance-card::after { background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%); }
+body.light-theme .bc-amount { color: #fff; }
+body.light-theme .bc-label { color: rgba(255,255,255,0.65); }
+body.light-theme .bc-sub { color: rgba(255,255,255,0.55); }
+body.light-theme .sp-bar { background: rgba(255,255,255,0.2); }
+body.light-theme .sp-bar.hi { background: rgba(255,255,255,0.85); }
+
+/* Earn summary */
+body.light-theme .earn-summary { background: linear-gradient(135deg, #EEF5FF, #DBEAFE); border-color: rgba(37,99,235,0.15); }
+body.light-theme .es-box { background: rgba(37,99,235,0.06); }
+
+/* Profile cover */
+body.light-theme .profile-cover { background: linear-gradient(135deg, #1845C8, #2563EB); }
+body.light-theme .p-sub { color: #2563EB; }
+body.light-theme .ptab.active { color: #2563EB; border-bottom-color: #2563EB; }
+
+/* Toggle */
 body.light-theme .settings-toggle.on { background: #2563EB; }
-body.light-theme #loadingScreen { background: #F2F5FB; }
+body.light-theme .settings-toggle { background: #DDE3EE; }
+
+/* Chart */
+body.light-theme .chart-bar { background: rgba(37,99,235,0.12); }
+body.light-theme .chart-bar.hi { background: #2563EB; }
+
+/* Loading */
+body.light-theme #loadingScreen { background: #EEF2F9; }
 body.light-theme .loading-logo span { color: #2563EB; }
-body.light-theme .spinner { border-top-color: #2563EB; }
+body.light-theme .spinner { border-top-color: #2563EB; border-color: rgba(37,99,235,0.15); border-top-color: #2563EB; }
+
+/* Input fields */
+body.light-theme .ef-input { background: #F4F6FB; border-color: rgba(0,0,0,0.10); color: #0D1B2E; }
+body.light-theme .ef-input:focus { border-color: #2563EB; }
+
+/* Section row */
+body.light-theme .student-row { border-color: rgba(0,0,0,0.06); }
+body.light-theme .sr-rank.top { color: #2563EB; }
+body.light-theme .sr-pts { color: #0EA5A0; }
+body.light-theme .qc-val { color: #0D1B2E; }
+
+/* Desktop nav light */
+@media(min-width:768px){
+  body.light-theme .nav { background: #fff; border-right-color: rgba(0,0,0,0.07); }
+  body.light-theme .ni.active { background: rgba(37,99,235,0.08); color: #2563EB; }
+}
+
 body { transition: var(--trans); }
 
 /* ─── RESET ─── */
