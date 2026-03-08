@@ -29,6 +29,12 @@ from models import db   # qayerda db bo‘lsa o‘sha yerdan import qil
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.config.from_object(Config)
 
+# Session cookie — Render HTTPS uchun
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['PERMANENT_SESSION_LIFETIME'] = 86400 * 30  # 30 kun
+
 CORS(app, supports_credentials=True, origins=["http://localhost:5000", "http://127.0.0.1:5000", "*"])
 db.init_app(app)
 
