@@ -293,18 +293,13 @@ CU.applyTheme = function() {
   try {
     if(localStorage.getItem('cu_theme') === 'light') {
       document.body.classList.add('light-theme');
-      const btn = document.getElementById('themeToggleBtn');
-      if(btn) {
-        const themeIcon = btn.querySelector('.theme-icon');
-        if(themeIcon) themeIcon.textContent = '☀️';
-        
-        const themeLbl = btn.querySelector('.theme-lbl');
-        if(themeLbl) themeLbl.textContent = 'Qora rejim';
-      }
+    }
+    // Profildagi updateThemeToggle funksiyasini chaqirishga harakat qilamiz
+    if (typeof window.updateThemeToggle === 'function') {
+      window.updateThemeToggle();
     }
   } catch(e) {
-    console.log('Theme qo\'llashda xatolik (profil ishlashi uchun ignored):', e);
-    // Xatolikni ignore qilamiz - profil ishlashi kerak
+    console.log('Theme qo\'llashda xatolik (ignored):', e);
   }
 };
 
@@ -313,16 +308,10 @@ CU.toggleTheme = function() {
     const isLight = document.body.classList.toggle('light-theme');
     localStorage.setItem('cu_theme', isLight ? 'light' : 'dark');
     
-    const btn = document.getElementById('themeToggleBtn');
-    if(btn) {
-      const themeIcon = btn.querySelector('.theme-icon');
-      if(themeIcon) themeIcon.textContent = isLight ? '☀️' : '🌙';
-      
-      const themeLbl = btn.querySelector('.theme-lbl');
-      if(themeLbl) themeLbl.textContent = isLight ? 'Qora rejim' : 'Oq rejim';
+    // Profildagi updateThemeToggle funksiyasini chaqirish
+    if (typeof window.updateThemeToggle === 'function') {
+      window.updateThemeToggle();
     }
-    
-    if(btn) btn.classList.toggle('on', isLight);
   } catch(e) {
     console.log('Theme o\'zgartirishda xatolik:', e);
   }
