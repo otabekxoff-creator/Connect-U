@@ -290,17 +290,42 @@ CU.toast = function(msg, type='ok') {
 
 /* ─── THEME ─── */
 CU.applyTheme = function() {
-  if(localStorage.getItem('cu_theme') === 'light') {
-    document.body.classList.add('light-theme');
-    const btn = document.getElementById('themeToggleBtn');
-    if(btn) { btn.querySelector('.theme-icon').textContent = '☀️'; btn.querySelector('.theme-lbl').textContent = 'Qora rejim'; }
+  try {
+    if(localStorage.getItem('cu_theme') === 'light') {
+      document.body.classList.add('light-theme');
+      const btn = document.getElementById('themeToggleBtn');
+      if(btn) {
+        const themeIcon = btn.querySelector('.theme-icon');
+        if(themeIcon) themeIcon.textContent = '☀️';
+        
+        const themeLbl = btn.querySelector('.theme-lbl');
+        if(themeLbl) themeLbl.textContent = 'Qora rejim';
+      }
+    }
+  } catch(e) {
+    console.log('Theme qo\'llashda xatolik (profil ishlashi uchun ignored):', e);
+    // Xatolikni ignore qilamiz - profil ishlashi kerak
   }
 };
+
 CU.toggleTheme = function() {
-  const isLight = document.body.classList.toggle('light-theme');
-  localStorage.setItem('cu_theme', isLight ? 'light' : 'dark');
-  const btn = document.getElementById('themeToggleBtn');
-  if(btn) { btn.querySelector('.theme-icon').textContent = isLight ? '☀️' : '🌙'; btn.querySelector('.theme-lbl').textContent = isLight ? 'Qora rejim' : 'Oq rejim'; }
+  try {
+    const isLight = document.body.classList.toggle('light-theme');
+    localStorage.setItem('cu_theme', isLight ? 'light' : 'dark');
+    
+    const btn = document.getElementById('themeToggleBtn');
+    if(btn) {
+      const themeIcon = btn.querySelector('.theme-icon');
+      if(themeIcon) themeIcon.textContent = isLight ? '☀️' : '🌙';
+      
+      const themeLbl = btn.querySelector('.theme-lbl');
+      if(themeLbl) themeLbl.textContent = isLight ? 'Qora rejim' : 'Oq rejim';
+    }
+    
+    if(btn) btn.classList.toggle('on', isLight);
+  } catch(e) {
+    console.log('Theme o\'zgartirishda xatolik:', e);
+  }
 };
 
 /* ─── MODAL (bottom sheet) ─── */
