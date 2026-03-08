@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>ConnectU — Sessiyalar</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mentor-shared.css">
+<style>
+/* ─── Sessions-specific ─── */
+.sess-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 18px 16px}
+.ss-box{background:var(--s1);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 8px;text-align:center}
+.ss-val{font-size:18px;font-weight:800;margin-bottom:2px}
+.ss-lbl{font-size:9px;color:var(--text2);font-weight:500}
+
+.sess-item{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;gap:12px;cursor:pointer;transition:background .15s;align-items:flex-start}
+.sess-item:last-child{border-bottom:none}
+.sess-item:active{background:var(--s2)}
+.si-left{flex:1;min-width:0}
+.si-right{text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+
+/* Student profile mini card in modal */
+.student-profile{background:var(--s2);border-radius:var(--r-sm);padding:14px;display:flex;gap:12px;align-items:center;margin-bottom:16px}
+.sp-av{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0}
+.sp-name{font-size:15px;font-weight:700}
+.sp-meta{font-size:12px;color:var(--text2);margin-top:2px}
+
+/* Meet link button */
+.meet-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:var(--r-sm);background:linear-gradient(135deg,#7C5CFC,#5B3FD8);color:#fff;font-size:14px;font-weight:600;border:none;width:100%;cursor:pointer;margin-top:10px}
+</style>
+</head>
+<body>
+
+<div id="loadingScreen">
+  <div class="spinner" style="width:44px;height:44px;border-width:4px"></div>
+  <div class="loading-logo">Connect<span>-U</span></div>
+</div>
+
+<div class="shell" id="appShell" style="display:none">
+
+<!-- HEADER -->
+<div class="hdr">
+  <button class="hdr-back" onclick="CU.navTo('home')">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <div class="hdr-title">Sessiyalar</div>
+  <div class="hdr-badge"><div class="dot"></div>MENTOR</div>
+</div>
+
+<div class="content">
+<div class="page active" id="pg-sessions">
+
+  <div class="ph" style="padding-bottom:8px">
+    <span class="label">SESSIYALAR</span>
+    <div class="pt">Mening sessiyalarim</div>
+    <div class="ps">Barcha seans va so'rovlar</div>
+  </div>
+
+  <!-- Stats summary -->
+  <div class="sess-summary">
+    <div class="ss-box"><div class="ss-val" id="ssAll">0</div><div class="ss-lbl">Jami</div></div>
+    <div class="ss-box"><div class="ss-val" style="color:var(--gold)" id="ssPending">0</div><div class="ss-lbl">Kutilmoqda</div></div>
+    <div class="ss-box"><div class="ss-val" style="color:var(--green)" id="ssCompleted">0</div><div class="ss-lbl">Tugallangan</div></div>
+    <div class="ss-box"><div class="ss-val" style="color:var(--teal)" id="ssTotalEarn">0</div><div class="ss-lbl">So'm</div></div>
+  </div>
+
+  <!-- Filter chips -->
+  <div class="chips">
+    <button class="chip active" onclick="filterSess('all',this)">Hammasi</button>
+    <button class="chip" onclick="filterSess('pending',this)">⏳ Kutilmoqda</button>
+    <button class="chip" onclick="filterSess('confirmed',this)">✓ Tasdiqlangan</button>
+    <button class="chip" onclick="filterSess('completed',this)">★ Tugallangan</button>
+    <button class="chip" onclick="filterSess('cancelled',this)">✕ Bekor</button>
+    <button class="chip" onclick="filterSess('individual',this)">👤 Individual</button>
+    <button class="chip" onclick="filterSess('group',this)">👥 Guruh</button>
+  </div>
+
+  <!-- Search bar -->
+  <div style="margin:0 18px 12px;position:relative">
+    <input id="sessSearch" class="ef-input" placeholder="Talaba ismini qidirish..." oninput="filterSess('search',null)" style="padding-left:40px">
+    <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.4" width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </div>
+
+  <div class="card" style="margin:0 18px"><div id="sessionsList"></div></div>
+  <div class="gap"></div>
+
+</div>
+</div><!-- /content -->
+
+<!-- BOTTOM NAV -->
+<nav class="nav">
+  <button class="ni" data-page="home" onclick="CU.navTo('home')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><polyline points="9,22 9,12 15,12 15,22" stroke="currentColor" stroke-width="2"/></svg>
+    <span class="ni-label">Asosiy</span>
+  </button>
+  <button class="ni active" data-page="sessions" onclick="CU.navTo('sessions')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span class="ni-label">Sessiyalar</span>
+  </button>
+  <button class="ni" data-page="videos" onclick="CU.navTo('videos')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><polygon points="23,7 16,12 23,17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="1" y="5" width="15" height="14" rx="2" stroke="currentColor" stroke-width="2"/></svg>
+    <span class="ni-label">Videolar</span>
+  </button>
+  <button class="ni" data-page="earnings" onclick="CU.navTo('earnings')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span class="ni-label">Daromad</span>
+  </button>
+  <button class="ni" data-page="profile" onclick="CU.navTo('profile')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+    <span class="ni-label">Profil</span>
+  </button>
+</nav>
+</div><!-- /shell -->
+
+<!-- SESSION DETAIL MODAL -->
+<div class="modal" id="sessDetailModal" onclick="if(event.target===this)CU.closeModal('sessDetailModal')">
+  <div class="modal-sheet" style="max-height:90vh;overflow-y:auto">
+    <div class="modal-handle"></div>
+    <div id="sessDetailBody"></div>
+  </div>
+</div>
+
+<script src="mentor-shared.js"></script>
+<script>
+let currentFilter = 'all';
+
+window.addEventListener('load', () => {
+  CU.init(() => {
+    renderStats();
+    renderSessions('all');
+  });
+});
+
+function renderStats() {
+  const s = CU.sessions;
+  document.getElementById('ssAll').textContent = s.length;
+  document.getElementById('ssPending').textContent = s.filter(x=>x.status==='pending').length;
+  document.getElementById('ssCompleted').textContent = s.filter(x=>x.status==='completed').length;
+  const earn = s.filter(x=>x.status==='completed').reduce((sum,x)=>sum+CU.sessionPts(x.session_type),0);
+  document.getElementById('ssTotalEarn').textContent = CU.fmt(earn);
+}
+
+function filterSess(f, btn) {
+  if(btn) { document.querySelectorAll('.chips .chip').forEach(c=>c.classList.remove('active')); btn.classList.add('active'); }
+  currentFilter = f;
+  renderSessions(f);
+}
+
+function renderSessions(filter) {
+  const query = document.getElementById('sessSearch').value.toLowerCase();
+  let list = CU.sessions;
+  if(filter === 'search') {
+    list = list.filter(s=>(s.student_name||'').toLowerCase().includes(query));
+  } else if(filter !== 'all') {
+    if(['pending','confirmed','completed','cancelled'].includes(filter)) {
+      list = list.filter(s=>s.status===filter);
+    } else if(filter === 'individual' || filter === 'group') {
+      list = list.filter(s=>s.session_type===filter);
+    }
+  }
+  if(query && filter !== 'search') {
+    list = list.filter(s=>(s.student_name||'').toLowerCase().includes(query));
+  }
+  
+  document.getElementById('sessionsList').innerHTML = list.length
+    ? list.map(sessHTML).join('')
+    : '<div class="empty-state"><div class="empty-state-icon">📅</div>Sessiya yo\'q</div>';
+}
+
+function sessHTML(s) {
+  const pts = CU.sessionPts(s.session_type);
+  return `<div class="sess-item" onclick="openSessDetail('${s.id}')">
+    <div class="si-avatar" style="background:${CU.strColor(s.student_name||'U')}">${(s.student_name||'U')[0]}</div>
+    <div class="si-left">
+      <div class="si-name">${CU.escHtml(s.student_name||'Foydalanuvchi')}</div>
+      <div class="si-meta" style="margin-bottom:6px">${CU.sessionTypeLabel(s.session_type)} · ${CU.fmtDate(s.scheduled_at)}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">${CU.sessionBadge(s.status)}</div>
+    </div>
+    <div class="si-right">
+      ${s.status==='completed'?`<div class="si-points">+${CU.fmt(pts)}</div>`:''}
+      ${s.status==='pending'?`<div style="font-size:11px;color:var(--red);font-weight:600">Yangi!</div>`:''}
+    </div>
+  </div>`;
+}
+
+function openSessDetail(id) {
+  const s = CU.sessions.find(x=>x.id===id);
+  if(!s) return;
+  const name = s.student_name || 'Foydalanuvchi';
+  const pts = CU.sessionPts(s.session_type);
+  document.getElementById('sessDetailBody').innerHTML = `
+    <div class="student-profile">
+      <div class="sp-av" style="background:${CU.strColor(name)}">${name[0]}</div>
+      <div>
+        <div class="sp-name">${CU.escHtml(name)}</div>
+        <div class="sp-meta">${CU.sessionTypeLabel(s.session_type)} sessiya</div>
+        ${s.student_university?`<div style="font-size:11px;color:var(--text2);margin-top:2px">🎓 ${CU.escHtml(s.student_university)}</div>`:''}
+      </div>
+      <div style="margin-left:auto">${CU.sessionBadge(s.status)}</div>
+    </div>
+
+    <div class="info-list" style="margin:0 0 16px">
+      <div class="il-row"><span class="il-label">Sessiya turi</span><span class="il-val">${CU.sessionTypeLabel(s.session_type)}</span></div>
+      <div class="il-row"><span class="il-label">Sana va vaqt</span><span class="il-val">${CU.fmtDate(s.scheduled_at)}</span></div>
+      <div class="il-row"><span class="il-label">Davomiyligi</span><span class="il-val">${s.duration_min||60} daqiqa</span></div>
+      <div class="il-row"><span class="il-label">To'lov miqdori</span><span class="il-val" style="color:var(--teal)">${CU.fmt(pts)} so'm</span></div>
+      ${s.student_phone?`<div class="il-row"><span class="il-label">Telefon</span><a class="il-val" href="tel:${s.student_phone}" style="color:var(--teal)">${s.student_phone}</a></div>`:''}
+      ${s.notes?`<div class="il-row"><span class="il-label">Izoh</span><span class="il-val" style="font-size:12px;flex-wrap:wrap">${CU.escHtml(s.notes)}</span></div>`:''}
+    </div>
+
+    ${s.status==='pending'?`
+    <div class="modal-btns">
+      <button class="btn btn-teal" onclick="CU.confirmSession('${s.id}',()=>{renderStats();renderSessions(currentFilter);CU.closeModal('sessDetailModal')})">✓ Tasdiqlash — ${CU.fmt(pts)} so'm</button>
+      <button class="btn btn-red" onclick="CU.rejectSession('${s.id}',()=>{renderStats();renderSessions(currentFilter);CU.closeModal('sessDetailModal')})">✕ Rad etish</button>
+    </div>`:''}
+
+    ${s.meet_link?`<button class="meet-btn" onclick="window.open('${s.meet_link}','_blank')">🎥 Google Meet ga kirish</button>`:''}
+    ${s.status==='confirmed'&&!s.meet_link?`<div style="margin-top:12px;padding:12px;background:var(--gold-d);border-radius:10px;font-size:12px;color:var(--gold)">📅 Sessiya vaqti kelganida meeting link yuboriladi</div>`:''}
+  `;
+  CU.openModal('sessDetailModal');
+}
+</script>
+</body>
+</html>
