@@ -81,12 +81,12 @@ def serve_upload(filename):
 def index():
     return redirect('/login.html')
 
-@app.route('/webhook', methods=['POST'])
-def webhook():
-    json_str = request.get_data(as_text=True)
-    update = telebot.types.Update.de_json(json_str)
-    bot.process_new_updates([update])
-    return 'OK', 200
+# @app.route('/webhook', methods=['POST'])
+# def webhook():
+#     json_str = request.get_data(as_text=True)
+#     update = telebot.types.Update.de_json(json_str)
+#     bot.process_new_updates([update])
+#     return 'OK', 200
 
 @app.route('/health', methods=['GET'])
 def health():
@@ -101,10 +101,12 @@ def serve_admin_login_page():
             return redirect('/admin.html')
     return send_from_directory('static', 'admin_login.html')
 
-
 @app.route('/<path:filename>.html')
 def serve_html(filename):
-    return send_from_directory('static', filename + '.html')
+    try:
+        return send_from_directory('static', filename + '.html')
+    except:
+        abort(404)
 
 @app.route('/static/<path:filename>')
 def serve_static(filename):
@@ -285,7 +287,7 @@ def send_new_login_notification(user, old_session, device_info):
 
 @app.route('/api/telegram-login', methods=['POST'])
 def telegram_login():
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
 
     # ── 1. initData orqali kelgan bo'lsa (Telegram Mini App) ──
     init_data_raw = data.get('initData') or data.get('init_data')
@@ -467,7 +469,7 @@ def check_auth_token():
 @app.route('/api/send-otp', methods=['POST'])
 def send_otp():
     try:
-        data = request.get_json(force=True, silent=True) or {}
+        data = request.json
         phone = data.get('phone')
         
         if not phone:
@@ -532,7 +534,7 @@ def send_otp():
         
 @app.route('/api/verify-otp', methods=['POST'])
 def verify_otp():
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
     phone = data.get('phone')
     code = data.get('code')
     
@@ -583,7 +585,7 @@ def sync_session():
                     'user': user.to_full_dict()
                 })
         
-        data = request.get_json(force=True, silent=True) or {}
+        data = request.json
         user_id = data.get('user_id')
         phone = data.get('phone')
         
@@ -620,7 +622,7 @@ def sync_session():
 
 @app.route('/api/login-telegram', methods=['POST'])
 def login_telegram():
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
 
     # initData yoki telegram_id qabul qilish
     init_data_raw = data.get('initData') or data.get('init_data')
@@ -682,7 +684,7 @@ def confirm_role():
     if not user:
         return jsonify({'success': False, 'error': 'Kirilmagan'}), 401
     
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
     role = data.get('role')
     phone = data.get('phone')
     
@@ -700,15 +702,21 @@ def confirm_role():
     db.session.commit()
     
     flask_session['role'] = user.role
-    
+
+    role_redirects = {
+        'mentor':  '/mentor-dashboard.html',
+        'student': '/abuturyent.html',
+    }
+
     return jsonify({
         'success': True,
-        'user': user.to_dict()
+        'user': user.to_dict(),
+        'redirect_url': role_redirects.get(user.role, '/login.html')
     })
 
 @app.route('/api/admin/login', methods=['POST'])
 def admin_login():
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
     username = data.get('username', '').strip()
     password = data.get('password', '').strip()
     
@@ -757,7 +765,7 @@ def admin_change_password():
     if not user or user.role not in ['admin', 'superadmin']:
         return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
     
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
     old_password = data.get('old_password', '')
     new_password = data.get('new_password', '')
     
@@ -792,9 +800,17 @@ def get_me():
         flask_session.clear()
         return jsonify({'success': False, 'error': 'Foydalanuvchi topilmadi'}), 401
     
+    role_redirects = {
+        'mentor':     '/mentor-dashboard.html',
+        'student':    '/abuturyent.html',
+        'admin':      '/admin.html',
+        'superadmin': '/admin.html',
+    }
+
     return jsonify({
         'success': True,
-        'user': user.to_full_dict()
+        'user': user.to_full_dict(),
+        'redirect_url': role_redirects.get(user.role, '/login.html')
     })
 
 @app.route('/api/debug-session', methods=['GET'])
@@ -830,7 +846,7 @@ def logout():
 @app.route('/api/bot/verify-login', methods=['POST'])
 def bot_verify_login():
     try:
-        data = request.get_json(force=True, silent=True) or {}
+        data = request.json
         token = data.get('token')
         telegram_id = data.get('telegram_id')
         first_name = data.get('first_name', '')
@@ -883,7 +899,7 @@ def bot_verify_login():
 @app.route('/api/bot/register', methods=['POST'])
 def bot_register():
     try:
-        data = request.get_json(force=True, silent=True) or {}
+        data = request.json
         
         telegram_id = data.get('telegram_id')
         phone = data.get('phone')
@@ -951,7 +967,7 @@ def bot_get_user(telegram_id):
 
 @app.route('/api/bot/update-user', methods=['POST'])
 def bot_update_user():
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
     telegram_id = data.get('telegram_id')
     
     user = User.query.filter_by(telegram_id=telegram_id).first()
@@ -995,7 +1011,7 @@ def bot_mark_otp_sent():
     if api_key != os.getenv('BOT_API_KEY', 'secret-key-123'):
         return jsonify({'success': False}), 403
     
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
     otp_id = data.get('otp_id')
     
     otp = db.session.get(OTPCode, otp_id)
@@ -1105,7 +1121,7 @@ def update_profile():
     if not user:
         return jsonify({'success': False, 'error': 'Kirilmagan'}), 401
     
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
     
     if 'full_name' in data:
         user.full_name = data['full_name']
@@ -1135,7 +1151,7 @@ def upload_avatar():
     if not user:
         return jsonify({'success': False, 'error': 'Kirilmagan'}), 401
     
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
     avatar_url = data.get('avatar_url')
     
     if not avatar_url:
@@ -1234,7 +1250,7 @@ def create_subscription():
     if not user:
         return jsonify({'success': False, 'error': 'Kirilmagan'}), 401
     
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
     tier = data.get('tier')
     price = data.get('price', 0)
     
@@ -1326,7 +1342,7 @@ def create_session():
     if not user:
         return jsonify({'success': False, 'error': 'Kirilmagan'}), 401
     
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
     mentor_id = data.get('mentor_id')
     session_type = data.get('session_type', 'individual')
     scheduled_at = data.get('scheduled_at')
@@ -1365,7 +1381,7 @@ def create_payment():
     if not user:
         return jsonify({'success': False, 'error': 'Kirilmagan'}), 401
     
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
     amount = data.get('amount')
     method = data.get('method')
     meta = data.get('meta', {})
@@ -1405,7 +1421,7 @@ def payment_callback(payment_id):
     if not payment:
         abort(404)
     
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
     status = data.get('status')
     provider_tx = data.get('transaction')
     
@@ -1540,7 +1556,6 @@ def admin_get_pending_withdrawals():
             'points_used': w.points_used,
             'card_last4': w.card_last4,
             'card_holder': w.card_holder,
-            'card_number': getattr(w, 'card_number', None) or (getattr(mentor, 'card_number', None) if mentor else None),
             'mentor_name': user.full_name if user else None,
             'mentor_phone': user.phone if user else None,
             'created_at': w.created_at.isoformat()
@@ -1598,7 +1613,7 @@ def admin_reject_withdrawal(wd_id):
     if not admin or admin.role not in ['admin', 'superadmin']:
         return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
     
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
     reason = data.get('reason', '')
     
     wd = db.session.get(Withdrawal, wd_id)
@@ -1767,7 +1782,6 @@ def admin_get_withdrawals():
             'points_used': w.points_used,
             'card_last4': w.card_last4,
             'card_holder': w.card_holder,
-            'card_number': getattr(w, 'card_number', None) or (getattr(mentor, 'card_number', None) if mentor else None),
             'status': w.status,
             'created_at': w.created_at.isoformat()
         })
@@ -1783,7 +1797,7 @@ def admin_broadcast():
     if not admin or admin.role not in ['admin', 'superadmin']:
         return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
     
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
     title = data.get('title')
     text = data.get('text')
     targets = data.get('targets', ['all'])
@@ -1915,7 +1929,7 @@ def add_mentor_certificate():
     if not mentor:
         return jsonify({'success': False, 'error': 'Mentor profil topilmadi'}), 404
 
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
     title = data.get('title', '').strip()
     if not title:
         return jsonify({'success': False, 'error': 'Sertifikat nomi kerak'}), 400
@@ -1976,20 +1990,15 @@ def save_mentor_card():
     if not mentor:
         return jsonify({'success': False, 'error': 'Mentor profil topilmadi'}), 404
 
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
     card_last4 = data.get('card_last4', '').strip()
     card_holder = data.get('card_holder', '').strip().upper()
-    card_number = data.get('card_number', '').strip()
 
     if len(card_last4) != 4 or not card_holder:
         return jsonify({'success': False, 'error': 'Karta ma\'lumotlari noto\'g\'ri'}), 400
 
     mentor.card_last4 = card_last4
     mentor.card_holder = card_holder
-    # Store full card number if available (for admin withdrawal processing)
-    if card_number and len(card_number) >= 16:
-        if hasattr(mentor, 'card_number'):
-            mentor.card_number = card_number
     db.session.commit()
 
     return jsonify({'success': True})
@@ -2004,7 +2013,7 @@ def mentor_withdraw():
     if not mentor:
         return jsonify({'success': False, 'error': 'Mentor profil topilmadi'}), 404
 
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
     amount = int(data.get('amount', 0))
 
     if amount < 50000:
@@ -2031,10 +2040,6 @@ def mentor_withdraw():
         card_holder=mentor.card_holder,
         status='pending'
     )
-    # Store full card number if available
-    if hasattr(mentor, 'card_number') and mentor.card_number:
-        if hasattr(wd, 'card_number'):
-            wd.card_number = mentor.card_number
     db.session.add(wd)
     db.session.commit()
 
@@ -2148,7 +2153,7 @@ def handle_universities():
         if not user or user.role not in ['admin', 'superadmin']:
             return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
         
-        data = request.get_json(force=True, silent=True) or {}
+        data = request.json
         try:
             uni = University(
                 short_name=data.get('short_name'),
@@ -2203,17 +2208,13 @@ def handle_university(uni_id):
         if not user or user.role not in ['admin', 'superadmin']:
             return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
         
-        data = request.get_json(force=True, silent=True) or {}
+        data = request.json
         uni.short_name = data.get('short_name', uni.short_name)
         uni.full_name = data.get('full_name', uni.full_name)
         uni.description = data.get('description', uni.description)
         uni.website = data.get('website', uni.website)
         uni.telegram = data.get('telegram', uni.telegram)
         uni.instagram = data.get('instagram', uni.instagram)
-        if hasattr(uni, 'facebook'):
-            uni.facebook = data.get('facebook', uni.facebook)
-        if hasattr(uni, 'youtube'):
-            uni.youtube = data.get('youtube', uni.youtube)
         uni.cover_url = data.get('cover_url', uni.cover_url)
         uni.sort_order = data.get('sort_order', uni.sort_order)
         
@@ -2247,7 +2248,7 @@ def handle_faculties(uni_id):
         if not user or user.role not in ['admin', 'superadmin']:
             return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
         
-        data = request.get_json(force=True, silent=True) or {}
+        data = request.json
         faculty = Faculty(
             university_id=uni_id,
             name=data.get('name'),
@@ -2291,7 +2292,7 @@ def handle_faculty(faculty_id):
         if not user or user.role not in ['admin', 'superadmin']:
             return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
         
-        data = request.get_json(force=True, silent=True) or {}
+        data = request.json
         faculty.name = data.get('name', faculty.name)
         faculty.description = data.get('description', faculty.description)
         faculty.cover_url = data.get('cover_url', faculty.cover_url)
@@ -2322,7 +2323,7 @@ def handle_faculty_stats(faculty_id):
     if not user or user.role not in ['admin', 'superadmin']:
         return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
     
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
     year = data.get('year')
     
     if not year:
@@ -2395,18 +2396,13 @@ def admin_get_verify_mentors():
 # YANGILIKLAR VA MATERIALLAR UCHUN API
 # ==========================================
 
-@app.route('/api/news', methods=['GET'])
-def get_news():
-    news_list = News.query.order_by(News.created_at.desc()).all()
-    return jsonify({'success': True, 'news': [n.to_dict() for n in news_list]})
-
 @app.route('/api/admin/news', methods=['POST'])
 def add_news():
     admin = get_current_user()
     if not admin or admin.role not in ['admin', 'superadmin']:
         return jsonify({'success': False, 'error': 'Ruxsat yoq'}), 403
     
-    data = request.get_json(force=True, silent=True) or {}
+    data = request.json
     if not data.get('title') or not data.get('content'):
         return jsonify({'success': False, 'error': 'Sarlavha va matn kerak'}), 400
         
@@ -2475,11 +2471,255 @@ def delete_material(mat_id):
         db.session.commit()
     return jsonify({'success': True})
 
-if __name__ == '__main__':
-    # Webhook o'rnatish
-    webhook_url = "https://connect-u-2.onrender.com/webhook"
-    bot.remove_webhook()
-    bot.set_webhook(url=webhook_url)
+# if __name__ == '__main__':
+#     # Webhook o'rnatish
+#     webhook_url = "https://connect-u-2.onrender.com/webhook"
+#     bot.remove_webhook()
+#     bot.set_webhook(url=webhook_url)
     
-    # Flask serverni ishga tushirish
+#     # Flask serverni ishga tushirish
+#     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 10000)))
+
+# ==========================================
+# MENTOR VIDEOS (mentor-videos.html uchun)
+# ==========================================
+
+@app.route('/api/mentor/videos', methods=['GET'])
+def get_mentor_videos():
+    user = get_current_user()
+    if not user or user.role != 'mentor':
+        return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
+
+    mentor = user.mentor_profile
+    if not mentor:
+        return jsonify({'success': False, 'error': 'Mentor profil topilmadi'}), 404
+
+    access = request.args.get('access')  # 'free' | 'premium' | None (all)
+
+    query = Material.query.filter_by(owner_id=mentor.id if hasattr(Material, 'owner_id') else None)
+
+    # owner_id yo'q bo'lsa — mentor_id orqali filter
+    # Material modeliga mentor_id qo'shilmagan bo'lsa, hamma videolarni ko'rsatamiz (demo)
+    try:
+        videos = Material.query.filter(
+            Material.material_type.in_(['video', 'youtube'])
+        ).order_by(Material.created_at.desc()).all()
+    except Exception:
+        videos = Material.query.order_by(Material.created_at.desc()).all()
+
+    result = []
+    for v in videos:
+        d = v.to_dict()
+        if access and d.get('access_type') != access:
+            continue
+        result.append(d)
+
+    # Top 5 — views bo'yicha
+    top5 = sorted(result, key=lambda x: x.get('views', 0), reverse=True)[:5]
+
+    total_views = sum(v.get('views', 0) for v in result)
+    free_count = sum(1 for v in result if v.get('access_type') != 'premium')
+    premium_count = sum(1 for v in result if v.get('access_type') == 'premium')
+
+    return jsonify({
+        'success': True,
+        'videos': result,
+        'top5': top5,
+        'stats': {
+            'total': len(result),
+            'total_views': total_views,
+            'free': free_count,
+            'premium': premium_count
+        }
+    })
+
+
+@app.route('/api/mentor/videos', methods=['POST'])
+def add_mentor_video():
+    user = get_current_user()
+    if not user or user.role != 'mentor':
+        return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
+
+    mentor = user.mentor_profile
+    if not mentor:
+        return jsonify({'success': False, 'error': 'Mentor profil topilmadi'}), 404
+
+    data = request.get_json(force=True, silent=True) or {}
+    title = data.get('title', '').strip()
+    url = data.get('url', '').strip()
+    description = data.get('description', '').strip()
+    access_type = data.get('access_type', 'free')  # 'free' | 'premium'
+
+    if not title or not url:
+        return jsonify({'success': False, 'error': 'Sarlavha va URL kerak'}), 400
+
+    video = Material(
+        title=title,
+        material_type='youtube' if 'youtube.com' in url or 'youtu.be' in url else 'video',
+        url=url
+    )
+
+    # Qo'shimcha maydonlar (Material modelda bo'lsa)
+    if hasattr(video, 'description'):
+        video.description = description
+    if hasattr(video, 'access_type'):
+        video.access_type = access_type
+    if hasattr(video, 'mentor_id'):
+        video.mentor_id = mentor.id
+    if hasattr(video, 'views'):
+        video.views = 0
+
+    db.session.add(video)
+    db.session.commit()
+
+    return jsonify({'success': True, 'video': video.to_dict()})
+
+
+@app.route('/api/mentor/videos/<string:video_id>', methods=['DELETE'])
+def delete_mentor_video(video_id):
+    user = get_current_user()
+    if not user or user.role != 'mentor':
+        return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
+
+    video = db.session.get(Material, video_id)
+    if not video:
+        abort(404)
+
+    # Faqat o'z videosini o'chira oladi
+    if hasattr(video, 'mentor_id') and video.mentor_id != user.mentor_profile.id:
+        return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
+
+    db.session.delete(video)
+    db.session.commit()
+
+    return jsonify({'success': True})
+
+
+@app.route('/api/mentor/videos/<string:video_id>/view', methods=['POST'])
+def increment_video_view(video_id):
+    """Video ko'rilganda views++ qilish"""
+    video = db.session.get(Material, video_id)
+    if not video:
+        abort(404)
+
+    if hasattr(video, 'views'):
+        video.views = (video.views or 0) + 1
+        db.session.commit()
+
+    return jsonify({'success': True})
+
+
+# ==========================================
+# MENTOR DASHBOARD STATS (mentor-dashboard.html)
+# ==========================================
+
+@app.route('/api/mentor/dashboard', methods=['GET'])
+def mentor_dashboard():
+    user = get_current_user()
+    if not user or user.role != 'mentor':
+        return jsonify({'success': False, 'error': 'Ruxsat yo\'q'}), 403
+
+    mentor = user.mentor_profile
+    if not mentor:
+        return jsonify({'success': False, 'error': 'Mentor profil topilmadi'}), 404
+
+    # Sessiyalar statistikasi
+    from sqlalchemy import func
+    total_sessions = Session.query.filter_by(mentor_id=mentor.id).count()
+    completed = Session.query.filter_by(mentor_id=mentor.id, status='completed').count()
+    pending = Session.query.filter_by(mentor_id=mentor.id, status='pending').count()
+    confirmed = Session.query.filter_by(mentor_id=mentor.id, status='confirmed').count()
+
+    # Unique talabalar
+    students = db.session.query(Session.student_id)\
+        .filter_by(mentor_id=mentor.id).distinct().count()
+
+    # Reyting
+    rated = Session.query.filter(
+        Session.mentor_id == mentor.id,
+        Session.student_rating.isnot(None)
+    ).all()
+    avg_rating = round(sum(s.student_rating for s in rated) / len(rated), 1) if rated else 0.0
+
+    # Yaqin sessiyalar (confirmed, kelayotgan)
+    upcoming = Session.query.filter_by(
+        mentor_id=mentor.id, status='confirmed'
+    ).filter(
+        Session.scheduled_at >= datetime.utcnow()
+    ).order_by(Session.scheduled_at).limit(5).all()
+
+    # So'ngi 7 kun daromadi (kunlik)
+    today = datetime.utcnow().date()
+    weekly = []
+    for i in range(6, -1, -1):
+        day = today - timedelta(days=i)
+        day_start = datetime.combine(day, datetime.min.time())
+        day_end = datetime.combine(day, datetime.max.time())
+        day_pts = db.session.query(func.sum(MentorPoint.points))\
+            .filter(
+                MentorPoint.mentor_id == mentor.id,
+                MentorPoint.points > 0,
+                MentorPoint.created_at.between(day_start, day_end)
+            ).scalar() or 0
+        weekly.append({'date': day.isoformat(), 'points': int(day_pts)})
+
+    # Kutilayotgan so'rovlar (pending)
+    pending_list = Session.query.filter_by(
+        mentor_id=mentor.id, status='pending'
+    ).order_by(Session.created_at.desc()).limit(10).all()
+
+    def session_to_dict(s):
+        student = db.session.get(User, s.student_id)
+        return {
+            'id': s.id,
+            'session_type': s.session_type,
+            'status': s.status,
+            'scheduled_at': s.scheduled_at.isoformat() if s.scheduled_at else None,
+            'student_name': student.full_name if student else 'Noma\'lum',
+            'student_avatar': student.avatar_url if student else None,
+            'student_phone': student.phone if student else None,
+            'meet_link': s.meet_link,
+            'points_awarded': s.points_awarded,
+            'duration_min': s.duration_min,
+        }
+
+    return jsonify({
+        'success': True,
+        'stats': {
+            'balance': mentor.balance or 0,
+            'total_sessions': total_sessions,
+            'completed': completed,
+            'pending': pending,
+            'confirmed': confirmed,
+            'students': students,
+            'avg_rating': avg_rating,
+            'is_verified': mentor.is_verified,
+        },
+        'weekly_earnings': weekly,
+        'upcoming_sessions': [session_to_dict(s) for s in upcoming],
+        'pending_requests': [session_to_dict(s) for s in pending_list],
+    })
+
+
+# ==========================================
+# NEWS — target=mentor filtri
+# ==========================================
+
+@app.route('/api/news', methods=['GET'])
+def get_news_filtered():
+    target = request.args.get('target')  # 'mentor' | 'student' | None
+
+    query = News.query.order_by(News.created_at.desc())
+
+    # Agar News modelda target maydoni bo'lsa — filter qo'llanadi
+    if target and hasattr(News, 'target'):
+        query = query.filter(
+            (News.target == target) | (News.target == 'all') | (News.target.is_(None))
+        )
+
+    news_list = query.all()
+    return jsonify({'success': True, 'news': [n.to_dict() for n in news_list]})
+
+
+if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 10000)))
