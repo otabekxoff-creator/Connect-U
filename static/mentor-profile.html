@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>ConnectU — Profil</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mentor-shared.css">
+<style>
+/* ─── Profile-specific ─── */
+.profile-tabs{display:flex;border-bottom:1px solid var(--border);margin:0;background:var(--bg);position:sticky;top:var(--nav-h);z-index:10;transition:var(--trans)}
+.ptab{flex:1;padding:12px 8px;border:none;background:none;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;font-family:inherit}
+.ptab.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* Instagram-style grid */
+.ig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:4px}
+.ig-cell{aspect-ratio:1;background:var(--s2);position:relative;overflow:hidden;cursor:pointer}
+.ig-cell img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;transition:transform .3s}
+.ig-cell:active img{transform:scale(1.05)}
+.ig-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;background:rgba(0,0,0,.5);transition:opacity .2s}
+.ig-cell:hover .ig-overlay{opacity:1}
+.ig-cell-empty{display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer}
+.ig-prem{position:absolute;top:4px;right:4px;background:rgba(240,165,0,.92);color:#040810;font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px}
+
+/* 2-col cert grid */
+.cert-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 18px}
+.cg-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r-sm);padding:13px;cursor:pointer;transition:border-color .2s}
+.cg-card:active{border-color:var(--gold)}
+.cg-icon{font-size:24px;margin-bottom:6px}
+.cg-title{font-size:12px;font-weight:700;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cg-issuer{font-size:10px;color:var(--text2)}
+
+/* Platform settings section */
+.platform-section{margin:0 18px 16px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.ps-header{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border)}
+.ps-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.ps-title{font-size:13px;font-weight:700}
+.ps-sub{font-size:11px;color:var(--text2)}
+.ps-row{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)}
+.ps-row:last-child{border-bottom:none}
+.ps-row-label{font-size:13px;color:var(--text2)}
+.ps-row-val{font-size:13px;font-weight:600;color:var(--text)}
+
+/* News mini */
+.news-mini{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;cursor:pointer}
+.nm-tag{display:inline-flex;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;margin-bottom:6px;background:var(--gold-d);color:var(--gold)}
+.nm-title{font-size:14px;font-weight:700;margin-bottom:4px;line-height:1.4}
+.nm-desc{font-size:12px;color:var(--text2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.nm-time{font-size:11px;color:var(--text3);margin-top:6px}
+
+/* Notif mini */
+.notif-mini{display:flex;gap:12px;padding:12px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;cursor:pointer;transition:border-color .2s}
+.notif-mini.unread{border-left:3px solid var(--gold)}
+.notif-mini:active{border-color:var(--border2)}
+</style>
+</head>
+<body>
+
+<div id="loadingScreen">
+  <div class="spinner" style="width:44px;height:44px;border-width:4px"></div>
+  <div class="loading-logo">Connect<span>-U</span></div>
+</div>
+
+<div class="shell" id="appShell" style="display:none">
+
+<!-- HEADER -->
+<div class="hdr">
+  <button class="hdr-back" onclick="CU.navTo('home')">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <div class="hdr-title">Profil</div>
+  <button class="btn-act" style="padding:7px 14px;font-size:12px" onclick="CU.openModal('profileEditModal')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    Tahrirlash
+  </button>
+</div>
+
+<div class="content">
+
+  <!-- Cover -->
+  <div class="profile-cover" id="profileCover" onclick="document.getElementById('coverInput').click()" style="cursor:pointer">
+    <div class="cover-edit-btn">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="1.8"/></svg>
+      Cover
+    </div>
+  </div>
+  <input type="file" id="coverInput" accept="image/*" onchange="handleCover(this)" style="display:none">
+
+  <!-- Avatar row -->
+  <div class="profile-avatar-wrap">
+    <div class="p-avatar" id="pAvatar" onclick="document.getElementById('avatarInput').click()">
+      <span id="pAvatarText">M</span>
+      <div class="p-avatar-overlay">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="white" stroke-width="1.8"/><circle cx="12" cy="13" r="4" stroke="white" stroke-width="1.8"/></svg>
+      </div>
+    </div>
+    <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatar(this)" style="display:none">
+    <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+      <div class="p-name" id="pName">Mentor</div>
+      <div class="p-sub" id="pSub">@username</div>
+      <div id="pVerifyBadge"></div>
+    </div>
+  </div>
+
+  <!-- Verify banners -->
+  <div id="bannerPending" class="verify-banner" style="background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.3);display:none;margin:0 18px 12px">
+    <div class="vb-icon" style="background:rgba(240,165,0,.15)">⚠️</div>
+    <div class="vb-text"><h4 id="bannerTitle">Verifikatsiya talab qilinadi</h4><p id="bannerMsg">3 kun ichida guvohnomangizni yuklang</p></div>
+    <button class="vb-action" onclick="switchTab('docs')">Yuklash →</button>
+  </div>
+  <div id="bannerVerified" class="verify-banner" style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);display:none;margin:0 18px 12px">
+    <div class="vb-icon" style="background:rgba(34,197,94,.15)">✅</div>
+    <div class="vb-text"><h4 style="color:var(--green)">✓ Profil tasdiqlangan</h4><p>Mentorlar ro'yxatida ko'rinasiz</p></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="profile-tabs">
+    <button class="ptab active" onclick="switchTab('info')" id="tab-info">📋 Ma'lumot</button>
+    <button class="ptab" onclick="switchTab('grid')" id="tab-grid">⊞ Postlar</button>
+    <button class="ptab" onclick="switchTab('docs')" id="tab-docs">📂 Hujjatlar</button>
+    <button class="ptab" onclick="switchTab('news')" id="tab-news">📢 Yangiliklar</button>
+  </div>
+
+  <!-- TAB: INFO -->
+  <div id="tabInfo" class="tab-content">
+    <div style="height:14px"></div>
+
+    <!-- Bio -->
+    <div style="padding:0 18px;margin-bottom:16px">
+      <span class="label">BIO</span>
+      <p id="bioDisplay" style="font-size:13px;color:var(--text2);line-height:1.7;margin-top:4px">—</p>
+    </div>
+
+    <!-- Info rows -->
+    <div style="padding:0 18px;margin-bottom:8px"><span class="label">ASOSIY MA'LUMOTLAR</span></div>
+    <div class="info-list" style="margin:0 18px 16px">
+      <div class="il-row"><span class="il-label">To'liq ism</span><span class="il-val" id="ilName">—</span></div>
+      <div class="il-row"><span class="il-label">Universitet</span><span class="il-val" id="ilUni">—</span></div>
+      <div class="il-row"><span class="il-label">Yo'nalish</span><span class="il-val" id="ilFaculty">—</span></div>
+      <div class="il-row"><span class="il-label">Kurs</span><span class="il-val" id="ilYear">—</span></div>
+      <div class="il-row"><span class="il-label">GPA</span><span class="il-val" id="ilGpa">—</span></div>
+      <div class="il-row"><span class="il-label">Reyting</span><span class="il-val" id="ilRating">5.0 ★</span></div>
+      <div class="il-row"><span class="il-label">Jami sessiyalar</span><span class="il-val" id="ilSess">0</span></div>
+    </div>
+
+    <!-- Platform settings -->
+    <div style="padding:0 18px;margin-bottom:8px"><span class="label">PLATFORMA SOZLAMALARI</span></div>
+    <div class="platform-section">
+      <div class="ps-row">
+        <span class="ps-row-label">🌙 Tema</span>
+        <button class="settings-toggle" id="themeToggleBtn" data-on="false" onclick="CU.toggleTheme();updateThemeToggle()"></button>
+      </div>
+      <div class="settings-row" style="cursor:default">
+        <span class="ps-row-label" style="flex:1">🔔 Bildirishnomalar</span>
+        <button class="settings-toggle on"></button>
+      </div>
+      <div class="settings-row" style="cursor:default">
+        <span class="ps-row-label" style="flex:1">👁 Profil ko'rinishi</span>
+        <span class="badge b-green">Ochiq</span>
+      </div>
+    </div>
+
+    <!-- Danger zone -->
+    <div class="settings-group" style="margin-bottom:24px">
+      <div class="settings-row" onclick="CU.logout()" style="cursor:pointer">
+        <div class="settings-icon" style="background:rgba(255,77,106,.1)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="#FF4D6A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="settings-row-text">
+          <h4 style="color:var(--red)">Chiqish</h4>
+          <p>Hisobdan chiqish</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: GRID (Instagram style) -->
+  <div id="tabGrid" class="tab-content" style="display:none">
+    <!-- Profile stats bar -->
+    <div style="display:flex;justify-content:space-around;padding:16px 18px;border-bottom:1px solid var(--border)">
+      <div style="text-align:center"><div style="font-size:18px;font-weight:800" id="gsVideos">0</div><div style="font-size:11px;color:var(--text2)">Videolar</div></div>
+      <div style="text-align:center"><div style="font-size:18px;font-weight:800" id="gsCerts">0</div><div style="font-size:11px;color:var(--text2)">Sertifikatlar</div></div>
+      <div style="text-align:center"><div style="font-size:18px;font-weight:800" id="gsSess">0</div><div style="font-size:11px;color:var(--text2)">Sessiyalar</div></div>
+    </div>
+    <!-- Grid filter -->
+    <div class="chips" style="padding:10px 18px">
+      <button class="chip active" onclick="filterGrid('videos',this)">▶️ Videolar</button>
+      <button class="chip" onclick="filterGrid('certs',this)">🏆 Sertifikatlar</button>
+    </div>
+    <div id="igGridContainer" class="ig-grid" style="padding:0"></div>
+    <div style="height:20px"></div>
+  </div>
+
+  <!-- TAB: DOCS -->
+  <div id="tabDocs" class="tab-content" style="display:none">
+    <div style="height:14px"></div>
+    <div style="padding:0 18px;margin-bottom:8px"><span class="label">TALABA GUVOHNOMASI (MAJBURIY)</span></div>
+    <div id="studentIdZone" class="upload-zone" style="margin:0 18px 16px" onclick="document.getElementById('studentIdInput').click()">
+      <div class="uz-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="var(--gold)" stroke-width="1.8"/><path d="M7 9h5M7 13h8M7 17h4" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <div class="uz-title">Talaba guvohnomasi</div>
+      <div class="uz-sub">JPG, PNG yoki PDF · 5 MB gacha</div>
+      <div id="studentIdStatus" style="margin-top:8px;font-size:12px;font-weight:600"></div>
+    </div>
+    <input type="file" id="studentIdInput" accept="image/*,.pdf" onchange="uploadStudentId(this)" style="display:none">
+
+    <div style="padding:0 18px;margin-bottom:8px"><span class="label">CV / REZYUME</span></div>
+    <div class="upload-zone" style="margin:0 18px 16px" onclick="document.getElementById('cvInput').click()">
+      <div class="uz-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="var(--teal)" stroke-width="1.8"/><polyline points="14,2 14,8 20,8" stroke="var(--teal)" stroke-width="1.8"/></svg></div>
+      <div class="uz-title">CV yuklash</div>
+      <div class="uz-sub">PDF, DOC · 10 MB gacha</div>
+    </div>
+    <input type="file" id="cvInput" accept=".pdf,.doc,.docx" onchange="uploadCV(this)" style="display:none">
+
+    <div class="sr" style="margin-top:4px">
+      <div class="sr-t">Sertifikatlar</div>
+      <button class="sr-a" onclick="CU.openModal('certModal')">+ Qo'shish</button>
+    </div>
+    <div id="certsList" style="margin:0 18px"></div>
+    <div class="gap"></div>
+  </div>
+
+  <!-- TAB: NEWS & NOTIFS -->
+  <div id="tabNews" class="tab-content" style="display:none">
+    <div style="height:14px"></div>
+    <!-- Sub tabs -->
+    <div style="display:flex;gap:8px;padding:0 18px;margin-bottom:14px">
+      <button class="chip active" onclick="switchNews('news',this)">📢 Yangiliklar</button>
+      <button class="chip" onclick="switchNews('notifs',this)">🔔 Bildirishnomalar</button>
+    </div>
+    <div id="newsPanel">
+      <div id="newsList" style="padding:0 18px"></div>
+    </div>
+    <div id="notifsPanel" style="display:none;padding:0 18px">
+      <div id="notifsList"></div>
+    </div>
+    <div class="gap"></div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- BOTTOM NAV -->
+<nav class="nav">
+  <button class="ni" data-page="home" onclick="CU.navTo('home')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><polyline points="9,22 9,12 15,12 15,22" stroke="currentColor" stroke-width="2"/></svg>
+    <span class="ni-label">Asosiy</span>
+  </button>
+  <button class="ni" data-page="sessions" onclick="CU.navTo('sessions')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span class="ni-label">Sessiyalar</span>
+  </button>
+  <button class="ni" data-page="videos" onclick="CU.navTo('videos')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><polygon points="23,7 16,12 23,17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="1" y="5" width="15" height="14" rx="2" stroke="currentColor" stroke-width="2"/></svg>
+    <span class="ni-label">Videolar</span>
+  </button>
+  <button class="ni" data-page="earnings" onclick="CU.navTo('earnings')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span class="ni-label">Daromad</span>
+  </button>
+  <button class="ni active" data-page="profile" onclick="CU.navTo('profile')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+    <span class="ni-label">Profil</span>
+  </button>
+</nav>
+</div><!-- /shell -->
+
+<!-- PROFILE EDIT MODAL -->
+<div class="modal" id="profileEditModal" onclick="if(event.target===this)CU.closeModal('profileEditModal')">
+  <div class="modal-sheet" style="max-height:90vh;overflow-y:auto">
+    <div class="modal-handle"></div>
+    <div class="modal-top">
+      <div class="modal-title">Profilni tahrirlash</div>
+      <button class="modal-close-btn" onclick="CU.closeModal('profileEditModal')">✕</button>
+    </div>
+    <div class="ef-field" style="margin-top:8px">
+      <label class="ef-label">To'liq ism</label>
+      <input class="ef-input" id="peFullName" type="text" placeholder="Ism Familiya">
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Universitet</label>
+      <input class="ef-input" id="peUniversity" type="text" placeholder="TDYU, TATU...">
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Yo'nalish (Fakultet)</label>
+      <input class="ef-input" id="peFaculty" type="text" placeholder="Huquqshunoslik...">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="ef-field">
+        <label class="ef-label">Kurs (1-6)</label>
+        <input class="ef-input" id="peYear" type="number" min="1" max="6" placeholder="2">
+      </div>
+      <div class="ef-field">
+        <label class="ef-label">GPA</label>
+        <input class="ef-input" id="peGpa" type="number" step="0.01" min="0" max="5" placeholder="3.85">
+      </div>
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Bio / O'zingiz haqingizda</label>
+      <textarea class="ef-input ef-textarea" id="peBio" placeholder="O'zingiz haqingizda yozing..."></textarea>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+      <button class="btn btn-ghost" onclick="CU.closeModal('profileEditModal')">Bekor</button>
+      <button class="btn btn-gold" onclick="saveProfileEdit()">💾 Saqlash</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD CERT MODAL -->
+<div class="modal" id="certModal" onclick="if(event.target===this)CU.closeModal('certModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Sertifikat qo'shish</div>
+    <div class="ef-field" style="margin-top:4px">
+      <label class="ef-label">Sertifikat nomi *</label>
+      <input class="ef-input" id="certTitle" placeholder="IELTS 7.0, AWS Certified...">
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Berilgan tashkilot</label>
+      <input class="ef-input" id="certIssuer" placeholder="British Council, Amazon...">
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Sana</label>
+      <input class="ef-input" id="certDate" type="date">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" onclick="addCert()">✓ Qo'shish</button>
+      <button class="btn btn-ghost" onclick="CU.closeModal('certModal')">Bekor qilish</button>
+    </div>
+  </div>
+</div>
+
+<script src="mentor-shared.js"></script>
+<script>
+let _gridMode = 'videos';
+let _newsMode = 'news';
+let _demoNotifs = [
+  {id:'n1',icon:'✓',iconBg:'rgba(34,197,94,.12)',title:'Sessiyangiz tasdiqlandi',desc:'Robiya Teshaboeva sessiyang ni tasdiqladi',time:new Date(Date.now()-3600000*2).toISOString(),read:false},
+  {id:'n2',icon:'💰',iconBg:'rgba(0,191,166,.12)',title:'Balans to\'ldirildi',desc:'+8,000 so\'m sessiya uchun qo\'shildi',time:new Date(Date.now()-86400000).toISOString(),read:false},
+  {id:'n3',icon:'📢',iconBg:'rgba(240,165,0,.12)',title:'Yangi yangilik',desc:'Platforma yangiligi: to\'lov tizimi yangilandi',time:new Date(Date.now()-86400000*2).toISOString(),read:true},
+];
+
+window.addEventListener('load', () => {
+  CU.init(async () => {
+    await CU.loadVideos();
+    renderProfile();
+    updateThemeToggle();
+  });
+});
+
+function updateThemeToggle() {
+  const btn = document.getElementById('themeToggleBtn');
+  const isLight = document.body.classList.contains('light-theme');
+  btn.classList.toggle('on', isLight);
+}
+
+function renderProfile() {
+  const u = CU.currentUser;
+  const md = CU.mentorData || {};
+  const name = u.full_name || 'Mentor';
+
+  document.getElementById('pAvatarText').textContent = name[0].toUpperCase();
+  document.getElementById('pName').textContent = name;
+  document.getElementById('pSub').textContent = u.username ? '@'+u.username : '@mentor';
+
+  if(u.avatar_url) {
+    let img = document.getElementById('pAvatar').querySelector('img');
+    if(!img) { img = document.createElement('img'); document.getElementById('pAvatar').appendChild(img); }
+    img.src = u.avatar_url;
+  }
+  if(md.cover_url) {
+    const c = document.getElementById('profileCover');
+    c.style.backgroundImage = `url(${md.cover_url})`;
+    c.style.backgroundSize = 'cover'; c.style.backgroundPosition = 'center';
+  }
+
+  // Info
+  document.getElementById('ilName').textContent = name;
+  document.getElementById('ilUni').textContent = md.university || '—';
+  document.getElementById('ilFaculty').textContent = md.faculty || '—';
+  document.getElementById('ilYear').textContent = md.year ? md.year+'-kurs' : '—';
+  document.getElementById('ilGpa').textContent = md.gpa || '—';
+  document.getElementById('ilRating').textContent = (md.rating||5.0).toFixed(1) + ' ★';
+  document.getElementById('ilSess').textContent = md.total_sessions || 0;
+  const bioEl = document.getElementById('bioDisplay');
+  if(bioEl) bioEl.textContent = md.bio || '—';
+
+  // Verify badge
+  if(md.is_verified) {
+    document.getElementById('pVerifyBadge').innerHTML = '<span class="badge b-green">✓ Tasdiqlangan</span>';
+    document.getElementById('bannerVerified').style.display = 'flex';
+    document.getElementById('bannerPending').style.display = 'none';
+  }
+
+  // Verify banner
+  if(CU._verifyData) updateVerifyBanners(CU._verifyData);
+
+  // Grid stats
+  document.getElementById('gsVideos').textContent = CU.videos.length;
+  document.getElementById('gsCerts').textContent = CU.certificates.length;
+  document.getElementById('gsSess').textContent = md.total_sessions || 0;
+
+  // Certs list
+  renderCertsList();
+
+  // Verify zone
+  if(CU._verifyData) updateStudentIdZone(
+    CU._verifyData.is_verified ? 'verified' : CU._verifyData.student_id_url ? 'pending' : 'none',
+    CU._verifyData.days_left
+  );
+}
+
+function updateVerifyBanners(data) {
+  if(data.is_verified) {
+    document.getElementById('bannerPending').style.display = 'none';
+    document.getElementById('bannerVerified').style.display = 'flex';
+  } else if(data.student_id_url) {
+    document.getElementById('bannerPending').style.display = 'flex';
+    document.getElementById('bannerVerified').style.display = 'none';
+    document.getElementById('bannerTitle').textContent = '⏳ Tekshiruv kutilmoqda';
+    document.getElementById('bannerMsg').textContent = 'Guvohnoma yuklandi, admin tekshirishi kutilmoqda';
+  } else {
+    document.getElementById('bannerPending').style.display = 'flex';
+    document.getElementById('bannerVerified').style.display = 'none';
+  }
+}
+
+/* ─── TABS ─── */
+function switchTab(tab) {
+  ['info','grid','docs','news'].forEach(t => {
+    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+    document.getElementById('tabInfo'+(t==='info'?'':t.charAt(0).toUpperCase()+t.slice(1))).style.display = t===tab?'block':'none';
+  });
+  if(tab==='grid') renderGrid();
+  if(tab==='news') renderNews();
+}
+// fix tab IDs
+const tabMap = {info:'tabInfo',grid:'tabGrid',docs:'tabDocs',news:'tabNews'};
+document.querySelectorAll('.ptab').forEach(t=>{});
+function _showTab(name) {
+  Object.keys(tabMap).forEach(k => {
+    document.getElementById('tab-'+k).classList.toggle('active',k===name);
+    document.getElementById(tabMap[k]).style.display = k===name ? 'block' : 'none';
+  });
+}
+function switchTab(tab) {
+  _showTab(tab);
+  if(tab==='grid') renderGrid();
+  if(tab==='news') renderNews();
+}
+
+/* ─── GRID ─── */
+function filterGrid(mode, btn) {
+  document.querySelectorAll('#tabGrid .chip').forEach(c=>c.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  _gridMode = mode;
+  renderGrid();
+}
+
+function renderGrid() {
+  const container = document.getElementById('igGridContainer');
+  if(_gridMode === 'videos') {
+    if(!CU.videos.length) {
+      container.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text2)"><div style="font-size:32px;margin-bottom:8px">🎬</div>Video yo\'q</div>';
+      return;
+    }
+    container.innerHTML = CU.videos.map(v => {
+      const thumb = v.thumbnail || CU.ytThumb(v.url||'');
+      return `<div class="ig-cell" onclick="${v.url?`window.open('${v.url}','_blank')`:''}">
+        ${thumb ? `<img src="${thumb}" loading="lazy">` : '<div class="ig-cell-empty">🎬</div>'}
+        <div class="ig-overlay">
+          <div style="display:flex;align-items:center;gap:6px;color:#fff;font-size:12px;font-weight:600">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>
+            ${CU.fmt(v.views||0)}
+          </div>
+        </div>
+        ${v.access==='premium'?'<div class="ig-prem">⭐</div>':''}
+      </div>`;
+    }).join('') + (CU.videos.length < 9 ? `<div class="ig-cell ig-cell-empty" onclick="CU.navTo('videos')" style="background:var(--s3)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" opacity=".4"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></div>` : '');
+  } else {
+    if(!CU.certificates.length) {
+      container.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text2)"><div style="font-size:32px;margin-bottom:8px">🏆</div>Sertifikat yo\'q</div>';
+      return;
+    }
+    container.innerHTML = CU.certificates.map(c => `
+      <div class="ig-cell ig-cell-empty" style="background:var(--s2);flex-direction:column;gap:4px;padding:8px">
+        <div style="font-size:24px">🏆</div>
+        <div style="font-size:9px;font-weight:700;text-align:center;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical">${CU.escHtml(c.title)}</div>
+        <div style="font-size:9px;color:var(--text2)">${c.issuer||''}</div>
+      </div>`).join('') + (CU.certificates.length < 9 ? `<div class="ig-cell ig-cell-empty" onclick="CU.openModal('certModal')" style="background:var(--s3)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" opacity=".4"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></div>` : '');
+  }
+}
+
+/* ─── NEWS/NOTIFS ─── */
+let _newsLoaded = false;
+function switchNews(mode, btn) {
+  document.querySelectorAll('#tabNews .chip').forEach(c=>c.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  _newsMode = mode;
+  document.getElementById('newsPanel').style.display = mode==='news'?'block':'none';
+  document.getElementById('notifsPanel').style.display = mode==='notifs'?'block':'none';
+  if(mode==='notifs') renderNotifs();
+}
+
+async function renderNews() {
+  if(_newsLoaded) return;
+  const el = document.getElementById('newsList');
+  el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">Yuklanmoqda...</div>';
+  let news;
+  try {
+    const d = await CU.API.get('/api/news?target=mentor');
+    news = d.success ? d.news : CU._demoNews();
+  } catch(e) { news = CU._demoNews(); }
+  _newsLoaded = true;
+  const catLabel = {update:'Yangilanish',event:'Tadbir',urgent:'Muhim',general:'Umumiy'};
+  const catIcon = {update:'🔄',event:'📅',urgent:'⚠️',general:'📢'};
+  el.innerHTML = news.map(n => `
+    <div class="news-mini ${n.priority==='critical'?'p-critical':n.priority==='high'?'p-high':''}" onclick="${n.link?`window.open('${n.link}','_blank')`:''}" style="background:var(--s1);border:1.5px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer">
+      <div class="nm-tag">${catIcon[n.category]||'📢'} ${catLabel[n.category]||'Yangilik'}</div>
+      <div class="nm-title">${CU.escHtml(n.title)}</div>
+      <div class="nm-desc">${CU.escHtml(n.content||'')}</div>
+      <div class="nm-time">${CU.timeAgo(n.created_at)}</div>
+    </div>`).join('');
+}
+
+function renderNotifs() {
+  const notifs = [..._demoNotifs, ...(CU.sessions.filter(s=>s.status==='pending').map(s=>({
+    id:'sess_'+s.id,icon:'📅',iconBg:'rgba(240,165,0,.12)',
+    title:'Yangi sessiya so\'rovi',desc:(s.student_name||'Talaba') + ' · ' + CU.sessionTypeLabel(s.session_type),
+    time:s.created_at||new Date().toISOString(),read:false
+  })))];
+  document.getElementById('notifsList').innerHTML = notifs.length
+    ? notifs.map(n => `
+      <div class="notif-mini ${!n.read?'unread':''}">
+        <div class="ni-icon" style="background:${n.iconBg||'rgba(255,255,255,.06)'}">${n.icon||'🔔'}</div>
+        <div class="ni-body">
+          <div class="ni-title">${CU.escHtml(n.title)}</div>
+          <div class="ni-desc">${CU.escHtml(n.desc||'')}</div>
+          <div class="ni-time">${CU.timeAgo(n.time)}</div>
+        </div>
+        ${!n.read?'<div class="ni-dot"></div>':''}
+      </div>`).join('')
+    : '<div class="empty-state"><div class="empty-state-icon">🔔</div>Bildirishnoma yo\'q</div>';
+}
+
+/* ─── PROFILE EDIT ─── */
+function openProfileEditModal() {
+  const md = CU.mentorData || {};
+  document.getElementById('peFullName').value = CU.currentUser.full_name || '';
+  document.getElementById('peUniversity').value = md.university || '';
+  document.getElementById('peFaculty').value = md.faculty || '';
+  document.getElementById('peYear').value = md.year || '';
+  document.getElementById('peGpa').value = md.gpa || '';
+  document.getElementById('peBio').value = md.bio || '';
+  CU.openModal('profileEditModal');
+}
+
+async function saveProfileEdit() {
+  const body = {
+    full_name: document.getElementById('peFullName').value.trim(),
+    university: document.getElementById('peUniversity').value.trim(),
+    faculty: document.getElementById('peFaculty').value.trim(),
+    year: document.getElementById('peYear').value || null,
+    gpa: document.getElementById('peGpa').value || null,
+    bio: document.getElementById('peBio').value.trim()
+  };
+  try {
+    const d = await CU.API.put('/api/profile', body);
+    if(d.success) {
+      if(body.full_name) CU.currentUser.full_name = body.full_name;
+      if(!CU.mentorData) CU.mentorData = {};
+      Object.assign(CU.mentorData, {university:body.university,faculty:body.faculty,year:body.year,gpa:body.gpa,bio:body.bio});
+      renderProfile();
+      CU.closeModal('profileEditModal');
+      CU.toast('Profil yangilandi ✓');
+    } else CU.toast(d.error||'Xatolik','err');
+  } catch(e) {
+    // Offline apply
+    if(body.full_name) CU.currentUser.full_name = body.full_name;
+    if(!CU.mentorData) CU.mentorData = {};
+    Object.assign(CU.mentorData, {university:body.university,faculty:body.faculty,year:body.year,gpa:body.gpa,bio:body.bio});
+    renderProfile();
+    CU.closeModal('profileEditModal');
+    CU.toast('Profil yangilandi ✓');
+  }
+}
+
+/* ─── CERTS ─── */
+function renderCertsList() {
+  const el = document.getElementById('certsList');
+  el.innerHTML = CU.certificates.length
+    ? CU.certificates.map(c => `
+      <div class="cert-card" style="margin-bottom:8px">
+        <div class="cert-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 15l-2 5-1-5-5-1 5-2 1-5 2 5 5 1-5 2z" stroke="var(--gold)" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+        <div class="cert-info">
+          <div class="cert-title">${CU.escHtml(c.title)}</div>
+          <div class="cert-issuer">${CU.escHtml(c.issuer||'—')} · ${c.issued_date||c.date||'—'}</div>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            ${c.file_url?`<button class="btn btn-surface btn-sm" onclick="window.open('${c.file_url}','_blank')">Ko'rish</button>`:''}
+            <button class="btn btn-red btn-sm" onclick="deleteCert('${c.id}')">🗑</button>
+          </div>
+        </div>
+      </div>`).join('')
+    : '<div class="empty-state" style="padding:24px"><div class="empty-state-icon">🏆</div>Sertifikat yo\'q</div>';
+}
+
+async function addCert() {
+  const title = document.getElementById('certTitle').value.trim();
+  const issuer = document.getElementById('certIssuer').value.trim();
+  const date = document.getElementById('certDate').value;
+  if(!title) { CU.toast('Nom kiriting', 'err'); return; }
+  try {
+    const d = await CU.API.post('/api/mentor/certificates', {title, issuer:issuer||null, date:date||null});
+    if(d.success) {
+      CU.certificates.push(d.certificate);
+      renderCertsList();
+      document.getElementById('gsVideos').textContent = CU.videos.length;
+      document.getElementById('gsCerts').textContent = CU.certificates.length;
+      CU.closeModal('certModal');
+      ['certTitle','certIssuer','certDate'].forEach(id=>document.getElementById(id).value='');
+      CU.toast('Sertifikat qo\'shildi ✓');
+    } else CU.toast(d.error||'Xatolik','err');
+  } catch(e) { CU.toast('Server xatosi','err'); }
+}
+
+async function deleteCert(id) {
+  if(!confirm('Sertifikatni o\'chirasizmi?')) return;
+  try { await CU.API.del(`/api/mentor/certificates/${id}`); } catch(e){}
+  CU.certificates = CU.certificates.filter(c=>c.id!==id);
+  renderCertsList();
+  CU.toast('O\'chirildi');
+}
+
+/* ─── AVATAR / COVER ─── */
+async function handleAvatar(input) {
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const d = await CU.API.post('/api/profile/avatar', {avatar_url: e.target.result});
+      if(d.success) {
+        const av = document.getElementById('pAvatar');
+        let img = av.querySelector('img');
+        if(!img) { img = document.createElement('img'); av.appendChild(img); }
+        img.src = d.avatar_url || e.target.result;
+        CU.toast('Rasm yuklandi ✓');
+      } else CU.toast(d.error||'Xatolik','err');
+    } catch(e) { CU.toast('Yuklashda xato','err'); }
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleCover(input) {
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const c = document.getElementById('profileCover');
+    c.style.backgroundImage = `url(${e.target.result})`;
+    c.style.backgroundSize = 'cover'; c.style.backgroundPosition = 'center';
+    CU.toast('Cover o\'zgartirildi ✓');
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ─── STUDENT ID UPLOAD ─── */
+async function uploadStudentId(input) {
+  if(!input.files[0]) return;
+  const formData = new FormData();
+  formData.append('student_id', input.files[0]);
+  document.getElementById('studentIdZone').innerHTML = '<div style="padding:24px;text-align:center"><div class="spinner"></div><p style="margin-top:12px;font-size:13px;color:var(--text2)">Yuklanmoqda...</p></div>';
+  try {
+    const res = await fetch('/api/mentor/upload-student-id', {method:'POST', body:formData, credentials:'include'});
+    const data = await res.json();
+    if(data.success) {
+      CU.toast('✅ Guvohnoma yuklandi!');
+      const vd = await CU.loadVerificationStatus();
+      if(vd) { updateVerifyBanners(vd); updateStudentIdZone(vd.student_id_url ? 'pending' : 'none', vd.days_left); }
+    } else { updateStudentIdZone('none'); CU.toast('❌ ' + (data.error||'Xato'), 'err'); }
+  } catch(e) { updateStudentIdZone('none'); CU.toast('Server bilan bog\'lanib bo\'lmadi','err'); }
+}
+
+function updateStudentIdZone(status, daysLeft) {
+  const zone = document.getElementById('studentIdZone');
+  if(!zone) return;
+  const cfg = {
+    verified:{icon:'✓',color:'var(--green)',bg:'rgba(34,197,94,.05)',border:'var(--green)',title:'✓ Guvohnoma tasdiqlangan',sub:'Admin tekshiruvidan o\'tgan',statusHtml:'<span style="color:var(--green);font-weight:700">✓ Tasdiqlangan</span>',clickable:false},
+    pending:{icon:'⏳',color:'var(--gold)',bg:'rgba(240,165,0,.05)',border:'var(--gold)',title:'⏳ Guvohnoma yuklangan',sub:'Admin tekshiruvi kutilmoqda',statusHtml:`<span style="color:var(--gold);font-weight:700">Kutilmoqda${daysLeft!==undefined?' · '+daysLeft+' kun':''}</span>`,clickable:false},
+    none:{icon:'📄',color:'var(--gold)',bg:'var(--s1)',border:'var(--border2)',title:'Talaba guvohnomasi',sub:'JPG, PNG yoki PDF · 5 MB gacha',statusHtml:'<span style="color:var(--red);font-weight:700">✕ Yuklanmagan</span>',clickable:true}
+  };
+  const c = cfg[status] || cfg.none;
+  zone.style.borderColor = c.border; zone.style.background = c.bg;
+  zone.style.cursor = c.clickable ? 'pointer' : 'default';
+  zone.onclick = c.clickable ? ()=>document.getElementById('studentIdInput').click() : null;
+  zone.innerHTML = `<div class="uz-icon" style="font-size:22px">${c.icon}</div><div class="uz-title">${c.title}</div><div class="uz-sub">${c.sub}</div><div style="margin-top:8px">${c.statusHtml}</div>`;
+}
+
+async function uploadCV(input) {
+  if(!input.files[0]) return;
+  const formData = new FormData();
+  formData.append('document', input.files[0]);
+  formData.append('type', 'cv');
+  try {
+    const res = await fetch('/api/mentor/documents', {method:'POST', body:formData, credentials:'include'});
+    const d = await res.json();
+    if(d.success) CU.toast('CV yuklandi ✓'); else CU.toast(d.error||'Xatolik','err');
+  } catch(e) { CU.toast('Yuklashda xato','err'); }
+}
+</script>
+</body>
+</html>
