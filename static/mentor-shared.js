@@ -41,26 +41,95 @@ CU.API = {
   }
 };
 
+/* ─── DEMO USER (backend yo'q bo'lganda ishlatiladi) ─── */
+CU._demoUser = function() {
+  return {
+    id: 'demo_mentor_1',
+    full_name: 'Mentor Foydalanuvchi',
+    username: 'mentor_demo',
+    role: 'mentor',
+    avatar_url: '',
+    balance: 3950000,
+    pending_balance: 480000,
+    total_sessions: 12,
+    rating: 4.8,
+    reviews_count: 5,
+    mentor_profile: {
+      bio: 'TDYU 3-kurs talabasi. Matematika va fizika bo\'yicha mentor.',
+      university: 'TDYU',
+      faculty: 'Muhandislik fakulteti',
+      year: 3,
+      subjects: ['Matematika', 'Fizika'],
+      languages: ['Uzbek', 'Russian'],
+      individual_price: 8000,
+      group_price: 2000,
+    }
+  };
+};
+
+CU._demoSessions = function() {
+  const names = ['Bobur T.','Malika S.','Nilufar B.','Jasur M.','Dilnoza T.','Sherzod A.'];
+  const statuses = ['pending','confirmed','completed','completed','cancelled','completed'];
+  const types = ['individual','group','individual','group','individual','individual'];
+  return names.map((n,i) => ({
+    id: 'sess_'+i,
+    student_name: n,
+    student_university: 'TDYU',
+    session_type: types[i],
+    status: statuses[i],
+    scheduled_at: new Date(Date.now() + (i-2)*86400000).toISOString(),
+    duration_min: 60,
+    notes: '',
+    meet_link: i===1 ? 'https://meet.google.com/abc-defg-hij' : ''
+  }));
+};
+
+CU._demoPoints = function() {
+  return [
+    {id:'p1',type:'session',amount:8000,description:'Individual sessiya — Bobur T.',created_at:new Date(Date.now()-86400000).toISOString()},
+    {id:'p2',type:'session',amount:2000,description:'Guruh sessiya — Malika S.',created_at:new Date(Date.now()-86400000*3).toISOString()},
+    {id:'p3',type:'withdrawal',amount:-50000,description:'Pul yechish',created_at:new Date(Date.now()-86400000*7).toISOString()},
+    {id:'p4',type:'session',amount:8000,description:'Individual sessiya — Jasur M.',created_at:new Date(Date.now()-86400000*10).toISOString()},
+  ];
+};
+
 /* ─── AUTH ─── */
 CU.init = async function(onSuccess) {
   try {
     const tg = window.Telegram?.WebApp;
     if(tg){tg.ready();tg.expand();}
-    
-    const d = await CU.API.get('/api/me');
-    if(!d.success) { location.href='login.html'; return; }
-    CU.currentUser = d.user;
-    if(CU.currentUser.role !== 'mentor') { location.href='index.html'; return; }
-    if(CU.currentUser.mentor_profile) CU.mentorData = CU.currentUser.mentor_profile;
+
+    let d = null;
+    try {
+      d = await CU.API.get('/api/me');
+    } catch(fetchErr) {
+      d = null;
+    }
+
+    if(!d || !d.success) {
+      /* Backend yo'q — demo rejimda ishlaymiz */
+      CU._demoMode = true;
+      CU.currentUser = CU._demoUser();
+      CU.mentorData = CU.currentUser.mentor_profile;
+      CU.sessions = CU._demoSessions();
+      CU.pointsHistory = CU._demoPoints();
+      CU.certificates = [];
+      CU._verifyData = {success:true, status:'none', days_left: 0};
+    } else {
+      CU._demoMode = false;
+      CU.currentUser = d.user;
+      if(CU.currentUser.role !== 'mentor') { location.href='index.html'; return; }
+      if(CU.currentUser.mentor_profile) CU.mentorData = CU.currentUser.mentor_profile;
+
+      await Promise.allSettled([
+        CU.loadSessions(),
+        CU.loadPoints(),
+        CU.loadCertificates(),
+        CU.loadVerificationStatus(),
+      ]);
+    }
 
     CU.applyTheme();
-
-    await Promise.allSettled([
-      CU.loadSessions(),
-      CU.loadPoints(),
-      CU.loadCertificates(),
-      CU.loadVerificationStatus(),
-    ]);
 
     if(onSuccess) onSuccess();
 
@@ -71,12 +140,28 @@ CU.init = async function(onSuccess) {
 
   } catch(e) {
     console.error('Init error:', e);
-    location.href = 'login.html';
+    /* Xato bo'lsa ham demo rejimda ko'rsatamiz */
+    CU._demoMode = true;
+    CU.currentUser = CU._demoUser();
+    CU.mentorData = CU.currentUser.mentor_profile;
+    CU.sessions = CU._demoSessions();
+    CU.pointsHistory = CU._demoPoints();
+    CU.certificates = [];
+
+    CU.applyTheme();
+    if(onSuccess) onSuccess();
+
+    const ls = document.getElementById('loadingScreen');
+    const shell = document.getElementById('appShell');
+    if(ls) ls.style.display = 'none';
+    if(shell) shell.style.display = 'flex';
   }
 };
 
 CU.logout = async function() {
-  try { await fetch('/api/logout',{method:'POST',credentials:'include'}); } catch(e){}
+  if(!CU._demoMode) {
+    try { await fetch('/api/logout',{method:'POST',credentials:'include'}); } catch(e){}
+  }
   location.href = 'login.html';
 };
 
@@ -241,6 +326,13 @@ CU.sessionTypeLabel = function(type) {
 };
 
 CU.confirmSession = async function(id, onDone) {
+  if(CU._demoMode) {
+    const s = CU.sessions.find(x=>x.id===id);
+    if(s) s.status = 'confirmed';
+    CU.toast('Sessiya tasdiqlandi ✓');
+    if(onDone) onDone();
+    return;
+  }
   try {
     const d = await CU.API.post(`/api/sessions/${id}/confirm`, {});
     if(d.success) {
@@ -253,6 +345,13 @@ CU.confirmSession = async function(id, onDone) {
 };
 
 CU.rejectSession = async function(id, onDone) {
+  if(CU._demoMode) {
+    const s = CU.sessions.find(x=>x.id===id);
+    if(s) s.status = 'cancelled';
+    CU.toast('Rad etildi');
+    if(onDone) onDone();
+    return;
+  }
   try {
     const d = await CU.API.post(`/api/sessions/${id}/reject`, {});
     if(d.success) {
