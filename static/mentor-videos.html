@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>ConnectU — Videolar</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mentor-shared.css">
+<style>
+/* ─── Videos-specific ─── */
+.vid-hero{
+  margin:16px 18px;border-radius:20px;
+  background:linear-gradient(135deg,#0A1535,#1a0a35);
+  border:1px solid rgba(124,92,252,.25);
+  padding:20px;position:relative;overflow:hidden;
+}
+.vid-hero::before{content:'VIDEO';position:absolute;right:-10px;top:50%;transform:translateY(-50%) rotate(-12deg);font-size:80px;font-weight:900;color:rgba(124,92,252,.06);font-family:'JetBrains Mono',monospace;letter-spacing:-2px;pointer-events:none}
+.vh-title{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--purple);margin-bottom:6px}
+.vh-heading{font-size:22px;font-weight:800;margin-bottom:4px}
+.vh-sub{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:16px}
+.vh-stats{display:flex;gap:20px}
+.vhs-item{text-align:center}
+.vhs-val{font-size:18px;font-weight:800;color:var(--purple)}
+.vhs-lbl{font-size:10px;color:var(--text3)}
+
+/* Video grid */
+.mv-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 18px}
+@media(min-width:600px){.mv-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* Top videos leaderboard */
+.top-vid-item{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--border);align-items:center}
+.top-vid-item:last-child{border-bottom:none}
+.tvi-rank{font-size:13px;font-weight:800;width:22px;text-align:center;flex-shrink:0}
+.tvi-thumb{width:60px;height:40px;border-radius:6px;overflow:hidden;flex-shrink:0;background:var(--s3);position:relative}
+.tvi-thumb img{width:100%;height:100%;object-fit:cover}
+.tvi-info{flex:1;min-width:0}
+.tvi-title{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.tvi-stats{display:flex;gap:8px;font-size:10px;color:var(--text2)}
+.tvi-right{flex-shrink:0}
+
+/* Video detail modal */
+.vd-thumb{width:100%;aspect-ratio:16/9;border-radius:12px;overflow:hidden;position:relative;background:var(--s3);margin-bottom:16px}
+.vd-thumb img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.vd-play-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);cursor:pointer}
+.vd-play-btn{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center}
+
+/* Upload zone fancy */
+.upload-zone-purple{border:2px dashed rgba(124,92,252,.4);border-radius:var(--r);padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(124,92,252,.04)}
+.upload-zone-purple:active{border-color:var(--purple);background:rgba(124,92,252,.1)}
+</style>
+</head>
+<body>
+
+<div id="loadingScreen">
+  <div class="spinner" style="width:44px;height:44px;border-width:4px"></div>
+  <div class="loading-logo">Connect<span>-U</span></div>
+</div>
+
+<div class="shell" id="appShell" style="display:none">
+
+<!-- HEADER -->
+<div class="hdr">
+  <button class="hdr-back" onclick="CU.navTo('home')">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <div class="hdr-title">Video materiallar</div>
+  <button class="btn-act" onclick="CU.openModal('videoAddModal')" style="padding:7px 14px;font-size:12px">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+    Qo'shish
+  </button>
+</div>
+
+<div class="content">
+<div class="page active">
+
+  <!-- Hero stats -->
+  <div class="vid-hero">
+    <div class="vh-title">VIDEO MATERIALLAR</div>
+    <div class="vh-heading">Mening videolarim</div>
+    <div class="vh-sub">Bepul va premium kontent</div>
+    <div class="vh-stats">
+      <div class="vhs-item"><div class="vhs-val" id="vhTotal">0</div><div class="vhs-lbl">Video</div></div>
+      <div class="vhs-item"><div class="vhs-val" id="vhViews">0</div><div class="vhs-lbl">Ko'rishlar</div></div>
+      <div class="vhs-item"><div class="vhs-val" id="vhFree">0</div><div class="vhs-lbl">Bepul</div></div>
+      <div class="vhs-item"><div class="vhs-val" id="vhPrem">0</div><div class="vhs-lbl">Premium</div></div>
+    </div>
+  </div>
+
+  <!-- Filter chips -->
+  <div class="chips">
+    <button class="chip active" onclick="filterVids('all',this)">Hammasi</button>
+    <button class="chip" onclick="filterVids('free',this)">✓ Bepul</button>
+    <button class="chip" onclick="filterVids('premium',this)">⭐ Premium</button>
+  </div>
+
+  <!-- My videos grid -->
+  <div class="sr"><div class="sr-t">Mening videolarim</div></div>
+  <div class="mv-grid" id="myVideoGrid"></div>
+
+  <!-- Upload zone if empty -->
+  <div id="uploadZoneArea" style="display:none;margin:0 18px 20px">
+    <div class="upload-zone-purple" onclick="CU.openModal('videoAddModal')">
+      <div style="font-size:40px;margin-bottom:10px">🎬</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:4px">Birinchi videongizni qo'shing</div>
+      <div style="font-size:13px;color:var(--text2)">YouTube yoki Telegram video linkini kiriting</div>
+    </div>
+  </div>
+
+  <!-- Top videos leaderboard -->
+  <div class="sr" style="margin-top:8px">
+    <div class="sr-t">🏆 Top videolar</div>
+    <span style="font-size:12px;color:var(--text2)">Ko'rishlar bo'yicha</span>
+  </div>
+  <div class="card" style="margin:0 18px 16px;padding:0 16px">
+    <div id="topVideosList"></div>
+  </div>
+
+  <div class="gap"></div>
+</div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="nav">
+  <button class="ni" data-page="home" onclick="CU.navTo('home')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><polyline points="9,22 9,12 15,12 15,22" stroke="currentColor" stroke-width="2"/></svg>
+    <span class="ni-label">Asosiy</span>
+  </button>
+  <button class="ni" data-page="sessions" onclick="CU.navTo('sessions')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span class="ni-label">Sessiyalar</span>
+  </button>
+  <button class="ni active" data-page="videos" onclick="CU.navTo('videos')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><polygon points="23,7 16,12 23,17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="1" y="5" width="15" height="14" rx="2" stroke="currentColor" stroke-width="2"/></svg>
+    <span class="ni-label">Videolar</span>
+  </button>
+  <button class="ni" data-page="earnings" onclick="CU.navTo('earnings')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span class="ni-label">Daromad</span>
+  </button>
+  <button class="ni" data-page="profile" onclick="CU.navTo('profile')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+    <span class="ni-label">Profil</span>
+  </button>
+</nav>
+</div><!-- /shell -->
+
+<!-- ADD VIDEO MODAL -->
+<div class="modal" id="videoAddModal" onclick="if(event.target===this)CU.closeModal('videoAddModal')">
+  <div class="modal-sheet" style="max-height:90vh;overflow-y:auto">
+    <div class="modal-handle"></div>
+    <div class="modal-top">
+      <div class="modal-title">Video qo'shish</div>
+      <button class="modal-close-btn" onclick="CU.closeModal('videoAddModal')">✕</button>
+    </div>
+    <div class="modal-sub">Bepul yoki premium video joylang</div>
+    <!-- Access type -->
+    <div style="margin-bottom:16px">
+      <div class="ef-label">Ko'rish huquqi</div>
+      <div style="display:flex;gap:8px">
+        <div class="target-chip active" id="vaFree" onclick="setAccess('free',this)" style="flex:1;justify-content:center">✓ Bepul (hammaga)</div>
+        <div class="target-chip" id="vaPrem" onclick="setAccess('premium',this)" style="flex:1;justify-content:center">⭐ Premium</div>
+      </div>
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Sarlavha *</label>
+      <input class="ef-input" id="mvTitle" placeholder="DTM matematika: formulalar...">
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Video URL *</label>
+      <input class="ef-input" id="mvUrl" placeholder="https://youtube.com/watch?v=..." oninput="autoThumb(this.value)">
+      <div style="font-size:11px;color:var(--text2);margin-top:3px">YouTube, Vimeo yoki boshqa platformalar</div>
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Thumbnail (preview rasm)</label>
+      <input class="ef-input" id="mvThumb" placeholder="https://...">
+      <div id="mvThumbPrev" style="display:none;margin-top:8px;border-radius:10px;overflow:hidden;aspect-ratio:16/9">
+        <img id="mvThumbImg" style="width:100%;height:100%;object-fit:cover">
+      </div>
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Tavsif</label>
+      <textarea class="ef-input ef-textarea" id="mvDesc" placeholder="Bu video nima haqida..."></textarea>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+      <button class="btn btn-ghost" onclick="CU.closeModal('videoAddModal')">Bekor</button>
+      <button class="btn btn-gold" onclick="saveVideo()">💾 Saqlash</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIDEO DETAIL MODAL -->
+<div class="modal" id="videoDetailModal" onclick="if(event.target===this)CU.closeModal('videoDetailModal')">
+  <div class="modal-sheet" style="max-height:90vh;overflow-y:auto">
+    <div class="modal-handle"></div>
+    <div id="videoDetailBody"></div>
+  </div>
+</div>
+
+<script src="mentor-shared.js"></script>
+<script>
+let _access = 'free';
+let _currentVids = [];
+
+window.addEventListener('load', () => {
+  CU.init(async () => {
+    await CU.loadVideos();
+    _currentVids = CU.videos;
+    renderAll();
+  });
+});
+
+function renderAll() {
+  // Hero stats
+  const vids = CU.videos;
+  document.getElementById('vhTotal').textContent = vids.length;
+  document.getElementById('vhViews').textContent = CU.fmt(vids.reduce((s,v)=>s+(v.views||0),0));
+  document.getElementById('vhFree').textContent = vids.filter(v=>v.access==='free').length;
+  document.getElementById('vhPrem').textContent = vids.filter(v=>v.access==='premium').length;
+
+  renderVideoGrid(vids);
+  renderTopVideos();
+}
+
+function filterVids(f, btn) {
+  document.querySelectorAll('.chips .chip').forEach(c=>c.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const list = f === 'all' ? CU.videos : CU.videos.filter(v=>v.access===f);
+  renderVideoGrid(list);
+}
+
+function renderVideoGrid(list) {
+  const grid = document.getElementById('myVideoGrid');
+  const zone = document.getElementById('uploadZoneArea');
+  if(!list.length) {
+    grid.innerHTML = '';
+    zone.style.display = 'block';
+    return;
+  }
+  zone.style.display = 'none';
+  grid.innerHTML = list.map(v => {
+    const thumb = v.thumbnail || CU.ytThumb(v.url||'');
+    return `<div class="mv-card" onclick="openVideoDetail('${v.id}')">
+      <div class="mv-thumb">
+        ${thumb ? `<img src="${thumb}" loading="lazy" alt="">` : `<div style="font-size:28px;z-index:1">🎬</div>`}
+        <div class="mv-overlay"><div class="mv-play"><svg width="10" height="12" viewBox="0 0 24 24" fill="#040810"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+        ${v.access==='premium'?'<div class="mv-prem-tag">⭐ PRO</div>':''}
+      </div>
+      <div class="mv-body">
+        <div class="mv-title">${CU.escHtml(v.title)}</div>
+        <div class="mv-stats">
+          <span>👁 ${CU.fmt(v.views||0)}</span>
+          <span>❤️ ${v.likes||0}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderTopVideos() {
+  const sorted = [...CU.videos].sort((a,b)=>(b.views||0)-(a.views||0)).slice(0,5);
+  const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+  document.getElementById('topVideosList').innerHTML = sorted.length
+    ? sorted.map((v,i) => {
+        const thumb = v.thumbnail || CU.ytThumb(v.url||'');
+        return `<div class="top-vid-item">
+          <div class="tvi-rank">${medals[i]||i+1}</div>
+          <div class="tvi-thumb">${thumb?`<img src="${thumb}" loading="lazy">`:'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:16px">🎬</div>'}</div>
+          <div class="tvi-info">
+            <div class="tvi-title">${CU.escHtml(v.title)}</div>
+            <div class="tvi-stats"><span>👁 ${CU.fmt(v.views||0)}</span><span>❤️ ${v.likes||0}</span><span>${v.access==='premium'?'⭐ Premium':'✓ Bepul'}</span></div>
+          </div>
+        </div>`;
+      }).join('')
+    : '<div class="empty-state" style="padding:20px">Hali video yo\'q</div>';
+}
+
+function openVideoDetail(id) {
+  const v = CU.videos.find(x=>x.id===id);
+  if(!v) return;
+  const thumb = v.thumbnail || CU.ytThumb(v.url||'');
+  document.getElementById('videoDetailBody').innerHTML = `
+    <div class="vd-thumb">
+      ${thumb?`<img src="${thumb}" alt="">`:'<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:48px">🎬</div>'}
+      ${v.url?`<div class="vd-play-overlay" onclick="window.open('${v.url}','_blank')"><div class="vd-play-btn"><svg width="16" height="18" viewBox="0 0 24 24" fill="#040810"><polygon points="5,3 19,12 5,21"/></svg></div></div>`:''}
+    </div>
+    <div class="modal-title">${CU.escHtml(v.title)}</div>
+    <div style="display:flex;gap:8px;margin:8px 0 14px;flex-wrap:wrap">
+      <span class="badge ${v.access==='premium'?'b-gold':'b-teal'}">${v.access==='premium'?'⭐ Premium':'✓ Bepul'}</span>
+      <span class="badge b-gray">👁 ${CU.fmt(v.views||0)} ko'rish</span>
+      <span class="badge b-gray">❤️ ${v.likes||0} like</span>
+    </div>
+    ${v.description?`<p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px">${CU.escHtml(v.description)}</p>`:''}
+    <div class="info-list" style="margin:0 0 16px">
+      <div class="il-row"><span class="il-label">Joylashtirilgan</span><span class="il-val">${CU.fmtDateShort(v.created_at)}</span></div>
+      ${v.url?`<div class="il-row"><span class="il-label">Platforma</span><span class="il-val">${v.url.includes('youtube')||v.url.includes('youtu.be')?'YouTube':'Boshqa'}</span></div>`:''}
+    </div>
+    <div class="modal-btns">
+      ${v.url?`<button class="btn btn-purple" onclick="window.open('${v.url}','_blank')">▶️ Ko'rish</button>`:''}
+      <button class="btn btn-red" onclick="deleteVideo('${v.id}')">🗑 O'chirish</button>
+      <button class="btn btn-ghost" onclick="CU.closeModal('videoDetailModal')">Yopish</button>
+    </div>`;
+  CU.openModal('videoDetailModal');
+}
+
+function autoThumb(url) {
+  const t = CU.ytThumb(url);
+  if(t) {
+    document.getElementById('mvThumb').value = t;
+    document.getElementById('mvThumbImg').src = t;
+    document.getElementById('mvThumbPrev').style.display = 'block';
+  }
+}
+
+function setAccess(val, el) {
+  _access = val;
+  document.getElementById('vaFree').classList.toggle('active', val==='free');
+  document.getElementById('vaPrem').classList.toggle('active', val==='premium');
+}
+
+async function saveVideo() {
+  const title = document.getElementById('mvTitle').value.trim();
+  const url = document.getElementById('mvUrl').value.trim();
+  const thumb = document.getElementById('mvThumb').value.trim();
+  const desc = document.getElementById('mvDesc').value.trim();
+  if(!title || !url) { CU.toast('Sarlavha va URL kiriting', 'err'); return; }
+  try {
+    const d = await CU.API.post('/api/materials', {title, url, thumbnail:thumb||CU.ytThumb(url), description:desc, access:_access});
+    if(d.success) {
+      CU.videos.unshift(d.material || {id:Date.now()+'',title,url,thumbnail:thumb||CU.ytThumb(url),access:_access,views:0,likes:0,description:desc,created_at:new Date().toISOString()});
+      renderAll();
+      CU.closeModal('videoAddModal');
+      ['mvTitle','mvUrl','mvThumb','mvDesc'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('mvThumbPrev').style.display = 'none';
+      CU.toast('Video qo\'shildi ✓');
+    } else CU.toast(d.error||'Xatolik','err');
+  } catch(e) {
+    // offline demo
+    CU.videos.unshift({id:Date.now()+'',title,url,thumbnail:thumb||CU.ytThumb(url),access:_access,views:0,likes:0,description:desc,created_at:new Date().toISOString()});
+    renderAll();
+    CU.closeModal('videoAddModal');
+    CU.toast('Video qo\'shildi ✓');
+  }
+}
+
+async function deleteVideo(id) {
+  if(!confirm('Videoni o\'chirasizmi?')) return;
+  try {
+    await CU.API.del(`/api/materials/${id}`);
+  } catch(e){}
+  CU.videos = CU.videos.filter(v=>v.id!==id);
+  renderAll();
+  CU.closeModal('videoDetailModal');
+  CU.toast('O\'chirildi');
+}
+</script>
+</body>
+</html>
