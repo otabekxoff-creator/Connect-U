@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>ConnectU — Daromad</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mentor-shared.css">
+<style>
+/* ─── Earnings-specific ─── */
+.earn-hero{
+  margin:16px 18px;border-radius:20px;
+  background:linear-gradient(135deg,#061a12,#0d2a1e);
+  border:1px solid rgba(0,191,166,.2);
+  padding:22px 20px;position:relative;overflow:hidden;
+}
+.earn-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(0,191,166,.12),transparent 70%)}
+.eh-label{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--teal);margin-bottom:6px}
+.eh-balance{font-size:38px;font-weight:900;color:var(--teal);line-height:1;margin-bottom:4px;font-family:'JetBrains Mono',monospace}
+.eh-sub{font-size:12px;color:rgba(255,255,255,.4);margin-bottom:18px}
+.eh-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px}
+.eh-box{text-align:center;background:rgba(0,191,166,.06);border:1px solid rgba(0,191,166,.1);border-radius:10px;padding:10px 6px}
+.ehb-val{font-size:16px;font-weight:800;margin-bottom:2px}
+.ehb-lbl{font-size:10px;color:var(--text2)}
+
+/* Withdrawal status */
+.wd-status-card{margin:0 18px 12px;background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.wds-item{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--border)}
+.wds-item:last-child{border-bottom:none}
+.wds-left{display:flex;flex-direction:column;gap:3px}
+.wds-amount{font-size:15px;font-weight:800}
+.wds-meta{font-size:11px;color:var(--text2)}
+.wds-right{}
+
+/* Monthly chart */
+.month-chart-wrap{padding:0 18px 0;margin-bottom:16px}
+.mc-bars{display:flex;align-items:flex-end;gap:6px;height:80px;margin-bottom:6px}
+.mc-bar{flex:1;border-radius:4px 4px 0 0;background:var(--teal-d);border:1px solid rgba(0,191,166,.15);transition:height .5s cubic-bezier(.23,1,.32,1);cursor:pointer;position:relative}
+.mc-bar.hi{background:var(--teal);border-color:var(--teal)}
+.mc-labels{display:flex;justify-content:space-between}
+.mc-lbl{font-size:9px;color:var(--text3);flex:1;text-align:center}
+
+/* Transaction item */
+.txn-item{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.txn-item:last-child{border-bottom:none}
+.txn-item:active{background:var(--s2)}
+.txn-left{display:flex;gap:10px;align-items:center}
+.txn-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px}
+.txn-info h4{font-size:13px;font-weight:600;margin-bottom:2px}
+.txn-info p{font-size:11px;color:var(--text2)}
+.txn-amount{font-size:14px;font-weight:800}
+.txn-plus{color:var(--green)}
+.txn-minus{color:var(--red)}
+
+/* Card styled */
+.payment-card-styled{
+  background:linear-gradient(135deg,#1A2A4A,#0D1A30);
+  border:1px solid rgba(240,165,0,.2);border-radius:18px;padding:22px;
+  position:relative;overflow:hidden;margin:0 18px 12px;
+}
+.payment-card-styled::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:radial-gradient(circle,rgba(240,165,0,.15),transparent 70%);border-radius:50%}
+</style>
+</head>
+<body>
+
+<div id="loadingScreen">
+  <div class="spinner" style="width:44px;height:44px;border-width:4px"></div>
+  <div class="loading-logo">Connect<span>-U</span></div>
+</div>
+
+<div class="shell" id="appShell" style="display:none">
+
+<!-- HEADER -->
+<div class="hdr">
+  <button class="hdr-back" onclick="CU.navTo('home')">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <div class="hdr-title">Ballar & To'lovlar</div>
+  <div class="hdr-badge"><div class="dot"></div>DAROMAD</div>
+</div>
+
+<div class="content">
+<div class="page active">
+
+  <div class="ph" style="padding-bottom:8px">
+    <span class="label">DAROMAD</span>
+    <div class="pt">Ballar & To'lovlar</div>
+  </div>
+
+  <!-- Earn hero -->
+  <div class="earn-hero">
+    <div class="eh-label">MAVJUD BALANS</div>
+    <div class="eh-balance" id="ehBalance">0</div>
+    <div class="eh-sub">so'm</div>
+    <div class="eh-row">
+      <div class="eh-box"><div class="ehb-val" style="color:var(--teal)" id="ehTotal">0</div><div class="ehb-lbl">Jami topilgan</div></div>
+      <div class="eh-box"><div class="ehb-val" style="color:var(--green)" id="ehPaid">0</div><div class="ehb-lbl">Olingan</div></div>
+      <div class="eh-box"><div class="ehb-val" style="color:var(--gold)" id="ehSess">0</div><div class="ehb-lbl">Sessiyalar</div></div>
+    </div>
+    <button class="btn btn-teal" onclick="openWithdraw()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 7l-5-5-5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      Pul yechish so'rovi
+    </button>
+  </div>
+
+  <!-- Monthly chart -->
+  <div class="sr"><div class="sr-t">Oylik daromad</div><span style="font-size:11px;color:var(--text2)">so'm</span></div>
+  <div class="month-chart-wrap">
+    <div class="mc-bars" id="monthBars"></div>
+    <div class="mc-labels" id="monthLabels"></div>
+  </div>
+
+  <!-- Payment card -->
+  <div style="padding:0 18px;margin-bottom:8px"><span class="label">TO'LOV KARTASI</span></div>
+  <div class="payment-card-styled">
+    <div style="width:36px;height:26px;border-radius:5px;background:linear-gradient(135deg,#F0A500,#FFD166);margin-bottom:16px;position:relative;z-index:1"></div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:17px;letter-spacing:3px;margin-bottom:10px;color:#fff;position:relative;z-index:1" id="cdNumber">•••• •••• •••• ••••</div>
+    <div style="display:flex;justify-content:space-between;position:relative;z-index:1">
+      <div style="font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:#fff" id="cdHolder">KARTA EGASI</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.5);font-family:'JetBrains Mono',monospace">VISA / MC</div>
+    </div>
+  </div>
+  <div style="padding:0 18px;margin-bottom:16px">
+    <button class="btn btn-ghost" onclick="CU.openModal('cardModal')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="1" y="4" width="22" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M1 10h22" stroke="currentColor" stroke-width="1.8"/></svg>
+      Karta ma'lumotlarini o'zgartirish
+    </button>
+  </div>
+
+  <!-- Pending withdrawals -->
+  <div class="sr"><div class="sr-t">Yechish so'rovlari</div></div>
+  <div id="wdStatusArea" style="margin:0 18px 16px"></div>
+
+  <!-- Transaction history -->
+  <div class="sr"><div class="sr-t">Tranzaksiyalar tarixi</div></div>
+  <!-- Filter -->
+  <div class="chips">
+    <button class="chip active" onclick="filterTxns('all',this)">Hammasi</button>
+    <button class="chip" onclick="filterTxns('session_completed',this)">✓ Sessiyalar</button>
+    <button class="chip" onclick="filterTxns('withdrawal',this)">↑ Yechimlar</button>
+    <button class="chip" onclick="filterTxns('bonus',this)">🎁 Bonuslar</button>
+  </div>
+  <div class="card" style="margin:0 18px"><div id="txnList"></div></div>
+  <div class="gap"></div>
+
+</div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="nav">
+  <button class="ni" data-page="home" onclick="CU.navTo('home')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><polyline points="9,22 9,12 15,12 15,22" stroke="currentColor" stroke-width="2"/></svg>
+    <span class="ni-label">Asosiy</span>
+  </button>
+  <button class="ni" data-page="sessions" onclick="CU.navTo('sessions')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span class="ni-label">Sessiyalar</span>
+  </button>
+  <button class="ni" data-page="videos" onclick="CU.navTo('videos')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><polygon points="23,7 16,12 23,17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="1" y="5" width="15" height="14" rx="2" stroke="currentColor" stroke-width="2"/></svg>
+    <span class="ni-label">Videolar</span>
+  </button>
+  <button class="ni active" data-page="earnings" onclick="CU.navTo('earnings')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span class="ni-label">Daromad</span>
+  </button>
+  <button class="ni" data-page="profile" onclick="CU.navTo('profile')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+    <span class="ni-label">Profil</span>
+  </button>
+</nav>
+</div>
+
+<!-- WITHDRAW MODAL -->
+<div class="modal" id="withdrawModal" onclick="if(event.target===this)CU.closeModal('withdrawModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Pul yechish</div>
+    <div class="modal-sub" id="wdSubText">Mavjud balans: 0 so'm</div>
+    <div class="payment-card-styled" style="margin:0 0 16px">
+      <div style="width:30px;height:22px;border-radius:4px;background:linear-gradient(135deg,#F0A500,#FFD166);margin-bottom:12px;position:relative;z-index:1"></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:2px;color:#fff;margin-bottom:8px;position:relative;z-index:1" id="wdCardNum">•••• •••• •••• ••••</div>
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;color:#fff;position:relative;z-index:1" id="wdCardHolder">KARTA EGASI</div>
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Summa (so'm)</label>
+      <input class="ef-input mono" id="withdrawAmount" type="number" placeholder="50000" min="50000">
+      <div style="font-size:11px;color:var(--text2);margin-top:4px">Minimal: 50,000 so'm · 24 soat ichida o'tkaziladi</div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-teal" onclick="submitWithdraw()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 7l-5-5-5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        So'rov yuborish
+      </button>
+      <button class="btn btn-ghost" onclick="CU.closeModal('withdrawModal')">Bekor qilish</button>
+    </div>
+  </div>
+</div>
+
+<!-- CARD MODAL -->
+<div class="modal" id="cardModal" onclick="if(event.target===this)CU.closeModal('cardModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Karta ma'lumotlari</div>
+    <div class="modal-sub">Pul yechish uchun karta raqamingizni kiriting</div>
+    <div class="ef-field">
+      <label class="ef-label">Karta raqami</label>
+      <input class="ef-input mono" id="cardNumber" type="text" placeholder="8600 0000 0000 0000" maxlength="19" oninput="fmtCard(this)">
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Karta egasi (lotincha)</label>
+      <input class="ef-input" id="cardHolder" type="text" placeholder="AZIZ KARIMOV" style="text-transform:uppercase">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" onclick="saveCard()">💾 Saqlash</button>
+      <button class="btn btn-ghost" onclick="CU.closeModal('cardModal')">Bekor qilish</button>
+    </div>
+  </div>
+</div>
+
+<script src="mentor-shared.js"></script>
+<script>
+let _allTxns = [];
+
+window.addEventListener('load', () => {
+  CU.init(() => { renderEarnings(); });
+});
+
+function renderEarnings() {
+  const md = CU.mentorData || {};
+  const pts = CU.pointsHistory;
+  _allTxns = pts;
+
+  const balance = md.balance || 0;
+  const totalEarned = pts.filter(p=>p.points>0).reduce((s,p)=>s+p.points,0);
+  const paidOut = pts.filter(p=>p.points<0&&p.reason==='withdrawal').reduce((s,p)=>s+Math.abs(p.points),0);
+
+  document.getElementById('ehBalance').textContent = CU.fmt(balance);
+  document.getElementById('ehTotal').textContent = CU.fmt(totalEarned);
+  document.getElementById('ehPaid').textContent = CU.fmt(paidOut);
+  document.getElementById('ehSess').textContent = md.total_sessions || 0;
+  document.getElementById('wdSubText').textContent = 'Mavjud balans: ' + CU.fmt(balance) + ' so\'m';
+
+  if(md.card_last4) {
+    const masked = '•••• •••• •••• ' + md.card_last4;
+    ['cdNumber','wdCardNum'].forEach(id => document.getElementById(id).textContent = masked);
+    ['cdHolder','wdCardHolder'].forEach(id => document.getElementById(id).textContent = md.card_holder || '—');
+  }
+
+  renderMonthChart();
+  renderWithdrawals();
+  renderTxns('all');
+}
+
+function renderMonthChart() {
+  const monthNames = ['Yan','Fev','Mar','Apr','May','Iyn','Iyl','Avg','Sen','Okt','Noy','Dek'];
+  const now = new Date();
+  const months = Array.from({length:6}, (_,i) => {
+    const d = new Date(now.getFullYear(), now.getMonth()-5+i, 1);
+    return {month: d.getMonth(), year: d.getFullYear(), label: monthNames[d.getMonth()]};
+  });
+  const data = months.map(m => {
+    const sum = CU.pointsHistory.filter(p => {
+      if(!p.created_at||p.points<=0) return false;
+      const pd = new Date(p.created_at);
+      return pd.getMonth()===m.month && pd.getFullYear()===m.year;
+    }).reduce((s,p)=>s+p.points,0);
+    return {...m, val:sum};
+  });
+  const maxV = Math.max(...data.map(d=>d.val), 1);
+  document.getElementById('monthBars').innerHTML = data.map((d,i)=>
+    `<div class="mc-bar${i===data.length-1?' hi':''}" style="height:${Math.max(4,Math.round(d.val/maxV*100))}%" title="${CU.fmt(d.val)} so'm"></div>`
+  ).join('');
+  document.getElementById('monthLabels').innerHTML = data.map(d=>`<div class="mc-lbl">${d.label}</div>`).join('');
+}
+
+function renderWithdrawals() {
+  const area = document.getElementById('wdStatusArea');
+  // Show recent withdrawals from points history
+  const wds = CU.pointsHistory.filter(p=>p.reason==='withdrawal').slice(0,3);
+  if(!wds.length) { area.innerHTML = '<div style="font-size:13px;color:var(--text2);padding:4px 0">So\'rov yo\'q</div>'; return; }
+  area.innerHTML = `<div class="card"><div>` + wds.map(w => `
+    <div class="txn-item">
+      <div class="txn-left">
+        <div class="txn-icon" style="background:rgba(255,77,106,.1)">💸</div>
+        <div class="txn-info">
+          <h4>Pul yechish</h4>
+          <p>${CU.fmtDateShort(w.created_at)}</p>
+        </div>
+      </div>
+      <div class="txn-minus">-${CU.fmt(Math.abs(w.points))} so'm</div>
+    </div>`).join('') + `</div></div>`;
+}
+
+function filterTxns(f, btn) {
+  document.querySelectorAll('.chips .chip').forEach(c=>c.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderTxns(f);
+}
+
+const txnIcons = {
+  session_completed:{icon:'✓',bg:'rgba(34,197,94,.12)',label:'Sessiya yakunlandi'},
+  bonus:{icon:'🎁',bg:'rgba(240,165,0,.12)',label:'Bonus'},
+  withdrawal:{icon:'↑',bg:'rgba(255,77,106,.12)',label:'Pul yechildi'},
+  penalty:{icon:'!',bg:'rgba(255,77,106,.12)',label:'Jarima'},
+  refund:{icon:'↩',bg:'rgba(59,130,246,.12)',label:'Qaytarildi'},
+};
+
+function renderTxns(f) {
+  let list = _allTxns;
+  if(f !== 'all') list = list.filter(p=>p.reason===f);
+  const el = document.getElementById('txnList');
+  if(!list.length) { el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💳</div>Tranzaksiya yo\'q</div>'; return; }
+  el.innerHTML = list.map(p => {
+    const cfg = txnIcons[p.reason] || {icon:'•',bg:'rgba(255,255,255,.06)',label:p.reason||'Tranzaksiya'};
+    return `<div class="txn-item">
+      <div class="txn-left">
+        <div class="txn-icon" style="background:${cfg.bg};font-size:16px">${cfg.icon}</div>
+        <div class="txn-info">
+          <h4>${CU.escHtml(p.reason_text || cfg.label)}</h4>
+          <p>${CU.fmtDateShort(p.created_at)}</p>
+        </div>
+      </div>
+      <div class="${p.points>0?'txn-plus':'txn-minus'}">${p.points>0?'+':''}${CU.fmt(p.points)} so'm</div>
+    </div>`;
+  }).join('');
+}
+
+function openWithdraw() {
+  document.getElementById('withdrawAmount').value = '';
+  CU.openModal('withdrawModal');
+}
+
+async function submitWithdraw() {
+  const amt = parseInt(document.getElementById('withdrawAmount').value);
+  const balance = CU.mentorData?.balance || 0;
+  if(!amt || amt < 50000) { CU.toast('Minimal 50,000 so\'m', 'err'); return; }
+  if(amt > balance) { CU.toast('Balans yetarli emas', 'err'); return; }
+  if(!CU.mentorData?.card_last4) { CU.toast('Avval karta raqamini kiriting', 'err'); CU.closeModal('withdrawModal'); CU.openModal('cardModal'); return; }
+  try {
+    const d = await CU.API.post('/api/mentor/withdraw', {amount:amt});
+    if(d.success) { CU.closeModal('withdrawModal'); CU.toast('So\'rov yuborildi ✓'); }
+    else CU.toast(d.error||'Xatolik','err');
+  } catch(e) { CU.toast('Server xatosi','err'); }
+}
+
+function fmtCard(el) {
+  let v = el.value.replace(/\D/g,'').slice(0,16);
+  el.value = v.replace(/(\d{4})/g,'$1 ').trim();
+}
+
+async function saveCard() {
+  const raw = document.getElementById('cardNumber').value.replace(/\s/g,'');
+  const holder = document.getElementById('cardHolder').value.toUpperCase().trim();
+  if(raw.length < 16 || !holder) { CU.toast('Ma\'lumotlarni to\'liq kiriting', 'err'); return; }
+  try {
+    const d = await CU.API.post('/api/mentor/card', {card_number:raw, card_last4:raw.slice(-4), card_holder:holder});
+    if(d.success) {
+      if(!CU.mentorData) CU.mentorData = {};
+      CU.mentorData.card_last4 = raw.slice(-4);
+      CU.mentorData.card_holder = holder;
+      const masked = '•••• •••• •••• ' + raw.slice(-4);
+      ['cdNumber','wdCardNum'].forEach(id => document.getElementById(id).textContent = masked);
+      ['cdHolder','wdCardHolder'].forEach(id => document.getElementById(id).textContent = holder);
+      CU.closeModal('cardModal');
+      CU.toast('Karta saqlandi ✓');
+    } else CU.toast(d.error||'Xatolik','err');
+  } catch(e) { CU.toast('Server xatosi','err'); }
+}
+</script>
+</body>
+</html>
