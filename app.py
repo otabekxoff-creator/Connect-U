@@ -117,7 +117,8 @@ def serve_static(filename):
 
 @app.route('/<path:filename>')
 def serve_static_files(filename):
-    if filename.startswith('owner/') or filename == 'owner':
+    # API so'rovlari bu yerga kelmasligi kerak
+    if filename.startswith('api/') or filename.startswith('owner/') or filename == 'owner':
         abort(404)
 
     static_path = os.path.join('static', filename)
