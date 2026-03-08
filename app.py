@@ -590,14 +590,40 @@ def get_me():
     if not user:
         flask_session.clear()
         return jsonify({'success': False, 'error': 'Foydalanuvchi topilmadi'}), 401
+
+    user_dict = user.to_full_dict()
+
+    # Mentor profil to'liq ma'lumot
+    if user.role == 'mentor' and user.mentor_profile:
+        mp = user.mentor_profile
+        user_dict['mentor_profile'] = {
+            'id': mp.id,
+            'university': mp.university,
+            'faculty': mp.faculty,
+            'year': mp.year,
+            'bio': mp.bio,
+            'gpa': float(mp.gpa) if mp.gpa else None,
+            'is_verified': mp.is_verified,
+            'rating': float(mp.rating) if mp.rating else 5.0,
+            'total_sessions': mp.total_sessions or 0,
+            'total_reviews': mp.total_reviews or 0,
+            'balance': mp.balance or 0,
+            'card_last4': mp.card_last4,
+            'card_holder': mp.card_holder,
+            'student_id_url': mp.student_id_url,
+        }
+
     role_redirects = {
         'mentor':     '/mentor-dashboard.html',
         'student':    '/abuturyent.html',
         'admin':      '/admin.html',
         'superadmin': '/admin.html',
     }
-    return jsonify({'success': True, 'user': user.to_full_dict(),
-                    'redirect_url': role_redirects.get(user.role, '/login.html')})
+    return jsonify({
+        'success': True,
+        'user': user_dict,
+        'redirect_url': role_redirects.get(user.role, '/login.html')
+    })
 
 @app.route('/api/debug-session', methods=['GET'])
 def debug_session():
@@ -735,10 +761,25 @@ def bot_mark_otp_sent():
 
 @app.route('/api/universities', methods=['GET', 'POST'])
 def handle_universities():
-    # ── FIX 2: Birlashtirilgan, duplicate route yo'q ──
     if request.method == 'GET':
         unis = University.query.filter_by(is_active=True).order_by(University.sort_order).all()
-        return jsonify({'success': True, 'universities': [u.to_dict() for u in unis]})
+        result = []
+        for u in unis:
+            u_dict = u.to_dict()
+            # Fakultetlarni ham birga qaytaramiz — foydalanuvchi paneli uchun
+            faculties = Faculty.query.filter_by(university_id=u.id, is_active=True)\
+                .order_by(Faculty.sort_order).all()
+            fac_list = []
+            for f in faculties:
+                f_dict = f.to_dict()
+                stats = FacultyStat.query.filter_by(faculty_id=f.id).order_by(FacultyStat.year).all()
+                f_dict['stats'] = [{'year': s.year, 'min_score': s.min_score,
+                                    'max_score': s.max_score, 'applicants': s.applicants,
+                                    'quota': s.quota} for s in stats]
+                fac_list.append(f_dict)
+            u_dict['faculties'] = fac_list
+            result.append(u_dict)
+        return jsonify({'success': True, 'universities': result})
 
     user = get_current_user()
     if not user or user.role not in ['admin', 'superadmin']:
@@ -764,15 +805,19 @@ def handle_university(uni_id):
         abort(404)
     user = get_current_user()
     if request.method == 'GET':
-        faculties = Faculty.query.filter_by(university_id=uni_id).all()
+        faculties = Faculty.query.filter_by(university_id=uni_id)\
+            .order_by(Faculty.sort_order).all()
         faculties_data = []
         for f in faculties:
             f_dict = f.to_dict()
             stats = FacultyStat.query.filter_by(faculty_id=f.id).order_by(FacultyStat.year).all()
-            f_dict['stats'] = [{'year': s.year, 'min_score': s.min_score, 'max_score': s.max_score,
-                                 'applicants': s.applicants, 'quota': s.quota} for s in stats]
+            f_dict['stats'] = [{'year': s.year, 'min_score': s.min_score,
+                                 'max_score': s.max_score, 'applicants': s.applicants,
+                                 'quota': s.quota} for s in stats]
             faculties_data.append(f_dict)
-        return jsonify({'success': True, 'university': {**uni.to_dict(), 'faculties': faculties_data}})
+        uni_dict = uni.to_dict()
+        uni_dict['faculties'] = faculties_data
+        return jsonify({'success': True, 'university': uni_dict})
     elif request.method == 'PUT':
         if not user or user.role not in ['admin', 'superadmin']:
             return jsonify({'success': False, 'error': "Ruxsat yo'q"}), 403
@@ -881,15 +926,19 @@ def get_mentors():
     query = MentorProfile.query.filter_by(is_verified=True)
     if university:
         query = query.filter_by(university=university)
-    mentors = query.limit(20).all()
+    mentors = query.limit(50).all()
     result = []
     for m in mentors:
         user = db.session.get(User, m.user_id)
         if user:
             m_dict = m.to_dict()
+            m_dict['mentor_profile_id'] = m.id   # frontend uchun
             m_dict['full_name'] = user.full_name
             m_dict['username'] = user.username
             m_dict['avatar_url'] = user.avatar_url
+            m_dict['rating'] = float(m.rating) if m.rating else 5.0
+            m_dict['total_sessions'] = m.total_sessions or 0
+            m_dict['total_reviews'] = m.total_reviews or 0
             result.append(m_dict)
     return jsonify({'success': True, 'mentors': result})
 
@@ -902,9 +951,21 @@ def get_mentor_detail(mentor_id):
     if not user:
         return jsonify({'success': False, 'error': 'Foydalanuvchi topilmadi'}), 404
     mentor_dict = mentor.to_dict()
+    mentor_dict['mentor_profile_id'] = mentor.id
     mentor_dict['full_name'] = user.full_name
     mentor_dict['username'] = user.username
     mentor_dict['avatar_url'] = user.avatar_url
+    mentor_dict['bio'] = mentor.bio or ''
+    mentor_dict['university'] = mentor.university or ''
+    mentor_dict['faculty'] = mentor.faculty or ''
+    mentor_dict['year'] = mentor.year
+    mentor_dict['gpa'] = float(mentor.gpa) if mentor.gpa else None
+    mentor_dict['rating'] = float(mentor.rating) if mentor.rating else 5.0
+    mentor_dict['total_sessions'] = mentor.total_sessions or 0
+    mentor_dict['total_reviews'] = mentor.total_reviews or 0
+    mentor_dict['is_verified'] = mentor.is_verified
+
+    # Oxirgi 5 ta tugallangan sessiya (faqat student ko'ra oladigan ma'lumotlar)
     sessions = Session.query.filter_by(mentor_id=mentor.id, status='completed')\
         .order_by(Session.created_at.desc()).limit(5).all()
     mentor_dict['recent_sessions'] = []
@@ -917,6 +978,14 @@ def get_mentor_detail(mentor_id):
             'student_rating': s.student_rating,
             'student_review': s.student_review
         })
+
+    # Sertifikatlar (abuturyent ko'rishi uchun)
+    certs = MentorCertificate.query.filter_by(mentor_id=mentor.id).all()
+    mentor_dict['certificates'] = [{
+        'title': c.title, 'issuer': c.issuer,
+        'date': c.issued_date.isoformat() if c.issued_date else None
+    } for c in certs]
+
     return jsonify({'success': True, 'mentor': mentor_dict})
 
 # ==========================================
@@ -928,13 +997,38 @@ def update_profile():
     user = get_current_user()
     if not user:
         return jsonify({'success': False, 'error': 'Kirilmagan'}), 401
-    data = request.json
-    if 'full_name' in data:
-        user.full_name = data['full_name']
-    if user.role == 'mentor' and user.mentor_profile:
+    data = request.json or {}
+
+    # User maydonlari
+    if 'full_name' in data and data['full_name'].strip():
+        user.full_name = data['full_name'].strip()
+    if 'username' in data:
+        uname = data['username'].strip().lstrip('@')
+        if uname:
+            user.username = uname
+    if 'avatar_url' in data and data['avatar_url']:
+        user.avatar_url = data['avatar_url']
+
+    # Mentor profil maydonlari
+    if user.role == 'mentor':
+        if not user.mentor_profile:
+            mp = MentorProfile(user_id=user.id)
+            db.session.add(mp)
+            db.session.flush()
+        mp = user.mentor_profile
         for field in ['university', 'faculty', 'year', 'bio', 'gpa']:
             if field in data:
-                setattr(user.mentor_profile, field, data[field])
+                val = data[field]
+                if val is not None and str(val).strip() != '':
+                    setattr(mp, field, val)
+                elif field not in ('year', 'gpa'):
+                    setattr(mp, field, val)
+
+    # Student profil qo'shimcha maydonlari (abuturyent)
+    if user.role == 'student':
+        # Bu maydonlarni User modelida saqlashga urinmaymiz agar yo'q bo'lsa
+        pass
+
     db.session.commit()
     return jsonify({'success': True, 'user': user.to_full_dict()})
 
@@ -943,12 +1037,13 @@ def upload_avatar():
     user = get_current_user()
     if not user:
         return jsonify({'success': False, 'error': 'Kirilmagan'}), 401
-    avatar_url = (request.json or {}).get('avatar_url')
+    data = request.json or {}
+    avatar_url = data.get('avatar_url', '').strip()
     if not avatar_url:
         return jsonify({'success': False, 'error': 'Avatar URL kerak'}), 400
     user.avatar_url = avatar_url
     db.session.commit()
-    return jsonify({'success': True})
+    return jsonify({'success': True, 'avatar_url': user.avatar_url})
 
 # ==========================================
 # SESSIONS
@@ -962,19 +1057,19 @@ def get_sessions():
 
     if user.role == 'student':
         sessions = Session.query.filter_by(student_id=user.id)\
-            .order_by(Session.scheduled_at.desc()).limit(20).all()
+            .order_by(Session.scheduled_at.desc()).limit(50).all()
     elif user.role == 'mentor' and user.mentor_profile:
         sessions = Session.query.filter_by(mentor_id=user.mentor_profile.id)\
-            .order_by(Session.scheduled_at.desc()).limit(20).all()
+            .order_by(Session.scheduled_at.desc()).limit(50).all()
     else:
         sessions = []
 
     result = []
     for s in sessions:
-        # ── FIX 3: None check — crash yo'q ──
         mentor_profile = db.session.get(MentorProfile, s.mentor_id)
         mentor_user = db.session.get(User, mentor_profile.user_id) if mentor_profile else None
         student_user = db.session.get(User, s.student_id)
+
         result.append({
             'id': s.id,
             'session_type': s.session_type,
@@ -982,13 +1077,18 @@ def get_sessions():
             'scheduled_at': s.scheduled_at.isoformat() if s.scheduled_at else None,
             'duration_min': s.duration_min,
             'meet_link': s.meet_link,
+            'notes': s.notes or '',
+            'points_awarded': s.points_awarded or 0,
             'student_rating': s.student_rating,
             'student_review': s.student_review,
-            'notes': getattr(s, 'notes', ''),
-            'student_phone': student_user.phone if student_user else None,
-            'student_university': student_user.mentor_profile.university if student_user and student_user.mentor_profile else None,
             'mentor_name': mentor_user.full_name if mentor_user else None,
+            'mentor_avatar': mentor_user.avatar_url if mentor_user else None,
             'student_name': student_user.full_name if student_user else None,
+            'student_avatar': student_user.avatar_url if student_user else None,
+            'student_phone': student_user.phone if student_user else None,
+            'student_university': (student_user.mentor_profile.university
+                                   if student_user and student_user.mentor_profile else None),
+            'created_at': s.created_at.isoformat() if s.created_at else None,
         })
     return jsonify({'success': True, 'sessions': result})
 
@@ -1230,15 +1330,21 @@ def mentor_points():
     if not mentor:
         return jsonify({'success': False, 'error': 'Mentor profil topilmadi'}), 404
     reason_map = {
-        'session_completed': 'Sessiya yakunlandi', 'bonus': 'Bonus',
-        'withdrawal': 'Pul yechildi', 'penalty': 'Jarima', 'refund': 'Qaytarildi'
+        'session_completed': 'Sessiya yakunlandi',
+        'bonus': 'Bonus',
+        'withdrawal': 'Pul yechildi',
+        'penalty': 'Jarima',
+        'refund': 'Qaytarildi'
     }
     points = MentorPoint.query.filter_by(mentor_id=mentor.id)\
-        .order_by(MentorPoint.created_at.desc()).limit(50).all()
+        .order_by(MentorPoint.created_at.desc()).limit(100).all()
     return jsonify({'success': True, 'points': [{
-        'id': p.id, 'points': p.points, 'reason': p.reason,
+        'id': p.id,
+        'points': p.points,
+        'reason': p.reason,
         'reason_text': reason_map.get(p.reason, p.reason or 'Tranzaksiya'),
         'balance_after': p.balance_after,
+        'session_id': p.session_id,
         'created_at': p.created_at.isoformat() if p.created_at else None
     } for p in points]})
 
@@ -1306,15 +1412,26 @@ def save_mentor_card():
     mentor = user.mentor_profile
     if not mentor:
         return jsonify({'success': False, 'error': 'Mentor profil topilmadi'}), 404
-    data = request.json
+    data = request.json or {}
+
+    # card_number (to'liq) yoki card_last4 (oxirgi 4) qabul qilamiz
+    card_number = data.get('card_number', '').replace(' ', '').replace('-', '')
     card_last4 = data.get('card_last4', '').strip()
     card_holder = data.get('card_holder', '').strip().upper()
-    if len(card_last4) != 4 or not card_holder:
-        return jsonify({'success': False, 'error': "Karta ma'lumotlari noto'g'ri"}), 400
+
+    # card_last4 ni card_number dan olish
+    if card_number and len(card_number) >= 4:
+        card_last4 = card_number[-4:]
+    elif not card_last4 or len(card_last4) != 4:
+        return jsonify({'success': False, 'error': "Karta raqami noto'g'ri"}), 400
+
+    if not card_holder:
+        return jsonify({'success': False, 'error': "Karta egasi nomini kiriting"}), 400
+
     mentor.card_last4 = card_last4
     mentor.card_holder = card_holder
     db.session.commit()
-    return jsonify({'success': True})
+    return jsonify({'success': True, 'card_last4': card_last4, 'card_holder': card_holder})
 
 @app.route('/api/mentor/withdraw', methods=['POST'])
 def mentor_withdraw():
@@ -1324,19 +1441,53 @@ def mentor_withdraw():
     mentor = user.mentor_profile
     if not mentor:
         return jsonify({'success': False, 'error': 'Mentor profil topilmadi'}), 404
-    amount = int((request.json or {}).get('amount', 0))
+    data = request.json or {}
+    amount = int(data.get('amount', 0))
     if amount < 50000:
         return jsonify({'success': False, 'error': "Minimal 50,000 so'm"}), 400
     if amount > (mentor.balance or 0):
         return jsonify({'success': False, 'error': 'Balans yetarli emas'}), 400
     if not mentor.card_last4:
         return jsonify({'success': False, 'error': 'Avval karta raqamini kiriting'}), 400
-    if Withdrawal.query.filter_by(mentor_id=mentor.id, status='pending').first():
+    existing = Withdrawal.query.filter_by(mentor_id=mentor.id, status='pending').first()
+    if existing:
         return jsonify({'success': False, 'error': "Avvalgi so'rovingiz hali ko'rib chiqilmoqda"}), 400
-    wd = Withdrawal(mentor_id=mentor.id, amount=amount, points_used=amount,
-                    card_last4=mentor.card_last4, card_holder=mentor.card_holder, status='pending')
+
+    wd = Withdrawal(
+        mentor_id=mentor.id,
+        amount=amount,
+        points_used=amount,
+        card_last4=mentor.card_last4,
+        card_holder=mentor.card_holder,
+        status='pending'
+    )
     db.session.add(wd)
     db.session.commit()
+
+    # Adminlarga Telegram xabari yuborish
+    admins = User.query.filter(User.role.in_(['admin', 'superadmin']), User.is_active == True).all()
+    for admin in admins:
+        if admin.telegram_id:
+            msg = (
+                f"💸 <b>Yangi pul yechish so'rovi!</b>\n\n"
+                f"👤 <b>Mentor:</b> {user.full_name}\n"
+                f"📞 <b>Tel:</b> {user.phone or '—'}\n"
+                f"💳 <b>Karta:</b> •••• {mentor.card_last4} | {mentor.card_holder or '—'}\n"
+                f"💰 <b>Summa:</b> {amount:,} so'm\n"
+                f"🆔 <b>ID:</b> {wd.id[:8]}"
+            )
+            send_telegram_message(admin.telegram_id, msg)
+
+    # Mentorga tasdiq xabari
+    if user.telegram_id:
+        send_telegram_message(
+            user.telegram_id,
+            f"✅ <b>Pul yechish so'rovi qabul qilindi!</b>\n\n"
+            f"💰 Summa: <b>{amount:,} so'm</b>\n"
+            f"💳 Karta: •••• {mentor.card_last4}\n"
+            f"⏳ 24 soat ichida ko'rib chiqiladi."
+        )
+
     return jsonify({'success': True, 'withdrawal_id': wd.id})
 
 @app.route('/api/mentor/upload-student-id', methods=['POST'])
@@ -1446,10 +1597,15 @@ def mentor_dashboard():
         'success': True,
         'stats': {
             'balance': mentor.balance or 0,
-            'total_sessions': total_sessions, 'completed': completed,
-            'pending': pending, 'confirmed': confirmed,
-            'students': students, 'avg_rating': avg_rating,
+            'total_sessions': total_sessions,
+            'completed': completed,
+            'pending': pending,
+            'confirmed': confirmed,
+            'students': students,
+            'avg_rating': avg_rating,
             'is_verified': mentor.is_verified,
+            'card_last4': mentor.card_last4,
+            'card_holder': mentor.card_holder,
         },
         'weekly_earnings': weekly,
         'upcoming_sessions': [session_to_dict(s) for s in upcoming],
@@ -1562,18 +1718,45 @@ def increment_video_view(video_id):
 
 @app.route('/api/news', methods=['GET'])
 def get_news_filtered():
-    target = request.args.get('target')
+    target = request.args.get('target')  # 'abuturyent' | 'mentor' | None
     query = News.query.order_by(News.created_at.desc())
-    if target and hasattr(News, 'target'):
-        query = query.filter(
-            (News.target == target) | (News.target == 'all') | (News.target.is_(None))
-        )
-    return jsonify({'success': True, 'news': [n.to_dict() for n in query.all()]})
+    news_list = query.all()
+    result = []
+    for n in news_list:
+        n_dict = n.to_dict()
+        # target filter: agar news.target yo'q bo'lsa yoki 'all' bo'lsa hammaga ko'rinadi
+        n_target = getattr(n, 'target', None)
+        if target and n_target and n_target != 'all' and n_target != target:
+            continue
+        # Qo'shimcha maydonlar (model da bo'lmasa xavfsiz)
+        n_dict['category'] = getattr(n, 'category', 'general') or 'general'
+        n_dict['priority'] = getattr(n, 'priority', 'normal') or 'normal'
+        n_dict['image_url'] = getattr(n, 'image_url', '') or ''
+        n_dict['link'] = getattr(n, 'link', '') or ''
+        n_dict['target'] = n_target or 'all'
+        result.append(n_dict)
+    return jsonify({'success': True, 'news': result})
 
 @app.route('/api/materials', methods=['GET'])
 def get_materials():
     mats = Material.query.order_by(Material.created_at.desc()).all()
-    return jsonify({'success': True, 'materials': [m.to_dict() for m in mats]})
+    result = []
+    for m in mats:
+        d = m.to_dict()
+        # Ixtiyoriy maydonlar (model da bo'lmasa ham xavfsiz)
+        d['access_type'] = getattr(m, 'access_type', 'free') or 'free'
+        d['access'] = d['access_type']
+        d['views'] = getattr(m, 'views', 0) or 0
+        d['thumbnail'] = getattr(m, 'thumbnail', '') or ''
+        d['description'] = getattr(m, 'description', '') or ''
+        # YouTube thumbnail avtomatik
+        if not d['thumbnail'] and d.get('url'):
+            import re
+            ym = re.search(r'(?:youtube\.com/watch\?v=|youtu\.be/)([^&\s]+)', d['url'])
+            if ym:
+                d['thumbnail'] = f"https://img.youtube.com/vi/{ym.group(1)}/hqdefault.jpg"
+        result.append(d)
+    return jsonify({'success': True, 'materials': result})
 
 # ==========================================
 # ADMIN
@@ -1724,7 +1907,7 @@ def admin_get_withdrawals():
     user = get_current_user()
     if not user or user.role not in ['admin', 'superadmin']:
         return jsonify({'success': False, 'error': "Ruxsat yo'q"}), 403
-    status = request.args.get('status', 'pending')
+    status = request.args.get('status', 'all')
     query = Withdrawal.query
     if status != 'all':
         query = query.filter_by(status=status)
@@ -1734,10 +1917,18 @@ def admin_get_withdrawals():
         mentor = db.session.get(MentorProfile, w.mentor_id)
         mentor_user = db.session.get(User, mentor.user_id) if mentor else None
         result.append({
-            'id': w.id, 'mentor_name': mentor_user.full_name if mentor_user else None,
-            'amount': w.amount, 'points_used': w.points_used,
-            'card_last4': w.card_last4, 'card_holder': w.card_holder,
-            'status': w.status, 'created_at': w.created_at.isoformat()
+            'id': w.id,
+            'mentor_name': mentor_user.full_name if mentor_user else None,
+            'mentor_phone': mentor_user.phone if mentor_user else None,
+            'mentor_telegram': str(mentor_user.telegram_id) if mentor_user and mentor_user.telegram_id else None,
+            'amount': w.amount,
+            'points_used': w.points_used,
+            'card_last4': w.card_last4,
+            'card_holder': w.card_holder,
+            'status': w.status,
+            'admin_note': w.admin_note,
+            'processed_at': w.processed_at.isoformat() if w.processed_at else None,
+            'created_at': w.created_at.isoformat() if w.created_at else None
         })
     return jsonify({'success': True, 'withdrawals': result})
 
@@ -1747,17 +1938,22 @@ def admin_get_pending_withdrawals():
     if not admin or admin.role not in ['admin', 'superadmin']:
         return jsonify({'success': False, 'error': "Ruxsat yo'q"}), 403
     withdrawals = Withdrawal.query.filter_by(status='pending')\
-        .order_by(Withdrawal.created_at).limit(20).all()
+        .order_by(Withdrawal.created_at).all()
     result = []
     for w in withdrawals:
         mentor = db.session.get(MentorProfile, w.mentor_id)
         user = db.session.get(User, mentor.user_id) if mentor else None
         result.append({
-            'id': w.id, 'amount': w.amount, 'points_used': w.points_used,
-            'card_last4': w.card_last4, 'card_holder': w.card_holder,
+            'id': w.id,
+            'amount': w.amount,
+            'points_used': w.points_used,
+            'card_last4': w.card_last4,
+            'card_holder': w.card_holder,
             'mentor_name': user.full_name if user else None,
             'mentor_phone': user.phone if user else None,
-            'created_at': w.created_at.isoformat()
+            'mentor_telegram': str(user.telegram_id) if user and user.telegram_id else None,
+            'status': w.status,
+            'created_at': w.created_at.isoformat() if w.created_at else None
         })
     return jsonify({'success': True, 'withdrawals': result})
 
