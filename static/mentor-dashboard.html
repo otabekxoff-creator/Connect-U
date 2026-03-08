@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>ConnectU — Dashboard</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mentor-shared.css">
+<style>
+/* ── Page-specific styles ── */
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 18px 16px}
+.quick-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:8px;transition:var(--trans)}
+.qc-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.qc-val{font-size:22px;font-weight:800;color:var(--text)}
+.qc-lbl{font-size:11px;color:var(--text2);font-weight:500}
+.qc-diff{font-size:11px;font-weight:600}
+.qc-diff.up{color:var(--green)} .qc-diff.down{color:var(--red)}
+
+/* Pending request card */
+.req-card{margin:0 18px 10px;background:var(--s1);border:1.5px solid var(--border);border-radius:var(--r);padding:15px;display:flex;gap:12px;align-items:flex-start;transition:border-color .2s}
+.req-card:active{border-color:var(--gold)}
+.rc-avatar{width:46px;height:46px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff}
+.rc-info{flex:1;min-width:0}
+.rc-name{font-size:14px;font-weight:700;margin-bottom:2px}
+.rc-meta{font-size:12px;color:var(--text2);margin-bottom:8px}
+.rc-actions{display:flex;gap:8px}
+
+/* Top student */
+.student-row{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--border)}
+.student-row:last-child{border-bottom:none}
+.sr-rank{font-size:13px;font-weight:700;width:20px;text-align:center;color:var(--text3)}
+.sr-rank.top{color:var(--gold)}
+.sr-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
+.sr-name{font-size:13px;font-weight:600;flex:1}
+.sr-pts{font-size:12px;font-weight:700;color:var(--teal)}
+
+/* Weekly chart */
+.weekly-labels{display:flex;justify-content:space-around;padding:0 4px;margin-top:6px}
+.wl-item{font-size:9px;color:var(--text3);text-align:center;flex:1}
+</style>
+</head>
+<body>
+
+<div id="loadingScreen">
+  <div class="spinner" style="width:44px;height:44px;border-width:4px"></div>
+  <div class="loading-logo">Connect<span>-U</span></div>
+</div>
+
+<div class="shell" id="appShell" style="display:none">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-logo">Connect<span>-U</span></div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="hdr-badge" onclick="CU.navTo('profile')">
+      <div class="dot"></div>
+      <span id="hdrName">MENTOR</span>
+    </button>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- HOME PAGE -->
+  <div class="page active" id="pg-home">
+
+    <!-- Verify warning banner -->
+    <div id="homeVerifyBanner" style="display:none;margin:12px 18px 0;border-radius:var(--r);padding:12px 16px;align-items:center;gap:12px;cursor:pointer" onclick="CU.navTo('profile')">
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700" id="hvbTitle">⚠️ Verifikatsiya talab qilinadi</div>
+        <div style="font-size:12px;margin-top:2px;color:var(--text2)" id="hvbMsg">Guvohnomangizni yuklang</div>
+      </div>
+      <div style="font-size:12px;font-weight:600;white-space:nowrap">Yuklash →</div>
+    </div>
+
+    <!-- Balance card -->
+    <div class="balance-card" style="margin-top:16px">
+      <div class="bc-label">JORIY BALANS</div>
+      <div class="bc-amount mono" id="balanceAmount">0 so'm</div>
+      <div class="bc-sub" id="balancePending">Kutilmoqda: 0 so'm</div>
+      <div class="sparkline" id="sparkline"></div>
+      <div class="bc-actions">
+        <button class="bc-btn bc-btn-wd" onclick="CU.openModal('withdrawModal')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 7l-5-5-5 5M7 17l5 5 5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          Pul yechish
+        </button>
+        <button class="bc-btn bc-btn-hist" onclick="CU.navTo('earnings')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          Tarix
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick stats grid -->
+    <div class="quick-grid">
+      <div class="quick-card">
+        <div class="qc-icon" style="background:rgba(240,165,0,.12)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="var(--gold)" stroke-width="1.8"/><path d="M16 2v4M8 2v4M3 10h18" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="qc-val" id="kpiSessions">0</div>
+        <div class="qc-lbl">Jami sessiyalar</div>
+        <div class="qc-diff up" id="kpiSessionsDiff">↑ bu oy</div>
+      </div>
+      <div class="quick-card">
+        <div class="qc-icon" style="background:rgba(0,191,166,.1)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="var(--teal)" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="qc-val" id="kpiRating">5.0★</div>
+        <div class="qc-lbl">Reyting</div>
+        <div class="qc-diff" id="kpiRatingLbl" style="color:var(--text3)">talabalar bahosi</div>
+      </div>
+      <div class="quick-card">
+        <div class="qc-icon" style="background:rgba(124,92,252,.1)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="var(--purple)" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="var(--purple)" stroke-width="1.8"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="var(--purple)" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </div>
+        <div class="qc-val" id="kpiStudents">0</div>
+        <div class="qc-lbl">Talabalar</div>
+        <div class="qc-diff up" id="kpiStudentsDiff">↑ yangi</div>
+      </div>
+      <div class="quick-card">
+        <div class="qc-icon" style="background:rgba(34,197,94,.1)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><polygon points="23,7 16,12 23,17" stroke="var(--green)" stroke-width="1.8" stroke-linejoin="round"/><rect x="1" y="5" width="15" height="14" rx="2" stroke="var(--green)" stroke-width="1.8"/></svg>
+        </div>
+        <div class="qc-val" id="kpiVideos">0</div>
+        <div class="qc-lbl">Videolar</div>
+        <div class="qc-diff" style="color:var(--text3)" id="kpiVideosDiff">ko'rishlar</div>
+      </div>
+    </div>
+
+    <!-- Weekly chart -->
+    <div class="sr"><div class="sr-t">Haftalik daromad</div><span style="font-size:12px;color:var(--text2)">so'm</span></div>
+    <div class="card" style="margin:0 18px 16px;padding:16px 12px 8px">
+      <div class="chart-wrap" id="weekChart"></div>
+      <div class="weekly-labels" id="weekLabels"></div>
+    </div>
+
+    <!-- Upcoming sessions -->
+    <div class="sr">
+      <div class="sr-t">Yaqin sessiyalar</div>
+      <button class="sr-a" onclick="CU.navTo('sessions')">Hammasi →</button>
+    </div>
+    <div class="card" style="margin:0 18px 16px"><div id="upcomingSessions"></div></div>
+
+    <!-- Pending requests -->
+    <div class="sr">
+      <div class="sr-t">Yangi so'rovlar</div>
+      <span id="reqBadge" style="font-size:13px;color:var(--red);font-weight:700"></span>
+    </div>
+    <div id="pendingRequests" style="margin-bottom:16px"></div>
+    <div class="gap"></div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- BOTTOM NAV -->
+<nav class="nav">
+  <button class="ni active" data-page="home" onclick="CU.navTo('home')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><polyline points="9,22 9,12 15,12 15,22" stroke="currentColor" stroke-width="2"/></svg>
+    <span class="ni-label">Asosiy</span>
+  </button>
+  <button class="ni" data-page="sessions" onclick="CU.navTo('sessions')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span class="ni-label">Sessiyalar</span>
+    <span class="ni-badge" id="sessionBadge">0</span>
+  </button>
+  <button class="ni" data-page="videos" onclick="CU.navTo('videos')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><polygon points="23,7 16,12 23,17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="1" y="5" width="15" height="14" rx="2" stroke="currentColor" stroke-width="2"/></svg>
+    <span class="ni-label">Videolar</span>
+  </button>
+  <button class="ni" data-page="earnings" onclick="CU.navTo('earnings')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span class="ni-label">Daromad</span>
+  </button>
+  <button class="ni" data-page="profile" onclick="CU.navTo('profile')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+    <span class="ni-label">Profil</span>
+  </button>
+</nav>
+</div><!-- /shell -->
+
+<!-- WITHDRAW MODAL -->
+<div class="modal" id="withdrawModal" onclick="if(event.target===this)CU.closeModal('withdrawModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Pul yechish</div>
+    <div class="modal-sub" id="withdrawSub">Mavjud balans: 0 so'm</div>
+    <div class="card-display" style="margin:0 0 16px">
+      <div class="cd-chip"></div>
+      <div class="cd-number" id="wdCardNum">•••• •••• •••• ••••</div>
+      <div class="cd-bottom"><div class="cd-holder" id="wdCardHolder">KARTA EGASI</div><div class="cd-logo">VISA / MC</div></div>
+    </div>
+    <div class="ef-field">
+      <label class="ef-label">Summa (so'm)</label>
+      <input class="ef-input mono" id="withdrawAmount" type="number" placeholder="50000" min="50000">
+      <div style="font-size:11px;color:var(--text2);margin-top:4px">Minimal: 50,000 so'm</div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" onclick="submitWithdraw()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 7l-5-5-5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        So'rov yuborish
+      </button>
+      <button class="btn btn-ghost" onclick="CU.closeModal('withdrawModal')">Bekor qilish</button>
+    </div>
+  </div>
+</div>
+
+<!-- SESSION DETAIL MODAL -->
+<div class="modal" id="sessionDetailModal" onclick="if(event.target===this)CU.closeModal('sessionDetailModal')">
+  <div class="modal-sheet"><div class="modal-handle"></div><div id="sessionDetailContent"></div></div>
+</div>
+
+<script src="mentor-shared.js"></script>
+<script>
+/* ─── INIT ─── */
+window.addEventListener('load', () => {
+  CU.init(() => {
+    renderDashboard();
+    CU.highlightNav('home');
+    const name = CU.currentUser.full_name || 'Mentor';
+    document.getElementById('hdrName').textContent = name.split(' ')[0].toUpperCase();
+  });
+});
+
+/* ─── RENDER ─── */
+function renderDashboard() {
+  const md = CU.mentorData || {};
+  const balance = md.balance || 0;
+  
+  // Balance
+  document.getElementById('balanceAmount').textContent = CU.fmt(balance) + ' so\'m';
+  const pendingPts = CU.sessions.filter(s=>s.status==='pending'||s.status==='confirmed')
+    .reduce((sum,s)=>sum+CU.sessionPts(s.session_type),0);
+  document.getElementById('balancePending').textContent = 'Kutilmoqda: ' + CU.fmt(pendingPts) + ' so\'m';
+  document.getElementById('withdrawSub').textContent = 'Mavjud balans: ' + CU.fmt(balance) + ' so\'m';
+  
+  if(md.card_last4) {
+    document.getElementById('wdCardNum').textContent = '•••• •••• •••• ' + md.card_last4;
+    document.getElementById('wdCardHolder').textContent = md.card_holder || '—';
+  }
+
+  // Stats
+  document.getElementById('kpiSessions').textContent = md.total_sessions || 0;
+  document.getElementById('kpiRating').textContent = (md.rating || 5.0).toFixed(1) + '★';
+  document.getElementById('kpiStudents').textContent = md.total_reviews || 0;
+  document.getElementById('kpiVideos').textContent = CU.videos.length || 0;
+  
+  const totalViews = CU.videos.reduce((s,v)=>s+(v.views||0), 0);
+  document.getElementById('kpiVideosDiff').textContent = CU.fmt(totalViews) + ' ko\'rish';
+
+  // Sparkline
+  const hist = CU.pointsHistory.filter(p=>p.points>0).slice(-10);
+  const vals = hist.length >= 3 ? hist.map(p=>p.points) : [20,35,28,55,40,70,50,80,65,100];
+  const maxV = Math.max(...vals,1);
+  document.getElementById('sparkline').innerHTML = vals.map((v,i)=>
+    `<div class="sp-bar${i===vals.length-1?' hi':''}" style="height:${Math.max(8,Math.round(v/maxV*100))}%"></div>`
+  ).join('');
+
+  // Weekly chart
+  renderWeeklyChart();
+
+  // Verify banner
+  if(CU._verifyData) updateVerifyBanner(CU._verifyData);
+
+  // Upcoming sessions
+  const upcoming = CU.sessions.filter(s=>s.status==='confirmed'&&s.scheduled_at).slice(0,3);
+  document.getElementById('upcomingSessions').innerHTML = upcoming.length
+    ? upcoming.map(sessionItemHTML).join('')
+    : '<div class="empty-state">Tasdiqlangan sessiya yo\'q</div>';
+
+  // Pending requests
+  const pending = CU.sessions.filter(s=>s.status==='pending');
+  document.getElementById('reqBadge').textContent = pending.length ? pending.length + ' yangi' : '';
+  const badge = document.getElementById('sessionBadge');
+  badge.textContent = pending.length; badge.className = pending.length ? 'ni-badge show' : 'ni-badge';
+  document.getElementById('pendingRequests').innerHTML = pending.length
+    ? pending.map(pendingItemHTML).join('')
+    : '<div style="margin:0 18px"><div class="empty-state">Yangi so\'rov yo\'q</div></div>';
+}
+
+function renderWeeklyChart() {
+  const days = ['Du','Se','Ch','Pa','Ju','Sh','Ya'];
+  const today = new Date().getDay();
+  const sorted = days.map((d,i) => {
+    const dayIdx = (i+1)%7; // Mo=1..Su=0
+    const dayPts = CU.pointsHistory.filter(p => {
+      if(!p.created_at) return false;
+      const pDay = new Date(p.created_at).getDay();
+      return pDay === dayIdx && p.points > 0;
+    }).reduce((s,p)=>s+p.points,0);
+    return {label:d, val:dayPts, isToday: dayIdx === today};
+  });
+  const maxV = Math.max(...sorted.map(x=>x.val), 1);
+  document.getElementById('weekChart').innerHTML = sorted.map(x =>
+    `<div class="chart-bar-wrap">
+      <div class="chart-bar${x.isToday?' hi':''}" style="height:${Math.max(6,Math.round(x.val/maxV*100))}%" title="${CU.fmt(x.val)} so'm"></div>
+    </div>`
+  ).join('');
+  document.getElementById('weekLabels').innerHTML = sorted.map(x =>
+    `<div class="wl-item" style="color:${x.isToday?'var(--gold)':'var(--text3)'}">${x.label}</div>`
+  ).join('');
+}
+
+function updateVerifyBanner(data) {
+  const banner = document.getElementById('homeVerifyBanner');
+  if(!banner) return;
+  if(data.is_verified) { banner.style.display='none'; return; }
+  banner.style.display = 'flex';
+  if(data.student_id_url) {
+    banner.style.background = 'rgba(240,165,0,0.1)'; banner.style.border = '1px solid rgba(240,165,0,0.25)'; banner.style.color = 'var(--gold)';
+    document.getElementById('hvbTitle').textContent = '⏳ Tekshiruv kutilmoqda';
+    document.getElementById('hvbMsg').textContent = data.days_left !== undefined ? `${data.days_left} kun qoldi` : 'Admin tekshirishi kutilmoqda';
+  } else {
+    const urgent = data.days_left !== undefined && data.days_left <= 1;
+    banner.style.background = urgent ? 'rgba(255,77,106,0.12)' : 'rgba(240,165,0,0.1)';
+    banner.style.border = `1px solid ${urgent ? 'rgba(255,77,106,0.3)' : 'rgba(240,165,0,0.25)'}`;
+    banner.style.color = urgent ? 'var(--red)' : 'var(--gold)';
+    document.getElementById('hvbTitle').textContent = urgent ? '🚨 Muddati o\'tmoqda!' : '⚠️ Verifikatsiya talab qilinadi';
+    document.getElementById('hvbMsg').textContent = urgent ? 'Bugun guvohnomangizni yuklang!' : '3 kun ichida guvohnomangizni yuklang';
+  }
+}
+
+/* ─── SESSION HTML ─── */
+function sessionItemHTML(s) {
+  return `<div class="session-item" onclick="openSessionDetail('${s.id}')">
+    <div class="si-avatar" style="background:${CU.strColor(s.student_name||'U')}">${(s.student_name||'U')[0]}</div>
+    <div class="si-info">
+      <div class="si-name">${CU.escHtml(s.student_name||'Foydalanuvchi')}</div>
+      <div class="si-meta">${CU.sessionTypeLabel(s.session_type)} · ${CU.fmtDate(s.scheduled_at)}</div>
+      <div class="si-tags">${CU.sessionBadge(s.status)}</div>
+    </div>
+    <div class="si-right">
+      <div class="si-time">${CU.fmtDate(s.scheduled_at)}</div>
+      ${s.status==='completed'?`<div class="si-points">+${CU.fmt(CU.sessionPts(s.session_type))}</div>`:''}
+    </div>
+  </div>`;
+}
+
+function pendingItemHTML(s) {
+  const name = s.student_name || 'Foydalanuvchi';
+  return `<div class="req-card">
+    <div class="rc-avatar" style="background:${CU.strColor(name)}">${name[0]}</div>
+    <div class="rc-info">
+      <div class="rc-name">${CU.escHtml(name)}</div>
+      <div class="rc-meta">${CU.sessionTypeLabel(s.session_type)} · ${CU.fmtDate(s.scheduled_at)}</div>
+      <div class="rc-actions">
+        <button class="btn btn-teal btn-sm" onclick="doConfirm('${s.id}')">✓ Tasdiqlash</button>
+        <button class="btn btn-red btn-sm" onclick="doReject('${s.id}')">✕ Rad</button>
+        <button class="btn btn-ghost btn-sm" onclick="openSessionDetail('${s.id}')">Ko'rish</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function doConfirm(id) { CU.confirmSession(id, renderDashboard); }
+function doReject(id) { CU.rejectSession(id, renderDashboard); }
+
+function openSessionDetail(id) {
+  const s = CU.sessions.find(x=>x.id===id);
+  if(!s) return;
+  const pts = CU.sessionPts(s.session_type);
+  document.getElementById('sessionDetailContent').innerHTML = `
+    <div style="padding-bottom:16px">
+      <div class="modal-title">${CU.escHtml(s.student_name||'Foydalanuvchi')}</div>
+      <div style="margin-top:4px">${CU.sessionBadge(s.status)}</div>
+    </div>
+    <div class="info-list" style="margin:0 0 16px">
+      <div class="il-row"><span class="il-label">Tur</span><span class="il-val">${CU.sessionTypeLabel(s.session_type)}</span></div>
+      <div class="il-row"><span class="il-label">Vaqt</span><span class="il-val">${CU.fmtDate(s.scheduled_at)}</span></div>
+      <div class="il-row"><span class="il-label">Davomiyligi</span><span class="il-val">${s.duration_min||60} daqiqa</span></div>
+      <div class="il-row"><span class="il-label">To'lov</span><span class="il-val" style="color:var(--teal)">${CU.fmt(pts)} so'm</span></div>
+      ${s.notes?`<div class="il-row"><span class="il-label">Izoh</span><span class="il-val" style="font-size:12px">${CU.escHtml(s.notes)}</span></div>`:''}
+      ${s.student_phone?`<div class="il-row"><span class="il-label">Telefon</span><a class="il-val" href="tel:${s.student_phone}" style="color:var(--teal)">${s.student_phone}</a></div>`:''}
+    </div>
+    ${s.status==='pending'?`<div class="modal-btns">
+      <button class="btn btn-teal" onclick="doConfirm('${s.id}');CU.closeModal('sessionDetailModal')">✓ Tasdiqlash</button>
+      <button class="btn btn-red" onclick="doReject('${s.id}');CU.closeModal('sessionDetailModal')">✕ Rad etish</button>
+    </div>`:''}
+    ${s.meet_link?`<a href="${s.meet_link}" target="_blank" class="btn btn-purple" style="margin-top:10px">🎥 Meeting ga kirish</a>`:''}`;
+  CU.openModal('sessionDetailModal');
+}
+
+/* ─── WITHDRAW ─── */
+async function submitWithdraw() {
+  const amt = parseInt(document.getElementById('withdrawAmount').value);
+  const balance = CU.mentorData?.balance || 0;
+  if(!amt || amt < 50000) { CU.toast('Minimal 50,000 so\'m', 'err'); return; }
+  if(amt > balance) { CU.toast('Balans yetarli emas', 'err'); return; }
+  if(!CU.mentorData?.card_last4) { CU.toast('Avval karta raqamini kiriting', 'err'); CU.closeModal('withdrawModal'); CU.navTo('profile'); return; }
+  try {
+    const d = await CU.API.post('/api/mentor/withdraw', {amount:amt});
+    if(d.success) { CU.closeModal('withdrawModal'); CU.toast('So\'rov yuborildi ✓ Admin tasdiqlashi kutilmoqda'); }
+    else CU.toast(d.error||'Xatolik','err');
+  } catch(e) { CU.toast('Server xatosi','err'); }
+}
+</script>
+</body>
+</html>
