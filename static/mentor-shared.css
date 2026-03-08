@@ -15,14 +15,65 @@
   --trans: background .3s, color .3s, border-color .3s;
 }
 
-/* ─── LIGHT THEME ─── */
+/* ─── LIGHT THEME (oq dizayn — rasmga mos) ─── */
 body.light-theme {
-  --bg:#F0F4FA;--s1:#FFFFFF;--s2:#EEF2FA;--s3:#E2E8F4;
-  --border:rgba(0,0,0,0.07);--border2:rgba(0,0,0,0.13);
-  --text:#0F1829;--text2:#5A6A85;--text3:#9AA5B8;
-  --gold:#D48F00;--teal:#009E88;
-  --gold-d:rgba(212,143,0,0.12);--teal-d:rgba(0,158,136,0.1);
+  --bg:#F2F5FB;
+  --s1:#FFFFFF;
+  --s2:#F0F3FA;
+  --s3:#E4E9F5;
+  --border:rgba(0,0,0,0.07);
+  --border2:rgba(0,0,0,0.13);
+  --text:#0F172A;
+  --text2:#64748B;
+  --text3:#94A3B8;
+
+  /* Ko'k asosiy rang (rasmda ko'k gradient kartalar) */
+  --gold:#2563EB;
+  --gold-d:rgba(37,99,235,0.09);
+  --gold-g:rgba(37,99,235,0.20);
+  --teal:#0EA5A0;
+  --teal-d:rgba(14,165,160,0.10);
+  --purple:#7C3AED;
+  --red:#EF4444;
+  --green:#22C55E;
+  --blue:#2563EB;
+
+  /* Gradient kartalar */
+  --hero-grad: linear-gradient(135deg, #1D4ED8 0%, #2563EB 60%, #60A5FA 100%);
+  --hero-grad2: linear-gradient(135deg, #0D9488 0%, #0EA5A0 100%);
+  --card-dark: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
 }
+
+/* Light theme header & nav — oq */
+body.light-theme .hdr {
+  background: rgba(255,255,255,0.96);
+  box-shadow: 0 1px 0 rgba(0,0,0,0.07);
+}
+body.light-theme .nav {
+  background: rgba(255,255,255,0.97);
+  box-shadow: 0 -1px 0 rgba(0,0,0,0.07);
+}
+body.light-theme .hdr-logo span { color: #2563EB; }
+body.light-theme .ni.active { color: #2563EB; }
+body.light-theme .label { color: #2563EB; }
+body.light-theme .sr-a { color: #2563EB; }
+body.light-theme .chip.active {
+  background: rgba(37,99,235,0.09);
+  border-color: #2563EB;
+  color: #2563EB;
+}
+body.light-theme .btn-gold { background: #2563EB; color: white; }
+body.light-theme .btn-teal { background: #0EA5A0; color: white; }
+body.light-theme .b-gold { background: rgba(37,99,235,0.09); color: #2563EB; border-color: rgba(37,99,235,0.2); }
+body.light-theme .hdr-badge {
+  background: rgba(37,99,235,0.09);
+  border-color: rgba(37,99,235,0.2);
+  color: #2563EB;
+}
+body.light-theme .settings-toggle.on { background: #2563EB; }
+body.light-theme #loadingScreen { background: #F2F5FB; }
+body.light-theme .loading-logo span { color: #2563EB; }
+body.light-theme .spinner { border-top-color: #2563EB; }
 body { transition: var(--trans); }
 
 /* ─── RESET ─── */
@@ -157,7 +208,7 @@ body.light-theme .nav{background:rgba(240,244,250,0.97)}
   border:1px solid rgba(240,165,0,0.2);
   padding:24px 20px;position:relative;overflow:hidden;
 }
-body.light-theme .balance-card{background:linear-gradient(135deg,#1a3060,#0d2040)}
+body.light-theme .balance-card{background:linear-gradient(135deg,#1D4ED8 0%,#2563EB 60%,#60A5FA 100%)}
 .balance-card::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(240,165,0,.14),transparent 70%)}
 .balance-card::after{content:'';position:absolute;bottom:-40px;left:-20px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(0,191,166,.09),transparent 70%)}
 .bc-label{font-size:11px;color:rgba(255,255,255,.5);margin-bottom:6px;font-weight:500;letter-spacing:1px}
@@ -228,6 +279,7 @@ body.light-theme .es-box{background:rgba(0,0,0,.04)}
 
 /* ─── PROFILE ─── */
 .profile-cover{width:100%;height:150px;position:relative;background:linear-gradient(135deg,#0D1F3C,#1A3060);cursor:pointer;overflow:hidden}
+body.light-theme .profile-cover{background:linear-gradient(135deg,#1D4ED8,#2563EB)}
 .profile-cover img{width:100%;height:100%;object-fit:cover}
 .cover-edit-btn{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);padding:7px 13px;border-radius:20px;font-size:12px;font-weight:600;color:rgba(255,255,255,.9);display:flex;align-items:center;gap:5px;cursor:pointer}
 .profile-avatar-wrap{padding:0 18px;margin-top:-44px;position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
